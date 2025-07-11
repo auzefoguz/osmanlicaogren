@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -12,10 +13,6 @@
     body {
       font-family: 'Roboto', sans-serif;
       background-color: #f8f9fa;
-    }
-    .profile-header {
-      text-align: center;
-      margin-bottom: 2rem;
     }
     .profile-avatar {
       width: 120px;
@@ -36,9 +33,6 @@
       font-size: 1rem;
       font-weight: bold;
     }
-    .progress {
-      height: 20px;
-    }
     .table thead {
       background-color: #e9ecef;
     }
@@ -56,91 +50,93 @@
       padding: 2px 4px;
       cursor: text;
     }
-  </style>
+    .social-icon {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: #0d6efd;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 9999;
+      animation: pulse 2s infinite;
+    }
+    .social-icon:hover {
+      transform: scale(1.2) rotate(-10deg);
+      background-color: #084298;
+    }
+    @media (max-width: 768px) {
+      .social-icon {
+        bottom: 60px;
+      }
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+    }
+  
+<style>
+.social-icon {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  z-index: 9999;
+  animation: pulse 2s infinite;
+}
+.social-icon:hover {
+  transform: scale(1.2) rotate(-10deg);
+  background-color: #084298;
+}
+@media (max-width: 768px) {
+  .social-icon {
+    bottom: 60px;
+  }
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+}
+</style>
+
+</style>
 </head>
 <body>
-  <div class="container py-5">
-    <div class="profile-header">
-      <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" alt="Profil Resmi" class="profile-avatar mb-3">
-      <div>
-        <span class="change-photo" onclick="document.getElementById('imageInput').click()">Profil Fotoğrafını Değiştir</span>
-        <input type="file" id="imageInput" accept="image/*">
-      </div>
-      <!-- DÜZENLENEBİLİR ALANLAR -->
-      <h3 id="userName" contenteditable="true">Kullanıcı Adı</h3>
-      <p id="userEmail" contenteditable="true" class="text-muted">eposta@example.com</p>
-      <span id="premiumBadge" class="badge badge-premium"><i class="bi bi-star-fill"></i> Premium Üye</span>
-      <div class="mt-2">
-        <span id="levelBadge" class="level-badge badge bg-primary">Seviye 1</span>
-      </div>
+  <div class="container py-5 text-center">
+    <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" alt="Profil Resmi" class="profile-avatar mb-3">
+    <div>
+      <span class="change-photo" onclick="document.getElementById('imageInput').click()">Profil Fotoğrafını Değiştir</span>
+      <input type="file" id="imageInput" accept="image/*">
+    </div>
+    <h3 id="userName" contenteditable="true">Kullanıcı Adı</h3>
+    <p id="userEmail" contenteditable="true" class="text-muted">eposta@example.com</p>
+    <span id="premiumBadge" class="badge badge-premium"><i class="bi bi-star-fill"></i> Premium Üye</span>
+    <div class="mt-2">
+      <span id="levelBadge" class="level-badge badge bg-primary">Seviye 1</span>
     </div>
 
-    <!-- İSTATİSTİKLER -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-4">
-        <div class="card shadow-sm stats-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Bilinen Kelime</h5>
-            <h2 id="kelimeSayisi" class="text-success">0</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm stats-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Çözülmüş Quiz</h5>
-            <h2 id="quizSayisi" class="text-info">0</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm stats-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Başarı Oranı</h5>
-            <h2 id="basariOrani" class="text-warning">0%</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- GRAFİK -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <h5 class="card-title d-flex justify-content-between align-items-center">
-          Günlük Çözüm Geçmişi
-          <select id="grafikFiltre" class="form-select form-select-sm w-auto">
-            <option value="7">Son 7 Gün</option>
-            <option value="14">Son 14 Gün</option>
-            <option value="30">Son 30 Gün</option>
-          </select>
-        </h5>
-        <canvas id="progressChart" height="100"></canvas>
-      </div>
-    </div>
-
-    <!-- SON QUIZLER -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Son Quizler</h5>
-        <table class="table table-hover">
-          <thead>
-            <tr><th>Tarih</th><th>Quiz Adı</th><th>Skor</th></tr>
-          </thead>
-          <tbody id="quizListesi"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ROZETLER -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Kazanılan Rozetler</h5>
-        <div id="rozetAlani" class="d-flex flex-wrap gap-2"></div>
-      </div>
-    </div>
-
-    <!-- GÜNÜN SÖZÜ -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm my-4">
       <div class="card-body">
         <h5 class="card-title">Günün Sözü</h5>
         <blockquote id="gununSozu" class="blockquote mb-0 text-start">
@@ -151,100 +147,36 @@
     </div>
   </div>
 
-  <script>
-    function grafikVerileri(gun) {
-      const bugun = new Date();
-      const etiketler = [];
-      const veriler = [];
-      for (let i = gun - 1; i >= 0; i--) {
-        const tarih = new Date(bugun);
-        tarih.setDate(bugun.getDate() - i);
-        etiketler.push(`${tarih.getDate()} ${tarih.toLocaleString("tr-TR", { month: "short" })}`);
-        veriler.push(Math.floor(Math.random() * 7));
-      }
-      return { etiketler, veriler };
-    }
+  <a href="index.html" id="geriButon" class="social-icon" data-bs-toggle="tooltip" title="Ana Sayfaya Dön">
+    <i class="bi bi-house-door-fill"></i>
+  </a>
+  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
 
-    // localStorage kullanıcı bilgisi
+  <script>
     const kullanici = JSON.parse(localStorage.getItem("kullaniciBilgileri")) || {
       ad: "Ahmet Yılmaz",
       email: "ahmet@example.com",
-      kelime: 275,
-      quiz: 42,
-      basariOrani: 89,
       seviye: 3,
       premium: true,
-      profilResmi: "https://via.placeholder.com/120",
-      rozetler: ["ilk50", "10quiz", "aktif"],
-      quizler: [
-        { tarih: "10 Temmuz", ad: "1. Kur Testi", skor: "85%" },
-        { tarih: "8 Temmuz", ad: "Rika Hattı", skor: "90%" },
-        { tarih: "5 Temmuz", ad: "Mezar Taşları", skor: "100%" }
-      ]
+      profilResmi: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
     };
 
-    // Sayfaya bilgileri yaz
     document.getElementById("userName").textContent = kullanici.ad;
     document.getElementById("userEmail").textContent = kullanici.email;
     document.getElementById("profileImage").src = kullanici.profilResmi;
     document.getElementById("levelBadge").textContent = `Seviye ${kullanici.seviye}`;
-    document.getElementById("kelimeSayisi").textContent = kullanici.kelime;
-    document.getElementById("quizSayisi").textContent = kullanici.quiz;
-    document.getElementById("basariOrani").textContent = `${kullanici.basariOrani}%`;
     if (!kullanici.premium) document.getElementById("premiumBadge").style.display = "none";
 
-    // Quiz tablosu
-    const quizBody = document.getElementById("quizListesi");
-    kullanici.quizler.forEach(q => {
-      quizBody.innerHTML += `<tr><td>${q.tarih}</td><td>${q.ad}</td><td>${q.skor}</td></tr>`;
+    document.getElementById("userName").addEventListener("input", function () {
+      kullanici.ad = this.textContent;
+      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
     });
 
-    // Rozetler
-    const badgeMap = {
-      "ilk50": `<span class="badge bg-success"><i class="bi bi-book"></i> İlk 50 Kelime</span>`,
-      "10quiz": `<span class="badge bg-info"><i class="bi bi-clipboard-check"></i> 10 Quiz Tamamlandı</span>`,
-      "aktif": `<span class="badge bg-warning text-dark"><i class="bi bi-lightning-charge"></i> Aktif Öğrenci</span>`
-    };
-    const rozetAlani = document.getElementById("rozetAlani");
-    kullanici.rozetler.forEach(r => {
-      if (badgeMap[r]) rozetAlani.innerHTML += badgeMap[r];
+    document.getElementById("userEmail").addEventListener("input", function () {
+      kullanici.email = this.textContent;
+      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
     });
 
-    // Grafik
-    let baslangicVeri = grafikVerileri(7);
-    const ctx = document.getElementById('progressChart').getContext('2d');
-    const quizChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: baslangicVeri.etiketler,
-        datasets: [{
-          label: 'Çözülen Quiz Sayısı',
-          data: baslangicVeri.veriler,
-          borderColor: '#0d6efd',
-          backgroundColor: 'rgba(13, 110, 253, 0.2)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-
-    document.getElementById("grafikFiltre").addEventListener("change", function () {
-      const gun = parseInt(this.value);
-      const yeniVeri = grafikVerileri(gun);
-      quizChart.data.labels = yeniVeri.etiketler;
-      quizChart.data.datasets[0].data = yeniVeri.veriler;
-      quizChart.update();
-    });
-
-    // PROFİL RESMİ DEĞİŞTİR
     document.getElementById("imageInput").addEventListener("change", function (event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -257,18 +189,6 @@
       reader.readAsDataURL(file);
     });
 
-    // AD VE EMAİL DÜZENLEME VE KAYDETME
-    document.getElementById("userName").addEventListener("input", function () {
-      kullanici.ad = this.textContent;
-      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
-    });
-
-    document.getElementById("userEmail").addEventListener("input", function () {
-      kullanici.email = this.textContent;
-      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
-    });
-
-    // GÜNÜN SÖZÜ
     const osmanlicaSozler = [
       { metin: "İlim Çin’de dahi olsa gidip alınız.", yazar: "Hz. Muhammed (s.a.v)" },
       { metin: "Marifet iltifata tabidir.", yazar: "Şeyh Edebali" },
@@ -277,14 +197,18 @@
       { metin: "Adalet mülkün temelidir.", yazar: "Hz. Ömer (r.a.)" }
     ];
     const rastgele = osmanlicaSozler[Math.floor(Math.random() * osmanlicaSozler.length)];
-    document.getElementById("gununSozu").innerHTML = `
-      <p>${rastgele.metin}</p>
-      <footer class="blockquote-footer">${rastgele.yazar}</footer>
-    `;
+    document.getElementById("gununSozu").innerHTML = `<p>${rastgele.metin}</p><footer class="blockquote-footer">${rastgele.yazar}</footer>`;
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    const geriButon = document.getElementById("geriButon");
+    const clickSound = document.getElementById("clickSound");
+    geriButon.addEventListener("click", function () {
+      clickSound.play();
+    });
   </script>
-  <a href="index.html" class="btn btn-primary rounded-pill shadow-lg d-flex align-items-center justify-content-center gap-2" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 12px 20px; font-weight: bold;">
-  <i class="bi bi-arrow-left-circle-fill"></i>
-  Anasayfa
-</a>
 </body>
 </html>
