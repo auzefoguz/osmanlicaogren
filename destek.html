@@ -120,18 +120,17 @@
 <!-- Email Bülteni Kaydı -->
 <div class="col-lg-5 d-flex flex-column align-items-center justify-content-center">
 <div class="w-100">
-<h5 class="mb-3">Gelişmelerden Haberdar Olun</h5>
-<form action="https://YOUR_MAILCHIMP_OR_NEWSLETTER_URL" class="row g-2 align-items-center" method="post" target="_blank">
-<div class="col-12">
-<input class="form-control" name="EMAIL" placeholder="E-posta adresiniz" required="" type="email"/>
-</div>
-<div class="col-12">
-<button class="btn btn-primary w-100" type="submit">Abone Ol</button>
-</div>
-</form>
-<div class="form-text mt-2 text-center">
-          Sadece önemli güncellemeler ve haberler için e-posta gönderilecektir.
-        </div>
+<!-- MailerLite Embed -->
+<div class="ml-embedded" data-form="UxSYTU"></div>
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '1657430');
+</script>
+<!-- End MailerLite -->
 </div>
 </div>
 </div>
@@ -322,19 +321,157 @@
 <section class="container my-5">
 <h3 class="fw-bold mb-4">Destek Talep Formu</h3>
 <form id="support-form">
-<input class="form-control mb-2" id="name" name="name" placeholder="Adınız" required="" type="text"/>
-<input class="form-control mb-2" id="email" name="osmanlicaogren" placeholder="E-posta adresiniz" required="" type="email"/>
-<textarea class="form-control mb-2" id="message" name="message" placeholder="Mesajınız" required="" rows="4"></textarea>
-<button class="btn btn-primary" type="submit">Gönder</button>
+<input name="name" required="" type="text"/>
+<input name="osmanlicaogren" required="" type="email"/>
+<textarea name="message" required=""></textarea>
+<button type="submit">Gönder</button>
 </form>
-<div class="mt-3" id="form-result"></div>
+<script>
+    document.getElementById('support-form').onsubmit = function(e) {
+      e.preventDefault();
+      // Basit demo için
+      document.getElementById('form-result').textContent = 'Mesajınız başarıyla gönderildi. Teşekkürler!';
+      this.reset();
+    };
+  </script>
 </section>
+<!-- Sıkça Sorulan Sorular (SSS) -->
+<section class="container my-5">
+<h3 class="fw-bold mb-4">Sıkça Sorulan Sorular</h3>
+<div class="accordion" id="faqAccordion">
+<div class="accordion-item">
+<h2 class="accordion-header" id="faq1-header">
+<button aria-controls="faq1" aria-expanded="true" class="accordion-button" data-bs-target="#faq1" data-bs-toggle="collapse" type="button">
+          Proje açık kaynak mı?
+        </button>
+</h2>
+<div aria-labelledby="faq1-header" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion" id="faq1">
+<div class="accordion-body">
+          Evet, Osmanlıca Öğren tamamen açık kaynak! Katkı için GitHub sayfamıza göz atabilirsiniz.
+        </div>
+</div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header" id="faq2-header">
+<button aria-controls="faq2" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#faq2" data-bs-toggle="collapse" type="button">
+          Nasıl destek alabilirim?
+        </button>
+</h2>
+<div aria-labelledby="faq2-header" class="accordion-collapse collapse" data-bs-parent="#faqAccordion" id="faq2">
+<div class="accordion-body">
+          Destek formunu doldurabilir ya da <a href="mailto:ozzasci@gmail.com">ozzasci@gmail.com</a> adresine e-posta gönderebilirsiniz.
+        </div>
+</div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header" id="faq3-header">
+<button aria-controls="faq3" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#faq3" data-bs-toggle="collapse" type="button">
+          Katkıda bulununca bana ne avantaj sağlanır?
+        </button>
+</h2>
+<div aria-labelledby="faq3-header" class="accordion-collapse collapse" data-bs-parent="#faqAccordion" id="faq3">
+<div class="accordion-body">
+          Katkıda bulunanlara özel rozet ve teşekkür belgesi sunulmaktadır. Ayrıca adınız GitHub sayfamızda listelenir.
+        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- ... sonraki kısımlar ... -->
+<!-- Küçük Sosyal Medya ve Bağış Çubuğu (Sağ Altta) -->
+<div class="social-media-bar">
+<!-- WhatsApp -->
+<a class="social-btn btn btn-success" data-bs-toggle="tooltip" href="https://wa.me/905309082276" title="WhatsApp">
+<i class="bi bi-whatsapp"></i>
+</a>
+<!-- Telegram -->
+<a class="social-btn btn btn-primary" data-bs-toggle="tooltip" href="https://t.me/Ozzasci" title="Telegram">
+<i class="bi bi-telegram"></i>
+</a>
+<!-- E-mail -->
+<a class="social-btn btn btn-danger" data-bs-toggle="tooltip" href="mailto:ozzasci@gmal.com" title="E-mail">
+<i class="bi bi-envelope-fill"></i>
+</a>
+<!-- Bağış Butonu -->
+<a class="social-btn btn donate-btn" data-bs-toggle="tooltip" href="#donate" title="Bağış Yap">
+<i class="bi bi-gift-fill"></i>
+</a>
+</div>
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+<div class="container">
+<div class="row">
+<div class="col-md-6">
+<h5><i class="bi bi-heart-fill text-danger"></i> Teşekkürler</h5>
+<p>Her katkınız projemizi daha iyi hale getiriyor.</p>
+</div>
+<div class="col-md-6 text-md-end">
+<p class="mb-0">© 2025 Osmanlıca Öğren | Tüm Hakları Saklıdır.</p>
+</div>
+</div>
+</div>
+</footer>
+<!-- Ana Sayfaya Dön Butonu -->
+<div class="position-fixed bottom-0 start-0 m-4">
+<a class="btn btn-primary btn-lg rounded-circle shadow" data-bs-toggle="tooltip" href="index.html" title="Ana Sayfaya Dön">
+<i class="bi bi-house-door-fill fs-4"></i>
+</a>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Tooltip aktivasyonu
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    // IBAN kopyalama işlevi
+    document.querySelectorAll('.copy-iban').forEach(button => {
+      button.addEventListener('click', function() {
+        const iban = this.getAttribute('data-iban')
+        navigator.clipboard.writeText(iban)
+          .then(() => {
+            const originalIcon = this.innerHTML
+            this.innerHTML = '<i class="bi bi-check"></i>'
+            setTimeout(() => {
+              this.innerHTML = originalIcon
+            }, 2000)
+          })
+      })
+    })
+  </script>
 <!-- EmailJS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  emailjs.init("8BdNp7u1PufddSEM8");
+  emailjs.init("8BdNp7u1PufddSEM8"); // Public key
+
+  document.getElementById("support-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = {
+      from_name: document.getElementById("name").value,
+      from_email: document.getElementById("email").value,
+      message: document.getElementById("message").value,
+    };
+
+    emailjs.sendForm("service_1avrv0q", "template_pc99ct6", "#support-form")
+      .then(() => {
+        document.getElementById("form-result").textContent = "Mesajınız başarıyla gönderildi. Teşekkürler!";
+        document.getElementById("form-result").classList.add("text-success");
+        document.getElementById("support-form").reset();
+      })
+      .catch((error) => {
+        document.getElementById("form-result").textContent = "Bir hata oluştu. Lütfen tekrar deneyin.";
+        document.getElementById("form-result").classList.add("text-danger");
+        console.error("EmailJS Hatası:", error);
+      });
+  });
+</script>
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("8BdNp7u1PufddSEM8"); // Public key
 
   document.getElementById("support-form").addEventListener("submit", function (e) {
     e.preventDefault();
@@ -360,6 +497,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("EmailJS Hatası:", error);
       });
   });
-});
-</script></body>
+</script>
+</body>
 </html>
+
