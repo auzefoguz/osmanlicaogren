@@ -480,5 +480,34 @@
       })
     })
   </script>
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("8BdNp7u1PufddSEM8"); // Public key
+
+  document.getElementById("support-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = {
+      from_name: document.getElementById("name").value,
+      from_email: document.getElementById("email").value,
+      message: document.getElementById("message").value,
+    };
+
+    emailjs.send("service_1avrv0q", "template_pc99ct6", formData)
+      .then(() => {
+        document.getElementById("form-result").textContent = "Mesajınız başarıyla gönderildi. Teşekkürler!";
+        document.getElementById("form-result").classList.add("text-success");
+        document.getElementById("support-form").reset();
+      })
+      .catch((error) => {
+        document.getElementById("form-result").textContent = "Bir hata oluştu. Lütfen tekrar deneyin.";
+        document.getElementById("form-result").classList.add("text-danger");
+        console.error("EmailJS Hatası:", error);
+      });
+  });
+</script>
+
 </body>
 </html>
