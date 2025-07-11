@@ -333,15 +333,15 @@
   <form id="support-form" class="row g-3" autocomplete="off">
     <div class="col-md-6">
       <label for="name" class="form-label">Adınız</label>
-      <input type="text" class="form-control" id="name" required maxlength="40">
+      <input type="text" class="form-control" id="name" required maxlength="40" name="name">
     </div>
     <div class="col-md-6">
       <label for="email" class="form-label">E-posta</label>
-      <input type="email" class="form-control" id="email" required maxlength="60">
+      <input type="email" class="form-control" id="email" required maxlength="60" name="osmanlicaogren">
     </div>
     <div class="col-12">
       <label for="message" class="form-label">Mesajınız</label>
-      <textarea class="form-control" id="message" rows="3" required maxlength="500"></textarea>
+      <textarea class="form-control" id="message" rows="3" required maxlength="500" name="message"></textarea>
     </div>
     <div class="col-12">
       <button type="submit" class="btn btn-primary">Gönder</button>
@@ -509,5 +509,38 @@
   });
 </script>
 
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("8BdNp7u1PufddSEM8"); // Public key
+
+  document.getElementById("support-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const templateParams = {
+      name: document.getElementById("name").value,
+      osmanlicaogren: document.getElementById("email").value,
+      message: document.getElementById("message").value,
+      time: new Date().toLocaleString("tr-TR"),
+    };
+
+    emailjs.send("service_1avrv0q", "template_pc99ct6", templateParams)
+      .then(() => {
+        document.getElementById("form-result").textContent = "Mesajınız başarıyla gönderildi. Teşekkürler!";
+        document.getElementById("form-result").classList.remove("text-danger");
+        document.getElementById("form-result").classList.add("text-success");
+        document.getElementById("support-form").reset();
+      })
+      .catch((error) => {
+        document.getElementById("form-result").textContent = "Bir hata oluştu. Lütfen tekrar deneyin.";
+        document.getElementById("form-result").classList.remove("text-success");
+        document.getElementById("form-result").classList.add("text-danger");
+        console.error("EmailJS Hatası:", error);
+      });
+  });
+</script>
+
 </body>
 </html>
+
