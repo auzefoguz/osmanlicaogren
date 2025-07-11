@@ -51,24 +51,31 @@
       text-decoration: underline;
       font-size: 0.9rem;
     }
+    [contenteditable] {
+      border-bottom: 1px dashed #ccc;
+      padding: 2px 4px;
+      cursor: text;
+    }
   </style>
 </head>
 <body>
   <div class="container py-5">
     <div class="profile-header">
-     <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" alt="Profil Resmi" class="profile-avatar mb-3">
+      <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" alt="Profil Resmi" class="profile-avatar mb-3">
       <div>
         <span class="change-photo" onclick="document.getElementById('imageInput').click()">Profil Fotoğrafını Değiştir</span>
         <input type="file" id="imageInput" accept="image/*">
       </div>
-      <h3 id="userName">Kullanıcı Adı</h3>
-      <p id="userEmail" class="text-muted">eposta@example.com</p>
+      <!-- DÜZENLENEBİLİR ALANLAR -->
+      <h3 id="userName" contenteditable="true">Kullanıcı Adı</h3>
+      <p id="userEmail" contenteditable="true" class="text-muted">eposta@example.com</p>
       <span id="premiumBadge" class="badge badge-premium"><i class="bi bi-star-fill"></i> Premium Üye</span>
       <div class="mt-2">
         <span id="levelBadge" class="level-badge badge bg-primary">Seviye 1</span>
       </div>
     </div>
 
+    <!-- İSTATİSTİKLER -->
     <div class="row g-4 mb-4">
       <div class="col-md-4">
         <div class="card shadow-sm stats-card">
@@ -96,6 +103,7 @@
       </div>
     </div>
 
+    <!-- GRAFİK -->
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <h5 class="card-title d-flex justify-content-between align-items-center">
@@ -110,6 +118,7 @@
       </div>
     </div>
 
+    <!-- SON QUIZLER -->
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <h5 class="card-title">Son Quizler</h5>
@@ -122,10 +131,22 @@
       </div>
     </div>
 
+    <!-- ROZETLER -->
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <h5 class="card-title">Kazanılan Rozetler</h5>
         <div id="rozetAlani" class="d-flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+
+    <!-- GÜNÜN SÖZÜ -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Günün Sözü</h5>
+        <blockquote id="gununSozu" class="blockquote mb-0 text-start">
+          <p>Yükleniyor...</p>
+          <footer class="blockquote-footer">Kaynak Bekleniyor</footer>
+        </blockquote>
       </div>
     </div>
   </div>
@@ -144,6 +165,7 @@
       return { etiketler, veriler };
     }
 
+    // localStorage kullanıcı bilgisi
     const kullanici = JSON.parse(localStorage.getItem("kullaniciBilgileri")) || {
       ad: "Ahmet Yılmaz",
       email: "ahmet@example.com",
@@ -151,10 +173,8 @@
       quiz: 42,
       basariOrani: 89,
       seviye: 3,
-      ilerleme: 75,
       premium: true,
       profilResmi: "https://via.placeholder.com/120",
-      grafik: [2, 3, 4, 2, 5, 6],
       rozetler: ["ilk50", "10quiz", "aktif"],
       quizler: [
         { tarih: "10 Temmuz", ad: "1. Kur Testi", skor: "85%" },
@@ -163,6 +183,7 @@
       ]
     };
 
+    // Sayfaya bilgileri yaz
     document.getElementById("userName").textContent = kullanici.ad;
     document.getElementById("userEmail").textContent = kullanici.email;
     document.getElementById("profileImage").src = kullanici.profilResmi;
@@ -172,11 +193,13 @@
     document.getElementById("basariOrani").textContent = `${kullanici.basariOrani}%`;
     if (!kullanici.premium) document.getElementById("premiumBadge").style.display = "none";
 
+    // Quiz tablosu
     const quizBody = document.getElementById("quizListesi");
     kullanici.quizler.forEach(q => {
       quizBody.innerHTML += `<tr><td>${q.tarih}</td><td>${q.ad}</td><td>${q.skor}</td></tr>`;
     });
 
+    // Rozetler
     const badgeMap = {
       "ilk50": `<span class="badge bg-success"><i class="bi bi-book"></i> İlk 50 Kelime</span>`,
       "10quiz": `<span class="badge bg-info"><i class="bi bi-clipboard-check"></i> 10 Quiz Tamamlandı</span>`,
@@ -187,6 +210,7 @@
       if (badgeMap[r]) rozetAlani.innerHTML += badgeMap[r];
     });
 
+    // Grafik
     let baslangicVeri = grafikVerileri(7);
     const ctx = document.getElementById('progressChart').getContext('2d');
     const quizChart = new Chart(ctx, {
@@ -220,6 +244,7 @@
       quizChart.update();
     });
 
+    // PROFİL RESMİ DEĞİŞTİR
     document.getElementById("imageInput").addEventListener("change", function (event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -231,6 +256,31 @@
       };
       reader.readAsDataURL(file);
     });
+
+    // AD VE EMAİL DÜZENLEME VE KAYDETME
+    document.getElementById("userName").addEventListener("input", function () {
+      kullanici.ad = this.textContent;
+      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
+    });
+
+    document.getElementById("userEmail").addEventListener("input", function () {
+      kullanici.email = this.textContent;
+      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
+    });
+
+    // GÜNÜN SÖZÜ
+    const osmanlicaSozler = [
+      { metin: "İlim Çin’de dahi olsa gidip alınız.", yazar: "Hz. Muhammed (s.a.v)" },
+      { metin: "Marifet iltifata tabidir.", yazar: "Şeyh Edebali" },
+      { metin: "Söz gümüşse sükût altındır.", yazar: "Osmanlı Atasözü" },
+      { metin: "Kalpten çıkan söz kalbe gider.", yazar: "Mevlana" },
+      { metin: "Adalet mülkün temelidir.", yazar: "Hz. Ömer (r.a.)" }
+    ];
+    const rastgele = osmanlicaSozler[Math.floor(Math.random() * osmanlicaSozler.length)];
+    document.getElementById("gununSozu").innerHTML = `
+      <p>${rastgele.metin}</p>
+      <footer class="blockquote-footer">${rastgele.yazar}</footer>
+    `;
   </script>
 </body>
 </html>
