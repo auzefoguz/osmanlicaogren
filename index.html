@@ -378,9 +378,13 @@ firebase.auth().onAuthStateChanged(user => {
         gosterKelime(0);
       } else {
         console.log("Henüz bir kelime listesi bulunamadı.");
+          renderTable(); // boş da olsa tabloyu göster
       }
     })
-    .catch(err => console.error("Firebase veri hatası:", err));
+     .catch(err => {
+      console.error("Firebase veri hatası:", err);
+      renderTable(); // hata olsa bile boş tablo göster
+    });
 });
 
 // Firebase'e liste kaydet
@@ -402,6 +406,7 @@ function listeyiFirebaseeKaydet() {
 // Tabloyu oluştur
 function renderTable(page = 1) {
   const tbody = document.getElementById("wordListTableBody");
+  if (!tbody) return;
   tbody.innerHTML = "";
   const start = (page - 1) * rowsPerPage;
   const rows = filteredArray.slice(start, start + rowsPerPage);
@@ -421,6 +426,7 @@ function renderTable(page = 1) {
 function renderPagination() {
   const totalPages = Math.ceil(filteredArray.length / rowsPerPage);
   const container = document.getElementById("paginationControls");
+  if (!container) return;
   container.innerHTML = "";
   for (let i = 1; i <= totalPages; i++) {
     const btn = document.createElement("button");
@@ -462,15 +468,14 @@ function gosterKelime(index) {
 }
 
 // Kart butonları
-["oncekiKelimeBtn", "sonrakiKelimeBtn", "rastgeleKelimeBtn"].forEach(id => {
-  document.getElementById(id)?.addEventListener("click", () => {
-    if (!kelimelerArray.length) return;
-    if (id === "oncekiKelimeBtn" && aktifKelimeIndex > 0) aktifKelimeIndex--;
-    else if (id === "sonrakiKelimeBtn" && aktifKelimeIndex < kelimelerArray.length - 1) aktifKelimeIndex++;
-    else if (id === "rastgeleKelimeBtn") aktifKelimeIndex = Math.floor(Math.random() * kelimelerArray.length);
-    gosterKelime(aktifKelimeIndex);
-  });
+typeButton = id => document.getElementById(id)?.addEventListener("click", () => {
+  if (!kelimelerArray.length) return;
+  if (id === "oncekiKelimeBtn" && aktifKelimeIndex > 0) aktifKelimeIndex--;
+  else if (id === "sonrakiKelimeBtn" && aktifKelimeIndex < kelimelerArray.length - 1) aktifKelimeIndex++;
+  else if (id === "rastgeleKelimeBtn") aktifKelimeIndex = Math.floor(Math.random() * kelimelerArray.length);
+  gosterKelime(aktifKelimeIndex);
 });
+["oncekiKelimeBtn", "sonrakiKelimeBtn", "rastgeleKelimeBtn"].forEach(typeButton);
 
 // JSON yükleme fonksiyonu
 function jsonYuklendi(data) {
@@ -500,6 +505,11 @@ fileInput?.addEventListener("change", e => {
     fileInput.value = "";
   };
   reader.readAsText(file);
+});
+
+// Sayfa yüklendiğinde boş tabloyu göster
+window.addEventListener("DOMContentLoaded", () => {
+  renderTable();
 });
 
 
