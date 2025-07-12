@@ -353,103 +353,92 @@ document.getElementById("playAudioBtn").addEventListener("click", function () {
         })
     </script>
 <script>
-  let kelimelerArray = [];
-  let filteredArray = [];
-  let currentPage = 1;
-  const rowsPerPage = 10;
-  let aktifKelimeIndex = 0;
+// Kelime dizileri
+let kelimelerArray = [];
+let filteredArray = [];
+let currentPage = 1;
+const rowsPerPage = 10;
+let aktifKelimeIndex = 0;
 
-  // Firebase hazır olduğunda kullanıcının listesini çek
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-      const uid = user.uid;
-      const db = firebase.firestore();
-
-      db.collection("kullanicilar")
-        .doc(uid)
-        .collection("kelimeListeleri")
-        .doc("default")
-        .get()
-        .then(doc => {
-          if (doc.exists) {
-            kelimelerArray = doc.data().liste || [];
-            filteredArray = [...kelimelerArray];
-            currentPage = 1;
-            renderTable();
-            gosterKelime(0);
-            console.log("Firebase'den kelime listesi yüklendi.");
-          } else {
-            console.log("Henüz bir kelime listesi bulunamadı.");
-          }
-        })
-        .catch(error => {
-          console.error("Firebase'den veri okunamadı:", error);
-        });
-    }
-  });
-
-  function listeyiFirebaseeKaydet() {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-      alert("Lütfen önce giriş yapın.");
-      return;
-    }
-
-    const db = firebase.firestore();
-
-    db.collection("kullanicilar")
-      .doc(user.uid)
-      .collection("kelimeListeleri")
-      .doc("default")
-      .set({ liste: kelimelerArray })
-      .then(() => alert("Kelime listesi Firebase'e kaydedildi."))
-      .catch(err => console.error("Firebase'e kayıt hatası:", err));
-  }
-
-  function gosterKelime(index) {
-    if (!kelimelerArray.length) return;
-    const kelime = kelimelerArray[index];
-    document.getElementById("osmanlicaKelime").innerText = kelime.word || "-";
-    document.getElementById("transliteration").innerText = kelime.transliteration || "-";
-    const ekAnlam = kelime.additional_meanings?.length
-      ? ` (${kelime.additional_meanings.join(", ")})`
-      : "";
-    document.getElementById("meaning").innerText = (kelime.meaning || "-") + ekAnlam;
-    document.querySelector(".counter-text").innerText = `${index + 1}/${kelimelerArray.length}`;
-  }
-
-  // JSON dosyası yüklendiğinde
-  document.getElementById("jsonFileInput").addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      try {
-        const data = JSON.parse(event.target.result);
-        if (!Array.isArray(data)) throw new Error("Geçersiz JSON formatı");
-
-        kelimelerArray = data;
+// Firebase'den listeyi yükle
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) return;
+  const uid = user.uid;
+  db.collection("kullanicilar")
+    .doc(uid)
+    .collection("kelimeListeleri")
+    .doc("default")
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        kelimelerArray = doc.data().liste || [];
         filteredArray = [...kelimelerArray];
         currentPage = 1;
         renderTable();
         gosterKelime(0);
-        listeyiFirebaseeKaydet();
-
-        alert("Kelime listesi başarıyla yüklendi!");
-      } catch (err) {
-        alert("JSON dosyası okunamadı veya geçersiz format.");
-        console.error(err);
+      } else {
+        console.log("Henüz bir kelime listesi bulunamadı.");
       }
+    })
+    .catch(err => console.error("Firebase veri hatası:", err));
+});
 
-      document.getElementById("jsonFileInput").value = "";
-    };
-    reader.readAsText(file);
+// Firebase'e liste kaydet
+function listeyiFirebaseeKaydet() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Lütfen önce giriş yapın.");
+    return;
+  }
+  db.collection("kullanicilar")
+    .doc(user.uid)
+    .collection("kelimeListeleri")
+    .doc("default")
+    .set({ liste: kelimelerArray })
+    .then(() => console.log("Firebase'e kaydedildi."))
+    .catch(err => console.error("Firebase kayıt hatası:", err));
+}
+
+// Tabloyu oluştur
+function renderTable(page = 1) {
+  const tbody = document.getElementById("wordListTableBody");
+  tbody.innerHTML = "";
+  const start = (page - 1) * rowsPerPage;
+  const rows = filteredArray.slice(start, start + rowsPerPage);
+  rows.forEach(item => {
+    const ekAnlamlar = item.additional_meanings?.length ? `<br><small class="text-muted">(${item.additional_meanings.join(", ")})</small>` : "";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="osmanlica-font">${item.word || "-"}</td>
+      <td>${item.transliteration || "-"}</td>
+      <td>${item.meaning || "-"}${ekAnlamlar}</td>`;
+    tbody.appendChild(tr);
   });
+  renderPagination();
+}
 
-  // Arama kutusu
-  document.getElementById("searchInTable").addEventListener("input", function () {
-    const query = this.value.toLowerCase();
+// Sayfalama
+function renderPagination() {
+  const totalPages = Math.ceil(filteredArray.length / rowsPerPage);
+  const container = document.getElementById("paginationControls");
+  container.innerHTML = "";
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    btn.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'}`;
+    btn.onclick = () => {
+      currentPage = i;
+      renderTable(i);
+    };
+    container.appendChild(btn);
+  }
+}
+
+// Arama
+const searchInput = document.getElementById("searchInTable");
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
     filteredArray = kelimelerArray.filter(item =>
       (item.word || "").toLowerCase().includes(query) ||
       (item.transliteration || "").toLowerCase().includes(query) ||
@@ -459,128 +448,60 @@ document.getElementById("playAudioBtn").addEventListener("click", function () {
     currentPage = 1;
     renderTable();
   });
+}
 
-  // Tabloyu oluştur
-  function renderTable(page = 1) {
-    const tbody = document.getElementById("wordListTableBody");
-    tbody.innerHTML = "";
+// Kelime kartı göster
+function gosterKelime(index) {
+  if (!kelimelerArray.length) return;
+  const kelime = kelimelerArray[index];
+  document.getElementById("osmanlicaKelime").innerText = kelime.word || "-";
+  document.getElementById("transliteration").innerText = kelime.transliteration || "-";
+  const ekAnlam = kelime.additional_meanings?.length ? ` (${kelime.additional_meanings.join(", ")})` : "";
+  document.getElementById("meaning").innerText = (kelime.meaning || "-") + ekAnlam;
+  document.querySelector(".counter-text").innerText = `${index + 1}/${kelimelerArray.length}`;
+}
 
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const rows = filteredArray.slice(start, end);
-
-    rows.forEach(item => {
-      const tr = document.createElement("tr");
-
-      const ekAnlamlar = Array.isArray(item.additional_meanings) && item.additional_meanings.length > 0
-        ? `<br><small class="text-muted">(${item.additional_meanings.join(", ")})</small>`
-        : "";
-
-      tr.innerHTML = `
-        <td class="osmanlica-font">${item.word || "-"}</td>
-        <td>${item.transliteration || "-"}</td>
-        <td>${item.meaning || "-"}${ekAnlamlar}</td>
-      `;
-
-      tbody.appendChild(tr);
-    });
-
-    renderPagination();
-  }
-
-  // Sayfa düğmeleri
-  function renderPagination() {
-    const totalPages = Math.ceil(filteredArray.length / rowsPerPage);
-    const pagination = document.getElementById("paginationControls");
-    pagination.innerHTML = "";
-
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'}`;
-      btn.onclick = () => {
-        currentPage = i;
-        renderTable(i);
-      };
-      pagination.appendChild(btn);
-    }
-  }
-
-  // Butonlar
-  document.getElementById("oncekiKelimeBtn").addEventListener("click", function () {
-    if (aktifKelimeIndex > 0) {
-      aktifKelimeIndex--;
-      gosterKelime(aktifKelimeIndex);
-    } else {
-      alert("İlk kelimedesiniz.");
-    }
-  });
-
-  document.getElementById("sonrakiKelimeBtn").addEventListener("click", function () {
-    if (aktifKelimeIndex < kelimelerArray.length - 1) {
-      aktifKelimeIndex++;
-      gosterKelime(aktifKelimeIndex);
-    } else {
-      alert("Son kelimeye ulaştınız.");
-    }
-  });
-
-  document.getElementById("rastgeleKelimeBtn").addEventListener("click", function () {
+// Kart butonları
+["oncekiKelimeBtn", "sonrakiKelimeBtn", "rastgeleKelimeBtn"].forEach(id => {
+  document.getElementById(id)?.addEventListener("click", () => {
     if (!kelimelerArray.length) return;
-    aktifKelimeIndex = Math.floor(Math.random() * kelimelerArray.length);
+    if (id === "oncekiKelimeBtn" && aktifKelimeIndex > 0) aktifKelimeIndex--;
+    else if (id === "sonrakiKelimeBtn" && aktifKelimeIndex < kelimelerArray.length - 1) aktifKelimeIndex++;
+    else if (id === "rastgeleKelimeBtn") aktifKelimeIndex = Math.floor(Math.random() * kelimelerArray.length);
     gosterKelime(aktifKelimeIndex);
   });
-</script>
+});
 
+// JSON yükleme fonksiyonu
+function jsonYuklendi(data) {
+  kelimelerArray = data;
+  filteredArray = [...kelimelerArray];
+  currentPage = 1;
+  renderTable();
+  gosterKelime(0);
+  listeyiFirebaseeKaydet();
+}
 
-<script>
-  // Firestore bağlantısını yap
-
-  // Oturum açınca verileri çek
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-      const uid = user.uid;
-
-      db.collection("kullanicilar")
-        .doc(uid)
-        .collection("kelimeListeleri")
-        .doc("default")
-        .get()
-        .then(doc => {
-          if (doc.exists) {
-            kelimelerArray = doc.data().liste || [];
-            filteredArray = [...kelimelerArray];
-            currentPage = 1;
-            renderTable();
-            console.log("Firebase'den kelime listesi yüklendi.");
-          } else {
-            console.log("Henüz bir kelime listesi bulunamadı.");
-          }
-        })
-        .catch(error => {
-          console.error("Firebase'den veri okunamadı:", error);
-        });
+// Giriş yaptıktan sonra dosya yüklenince çağrılır
+const fileInput = document.getElementById("jsonFileInput");
+fileInput?.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = event => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (!Array.isArray(data)) throw new Error("Geçersiz format");
+      jsonYuklendi(data);
+    } catch (err) {
+      alert("Geçersiz JSON formatı.");
+      console.error(err);
     }
-  });
+    fileInput.value = "";
+  };
+  reader.readAsText(file);
+});
 
-  // Firebase'e listeyi kaydetme fonksiyonu
-  function listeyiFirebaseeKaydet() {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-      alert("Lütfen önce giriş yapın.");
-      return;
-    }
-
-    db.collection("kullanicilar")
-      .doc(user.uid)
-      .collection("kelimeListeleri")
-      .doc("default")
-      .set({ liste: kelimelerArray })
-      .then(() => alert("Kelime listesi Firebase'e kaydedildi."))
-      .catch(err => console.error("Firebase'e kayıt hatası:", err));
-  }
-</script>
-        <script src="firebase-kelime-liste.js"></script>
 
 </body>
 </html>
