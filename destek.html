@@ -184,6 +184,25 @@
     </ul>
   </section>
 
+  <!-- İstatistikler Bölümü -->
+  <section class="container my-5" id="stats">
+    <h3 class="fw-bold mb-4 text-center">Proje İstatistikleri</h3>
+    <div class="row justify-content-center text-center">
+      <div class="col-6 col-md-3 mb-3">
+        <div class="card p-4 contribution-card">
+          <h5>Abone Sayısı</h5>
+          <div id="subscriber-count" class="display-6 text-primary">Yükleniyor...</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 mb-3">
+        <div class="card p-4 contribution-card">
+          <h5>Gönderilen Formlar</h5>
+          <div id="form-sent-count" class="display-6 text-success">0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- MailerLite Abone Formu -->
   <section class="container my-5" id="subscribe">
     <h3 class="fw-bold mb-4 text-center">E-posta Listemize Abone Olun</h3>
@@ -336,45 +355,70 @@
         <p>Her katkınız projemizi daha iyi hale getiriyor.</p>
       </div>
       <div>
-        <p class="mb-0">© 2025 Osmanlıca Öğren | Tüm Hakları Saklıdır.</p>
+        <p class="mb-0">&copy; 2023-2025 Osmanlıca Öğren | <a href="https://github.com/ozzasci/Osmanl-ca" target="_blank" rel="noopener noreferrer">GitHub</a></p>
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS Bundle + Popper -->
+  <!-- Scriptler -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
+    // EmailJS Init
     emailjs.init('8BdNp7u1PufddSEM8');
 
-    // Form Gönderimi
-    document.getElementById('support-form').addEventListener('submit', function (e) {
+    // Form gönderim sayaç
+    const form = document.getElementById('support-form');
+    const resultDiv = document.getElementById('form-result');
+    const formCountEl = document.getElementById('form-sent-count');
+    const countKey = 'formSubmitCount';
+
+    // Daha önceki form gönderim sayısını yükle
+    let count = parseInt(localStorage.getItem(countKey) || '0');
+    formCountEl.textContent = count;
+
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
-      const form = this;
-      const resultDiv = document.getElementById('form-result');
       resultDiv.textContent = '';
       resultDiv.className = '';
 
-      emailjs.sendForm('service_1avrv0q', 'template_pc99ct6', form)
+      emailjs.sendForm('service_1avrv0q', 'template_pc99ct6', this)
         .then(() => {
+          count++;
+          localStorage.setItem(countKey, count);
+          formCountEl.textContent = count;
+
           resultDiv.textContent = 'Mesajınız başarıyla gönderildi. Teşekkürler!';
           resultDiv.className = 'text-success';
           form.reset();
-        }, (error) => {
+        })
+        .catch((error) => {
           console.error('EmailJS Hatası:', error);
           resultDiv.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
           resultDiv.className = 'text-danger';
         });
     });
 
-    // IBAN Kopyalama Butonu
+    // MailerLite API ile abone sayısını çek
+    fetch('https://connect.mailerlite.com/api/groups/159618115099952894/stats', {
+      headers: {
+        Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...' // Buraya gerçek tokenınızı yazın
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('subscriber-count').textContent = data.total_active_subscribers || '0';
+    })
+    .catch(() => {
+      document.getElementById('subscriber-count').textContent = 'N/A';
+    });
+
+    // IBAN kopyalama
     document.querySelectorAll('.copy-iban').forEach(button => {
       button.addEventListener('click', () => {
         const iban = button.getAttribute('data-iban');
         navigator.clipboard.writeText(iban).then(() => {
-          button.innerHTML = '<i class="bi bi-check-lg"></i>';
+          button.innerHTML = '<i class="bi bi-check2"></i>';
           setTimeout(() => {
             button.innerHTML = '<i class="bi bi-clipboard"></i>';
           }, 2000);
@@ -382,10 +426,10 @@
       });
     });
 
-    // Tooltiplar
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    // Bootstrap tooltip init
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
   </script>
 
