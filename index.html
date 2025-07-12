@@ -380,28 +380,31 @@ document.getElementById("playAudioBtn").addEventListener("click", function () {
 
     // JSON dosyası yükleme
     document.getElementById("jsonFileInput").addEventListener("change", function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            try {
-                const data = JSON.parse(event.target.result);
-                if (!Array.isArray(data)) throw new Error("Geçersiz JSON formatı");
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        try {
+            const data = JSON.parse(event.target.result);
+            if (!Array.isArray(data)) throw new Error("Geçersiz JSON formatı");
 
-                kelimelerArray = data;
-                filteredArray = [...kelimelerArray];
-                currentPage = 1;
-                renderTable();
+            kelimelerArray = data;
+            filteredArray = [...kelimelerArray];
+            currentPage = 1;
+            renderTable();
 
-                alert("Kelime listesi başarıyla yüklendi!");
-            } catch (err) {
-                alert("JSON dosyası okunamadı veya geçersiz format.");
-                console.error(err);
-            }
-        };
-        reader.readAsText(file);
-    });
+            alert("Kelime listesi başarıyla yüklendi!");
+        } catch (err) {
+            alert("JSON dosyası okunamadı veya geçersiz format.");
+            console.error(err);
+        }
+
+        // 👇 Bu satır problemi çözer!
+        document.getElementById("jsonFileInput").value = "";
+    };
+    reader.readAsText(file);
+});
 
     // Arama kutusu
     document.getElementById("searchInTable").addEventListener("input", function () {
@@ -466,6 +469,53 @@ document.getElementById("playAudioBtn").addEventListener("click", function () {
     renderTable();
 </script>
 
+<script>
+  // Firestore bağlantısını yap
+  const db = firebase.firestore();
 
+  // Oturum açınca verileri çek
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      const uid = user.uid;
+
+      db.collection("kullanicilar")
+        .doc(uid)
+        .collection("kelimeListeleri")
+        .doc("default")
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            kelimelerArray = doc.data().liste || [];
+            filteredArray = [...kelimelerArray];
+            currentPage = 1;
+            renderTable();
+            console.log("Firebase'den kelime listesi yüklendi.");
+          } else {
+            console.log("Henüz bir kelime listesi bulunamadı.");
+          }
+        })
+        .catch(error => {
+          console.error("Firebase'den veri okunamadı:", error);
+        });
+    }
+  });
+
+  // Firebase'e listeyi kaydetme fonksiyonu
+  function listeyiFirebaseeKaydet() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      alert("Lütfen önce giriş yapın.");
+      return;
+    }
+
+    db.collection("kullanicilar")
+      .doc(user.uid)
+      .collection("kelimeListeleri")
+      .doc("default")
+      .set({ liste: kelimelerArray })
+      .then(() => alert("Kelime listesi Firebase'e kaydedildi."))
+      .catch(err => console.error("Firebase'e kayıt hatası:", err));
+  }
+</script>
 </body>
 </html>
