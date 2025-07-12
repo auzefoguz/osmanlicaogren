@@ -125,10 +125,8 @@
         });
     });
 
-    // İstatistik - form sayacı
     document.getElementById('form-sent-count').textContent = localStorage.getItem(countKey) || '0';
 
-    // MailerLite Abone Sayısı (örnek token ve grup ID)
     fetch('https://connect.mailerlite.com/api/groups/159618115099952894/stats', {
       headers: {
         Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiYjliOGQzZjk2YTk2Y2ExNTZjNDlmNGE4MWQ4OGI5NGFiOWVjZGMyNjIxZTBmNDg2ZTE3ZmI4NDE1ODQ1NTQxMWRiZWU2YjY1Yjc3OGUyY2MiLCJpYXQiOjE3NTIzMDkyODQuMjA3Mjg1LCJuYmYiOjE3NTIzMDkyODQuMjA3Mjg3LCJleHAiOjQ5MDc5ODI4ODQuMjAzMzYsInN1YiI6IjE2NzA3MDgiLCJzY29wZXMiOltdfQ.JYTlZsc1wEmLve7_ZuroD8aOAYQE_N2z3sbv-jM-ZfBpK-yZNcWAcxiLoX...'
