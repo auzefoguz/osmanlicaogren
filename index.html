@@ -385,24 +385,25 @@ document.getElementById("playAudioBtn").addEventListener("click", function () {
 
     const reader = new FileReader();
     reader.onload = function (event) {
-        try {
-            const data = JSON.parse(event.target.result);
-            if (!Array.isArray(data)) throw new Error("Geçersiz JSON formatı");
+  try {
+    const data = JSON.parse(event.target.result);
+    if (!Array.isArray(data)) throw new Error("Geçersiz JSON formatı");
 
-            kelimelerArray = data;
-            filteredArray = [...kelimelerArray];
-            currentPage = 1;
-            renderTable();
+    kelimelerArray = data;
+    filteredArray = [...kelimelerArray];
+    currentPage = 1;
+    renderTable();
 
-            alert("Kelime listesi başarıyla yüklendi!");
-        } catch (err) {
-            alert("JSON dosyası okunamadı veya geçersiz format.");
-            console.error(err);
-        }
+    listeyiFirebaseeKaydet(); // 🔥 Firebase'e kaydediyoruz
 
-        // 👇 Bu satır problemi çözer!
-        document.getElementById("jsonFileInput").value = "";
-    };
+    alert("Kelime listesi başarıyla yüklendi!");
+  } catch (err) {
+    alert("JSON dosyası okunamadı veya geçersiz format.");
+    console.error(err);
+  }
+
+  document.getElementById("jsonFileInput").value = "";
+};
     reader.readAsText(file);
 });
 
