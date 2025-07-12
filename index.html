@@ -277,6 +277,31 @@
                     <div id="wordLimitAlert" class="alert alert-warning mt-2 d-none">
                         <i class="bi bi-exclamation-triangle"></i> Ücretsiz sürümde maksimum 100 kelime ekleyebilirsiniz. Premium üye olun!
                     </div>
+<!-- Kelime Tablosu ve Arama -->
+<div id="kelimeListesiPaneli" class="mt-4">
+    <h6>Yüklenen / Oluşturulan Kelimeler</h6>
+
+    <!-- Arama Kutusu -->
+    <input type="text" id="searchInTable" class="form-control mb-2" placeholder="Listede ara...">
+
+    <!-- Kelime Tablosu -->
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th>Osmanlıca</th>
+                <th>Okunuş</th>
+                <th>Anlam</th>
+            </tr>
+        </thead>
+        <tbody id="wordListTableBody">
+            <!-- JavaScript ile doldurulacak -->
+        </tbody>
+    </table>
+
+    <!-- Sayfalama Butonları -->
+    <div id="paginationControls" class="d-flex justify-content-center gap-2 flex-wrap mt-3"></div>
+</div>
+
                 </div>
             </div>
         </main>
@@ -327,5 +352,120 @@ document.getElementById("playAudioBtn").addEventListener("click", function () {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     </script>
+<script>
+    let kelimelerArray = [
+        {
+            word: "علم",
+            transliteration: "ilim",
+            meaning: "Bilgi",
+            additional_meanings: []
+        },
+        {
+            word: "كتاب",
+            transliteration: "kitap",
+            meaning: "Kitap",
+            additional_meanings: []
+        },
+        {
+            word: "قلم",
+            transliteration: "kalem",
+            meaning: "Kalem",
+            additional_meanings: []
+        }
+    ];
+
+    let filteredArray = [...kelimelerArray];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    // JSON dosyası yükleme
+    document.getElementById("jsonFileInput").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            try {
+                const data = JSON.parse(event.target.result);
+                if (!Array.isArray(data)) throw new Error("Geçersiz JSON formatı");
+
+                kelimelerArray = data;
+                filteredArray = [...kelimelerArray];
+                currentPage = 1;
+                renderTable();
+
+                alert("Kelime listesi başarıyla yüklendi!");
+            } catch (err) {
+                alert("JSON dosyası okunamadı veya geçersiz format.");
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // Arama kutusu
+    document.getElementById("searchInTable").addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        filteredArray = kelimelerArray.filter(item =>
+            (item.word || "").toLowerCase().includes(query) ||
+            (item.transliteration || "").toLowerCase().includes(query) ||
+            (item.meaning || "").toLowerCase().includes(query) ||
+            (item.additional_meanings || []).join(",").toLowerCase().includes(query)
+        );
+        currentPage = 1;
+        renderTable();
+    });
+
+    // Tabloyu oluştur
+    function renderTable(page = 1) {
+        const tbody = document.getElementById("wordListTableBody");
+        tbody.innerHTML = "";
+
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const rows = filteredArray.slice(start, end);
+
+        rows.forEach(item => {
+            const tr = document.createElement("tr");
+
+            const ekAnlamlar = Array.isArray(item.additional_meanings) && item.additional_meanings.length > 0
+                ? `<br><small class="text-muted">(${item.additional_meanings.join(", ")})</small>`
+                : "";
+
+            tr.innerHTML = `
+                <td class="osmanlica-font">${item.word || "-"}</td>
+                <td>${item.transliteration || "-"}</td>
+                <td>${item.meaning || "-"}${ekAnlamlar}</td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        renderPagination();
+    }
+
+    // Sayfa düğmeleri
+    function renderPagination() {
+        const totalPages = Math.ceil(filteredArray.length / rowsPerPage);
+        const pagination = document.getElementById("paginationControls");
+        pagination.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            btn.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'}`;
+            btn.onclick = () => {
+                currentPage = i;
+                renderTable(i);
+            };
+            pagination.appendChild(btn);
+        }
+    }
+
+    // Sayfa yüklendiğinde örnek verilerle başlat
+    renderTable();
+</script>
+
+
 </body>
 </html>
