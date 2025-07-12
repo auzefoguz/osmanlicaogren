@@ -374,6 +374,7 @@ firebase.auth().onAuthStateChanged(user => {
         kelimelerArray = doc.data().liste || [];
         filteredArray = [...kelimelerArray];
         currentPage = 1;
+    console.log("Veri geldi:", kelimelerArray);
         renderTable();
         gosterKelime(0);
       } else {
@@ -407,10 +408,12 @@ function listeyiFirebaseeKaydet() {
 function renderTable(page = 1) {
   const tbody = document.getElementById("wordListTableBody");
   if (!tbody) return;
+  console.log("renderTable çağrıldı, filteredArray:", filteredArray);
   tbody.innerHTML = "";
   const start = (page - 1) * rowsPerPage;
   const rows = filteredArray.slice(start, start + rowsPerPage);
   rows.forEach(item => {
+  console.log("Satır eklenecek:", item);
     const ekAnlamlar = item.additional_meanings?.length ? `<br><small class="text-muted">(${item.additional_meanings.join(", ")})</small>` : "";
     const tr = document.createElement("tr");
     tr.innerHTML = `
