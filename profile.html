@@ -327,10 +327,13 @@
 
 
 <script>
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
+  // DOM yüklendikten sonra çalıştır
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tooltip'leri başlat
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+      });
 
   const geriButon = document.getElementById("geriButon");
   const clickSound = document.getElementById("clickSound");
