@@ -10,33 +10,30 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="themes.css">
     <style>
-        .social-media-bar {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        .social-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .social-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-        }
-        .support-btn {
-            background-color: #6f42c1;
-            color: white;
-        }
-        #quizModal .modal-content { min-width: 320px;}
-        #quizModal .quiz-option { min-width: 200px; }
+       .social-media-bar {
+        margin-top: 20px;
+        padding: 15px 0;
+    }
+    .social-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    }
+    .support-btn {
+        background-color: #6f42c1;
+        color: white;
+    }
+    #quizModal .modal-content { min-width: 320px;}
+    #quizModal .quiz-option { min-width: 200px; }
     </style>
 </head>
 <body class="light-theme">
@@ -276,25 +273,28 @@
             
         </main>
 
-        <div class="social-media-bar">
-            <a href="https://wa.me/+905309082276" class="social-btn btn btn-success" data-bs-toggle="tooltip" title="WhatsApp">
-                <i class="bi bi-whatsapp"></i>
-            </a>
-            <a href="https://t.me/osmanlicaogren" class="social-btn btn btn-primary" data-bs-toggle="tooltip" title="Telegram">
-                <i class="bi bi-telegram"></i>
-            </a>
-            <a href="mailto:ozzasci@gmail.com" class="social-btn btn btn-danger" data-bs-toggle="tooltip" title="E-mail">
-                <i class="bi bi-envelope-fill"></i>
-            </a>
-            <a href="destek.html" class="social-btn btn support-btn" data-bs-toggle="tooltip" title="Destek Olun">
-                <i class="bi bi-heart-fill"></i>
-            </a>
-        </div>
-        <footer>
-            <div class="text-center py-2 border-top small">
-                &copy; 2025 Osmanlıca Öğren | Tüm Hakları Saklıdır
-            </div>
-        </footer>
+        <div class="social-media-bar text-center py-3">
+    <div class="d-flex justify-content-center gap-3">
+        <a href="https://wa.me/+905309082276" class="social-btn btn btn-success" data-bs-toggle="tooltip" title="WhatsApp">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="https://t.me/osmanlicaogren" class="social-btn btn btn-primary" data-bs-toggle="tooltip" title="Telegram">
+            <i class="bi bi-telegram"></i>
+        </a>
+        <a href="mailto:ozzasci@gmail.com" class="social-btn btn btn-danger" data-bs-toggle="tooltip" title="E-mail">
+            <i class="bi bi-envelope-fill"></i>
+        </a>
+        <a href="destek.html" class="social-btn btn support-btn" data-bs-toggle="tooltip" title="Destek Olun">
+            <i class="bi bi-heart-fill"></i>
+        </a>
+    </div>
+</div>
+
+<footer>
+    <div class="text-center py-2 border-top small">
+        &copy; 2025 Osmanlıca Öğren | Tüm Hakları Saklıdır
+    </div>
+</footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
