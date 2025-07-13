@@ -407,21 +407,46 @@ function listeyiFirebaseeKaydet() {
 // Tabloyu oluştur
 function renderTable(page = 1) {
   const tbody = document.getElementById("wordListTableBody");
-  if (!tbody) return;
-  console.log("renderTable çağrıldı, filteredArray:", filteredArray);
+  if (!tbody) {
+    console.error("Tablo body elementi bulunamadı!");
+    return;
+  }
+  
   tbody.innerHTML = "";
-  const start = (page - 1) * rowsPerPage;
-  const rows = filteredArray.slice(start, start + rowsPerPage);
-  rows.forEach(item => {
-  console.log("Satır eklenecek:", item);
-    const ekAnlamlar = item.additional_meanings?.length ? `<br><small class="text-muted">(${item.additional_meanings.join(", ")})</small>` : "";
+  
+  // Hata ayıklama için
+  console.log("Filtrelenmiş dizi:", filteredArray);
+  console.log("Toplam kayıt:", filteredArray.length);
+  
+  if (filteredArray.length === 0) {
+    // Boş durum için mesaj göster
     const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="3" class="text-center text-muted">Henüz kelime eklenmedi</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+  
+  const start = (page - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const rows = filteredArray.slice(start, end);
+  
+  rows.forEach((item, index) => {
+    const tr = document.createElement("tr");
+    
+    // Veri kontrolü için
+    console.log(`Satır ${start + index + 1}:`, item);
+    
+    const ekAnlamlar = item.additional_meanings?.length ? 
+      `<br><small class="text-muted">(${item.additional_meanings.join(", ")})</small>` : "";
+    
     tr.innerHTML = `
       <td class="osmanlica-font">${item.word || "-"}</td>
       <td>${item.transliteration || "-"}</td>
-      <td>${item.meaning || "-"}${ekAnlamlar}</td>`;
+      <td>${item.meaning || "-"}${ekAnlamlar}</td>
+    `;
     tbody.appendChild(tr);
   });
+  
   renderPagination();
 }
 
