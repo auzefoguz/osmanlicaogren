@@ -145,7 +145,9 @@
       <li><a class="dropdown-item" href="https://osmanlicaogren.com/ikinci-kur-osmanlica-testler/" target="_blank">2. Kur Testleri</a></li>
     </ul>
   </div>
-
+<a href="analytics.html" class="btn btn-info">
+    <i class="bi bi-graph-up"></i> İstatistikler
+</a>
   <!-- KAYNAKLAR DROPDOWN -->
   <div class="dropdown">
     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Osmanlıca Kaynaklar">
@@ -293,6 +295,19 @@
             </div>
         </footer>
     </div>
+<script>
+document.getElementById("playAudioBtn").addEventListener("click", function () {
+    const text = document.getElementById("transliteration").innerText;
+    if (!text || text.trim() === "---") {
+        alert("Okunacak bir kelime yok.");
+        return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "tr-TR"; // Türkçe okunuş
+    speechSynthesis.speak(utterance);
+});
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -310,4 +325,3 @@
 
 </body>
 </html>
-
