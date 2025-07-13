@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenme Analitiği - Osmanlıca Öğren</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --osmanli-gold: #D4AF37;
+            --osmanli-red: #C8102E;
+            --osmanli-blue: #005F6B;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .ottoman-card {
+            border: 2px solid var(--osmanli-gold);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .metric-card {
+            transition: all 0.3s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .osmanlica-font {
+            font-family: 'Lateef', serif;
+            font-size: 2.2rem;
+        }
+        .heatmap-day {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            margin: 2px;
+        }
+        .progress-thin {
+            height: 8px;
+        }
+        .nav-pills .nav-link.active {
+            background-color: var(--osmanli-blue);
+        }
+    </style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Başlık ve Filtreler -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0"><i class="bi bi-speedometer2"></i> Öğrenme Analitiği</h1>
+            <div>
+                <select id="timeRange" class="form-select form-select-sm w-auto d-inline-block">
+                    <option value="7">Son 1 Hafta</option>
+                    <option value="30" selected>Son 1 Ay</option>
+                    <option value="90">Son 3 Ay</option>
+                    <option value="365">Son 1 Yıl</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Ana Metrikler -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card h-100 bg-primary bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Toplam Kelime</h6>
+                        <h2 class="card-title" id="totalWords">0</h2>
+                        <p class="card-text small">Hedef: <span id="wordTarget">100</span></p>
+                        <div class="progress progress-thin">
+                            <div id="wordProgress" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card h-100 bg-success bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Öğrenme Hızı</h6>
+                        <h2 class="card-title" id="learningSpeed">0</h2>
+                        <p class="card-text small">Günlük Ortalama</p>
+                        <div class="progress progress-thin">
+                            <div id="speedProgress" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card h-100 bg-warning bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Doğruluk Oranı</h6>
+                        <h2 class="card-title" id="accuracyRate">0%</h2>
+                        <p class="card-text small">Son 30 Test</p>
+                        <div class="progress progress-thin">
+                            <div id="accuracyProgress" class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card h-100 bg-info bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Aktif Seri</h6>
+                        <h2 class="card-title" id="activeStreak">0 Gün</h2>
+                        <p class="card-text small">Üst Üste Giriş</p>
+                        <div class="progress progress-thin">
+                            <div id="streakProgress" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grafikler ve Detaylar -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card ottoman-card h-100">
+                    <div class="card-header bg-light">
+                        <ul class="nav nav-pills card-header-pills">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-chart="words">Kelime İlerleme</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-chart="accuracy">Doğruluk Trendi</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-chart="time">Çalışma Süreleri</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="analyticsChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card ottoman-card h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-calendar3"></i> Çalışma Takvimi</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="heatmap" class="d-flex flex-wrap justify-content-center"></div>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2"><i class="bi bi-square-fill text-success"></i> Yoğun</span>
+                            <span class="badge bg-light text-dark"><i class="bi bi-square-fill text-light"></i> Az</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kelime Performansı -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card ottoman-card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Kelime Performansı</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Kelime</th>
+                                        <th>Osmanlıca</th>
+                                        <th>Doğruluk</th>
+                                        <th>Son Deneme</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wordPerformance">
+                                    <!-- JS ile doldurulacak -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <!-- Öneriler -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card ottoman-card border-warning">
+            <div class="card-header bg-warning bg-opacity-10">
+                <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Kişiselleştirilmiş Öneriler</h5>
+            </div>
+            <div class="card-body">
+                <div id="recommendations">
+                    <!-- JS ile doldurulacak -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Örnek veri - Gerçek uygulamada Firebase'den çekilecek
+        const userData = {
+            stats: {
+                totalWords: 342,
+                targetWords: 500,
+                learningSpeed: 3.2,
+                accuracy: 68,
+                streak: 12,
+                dailyProgress: {
+                    '2024-02-01': 5,
+                    '2024-02-02': 8,
+                    '2024-02-03': 0,
+                    '2024-02-04': 3,
+                    '2024-02-05': 7,
+                    '2024-02-06': 4,
+                    '2024-02-07': 6,
+                    '2024-02-08': 2,
+                    '2024-02-09': 5,
+                    '2024-02-10': 9,
+                    '2024-02-11': 4,
+                    '2024-02-12': 7,
+                    '2024-02-13': 3,
+                    '2024-02-14': 8,
+                    '2024-02-15': 5,
+                    '2024-02-16': 6,
+                    '2024-02-17': 4,
+                    '2024-02-18': 7,
+                    '2024-02-19': 5,
+                    '2024-02-20': 9,
+                    '2024-02-21': 6,
+                    '2024-02-22': 4,
+                    '2024-02-23': 7,
+                    '2024-02-24': 5,
+                    '2024-02-25': 3,
+                    '2024-02-26': 8,
+                    '2024-02-27': 6,
+                    '2024-02-28': 4,
+                    '2024-02-29': 7
+                },
+                wordPerformance: [
+                    { word: "Merhaba", ottoman: "مرحبا", accuracy: 92, lastAttempt: "2024-02-28" },
+                    { word: "Hükümet", ottoman: "حكومت", accuracy: 65, lastAttempt: "2024-02-27" },
+                    { word: "Muvaffakiyet", ottoman: "موفقیت", accuracy: 31, lastAttempt: "2024-02-25" },
+                    { word: "Kitap", ottoman: "كتاب", accuracy: 88, lastAttempt: "2024-02-29" },
+                    { word: "Tarih", ottoman: "تاريخ", accuracy: 72, lastAttempt: "2024-02-28" }
+                ]
+            }
+        };
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMetrics();
+            renderHeatmap();
+            renderWordPerformance();
+            generateRecommendations();
+            initChart('words');
+            
+            // Filtre değişikliği
+            document.getElementById('timeRange').addEventListener('change', function() {
+                initChart('words');
+            });
+            
+            // Tab geçişleri
+            document.querySelectorAll('[data-chart]').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('[data-chart]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    initChart(this.dataset.chart);
+                });
+            });
+        });
+
+        // Metrikleri yükle
+        function loadMetrics() {
+            document.getElementById('totalWords').textContent = userData.stats.totalWords;
+            document.getElementById('wordTarget').textContent = userData.stats.targetWords;
+            document.getElementById('learningSpeed').textContent = userData.stats.learningSpeed + '/gün';
+            document.getElementById('accuracyRate').textContent = userData.stats.accuracy + '%';
+            document.getElementById('activeStreak').textContent = userData.stats.streak + ' Gün';
+            
+            // Progress barlar
+            const wordProgress = Math.min(100, (userData.stats.totalWords / userData.stats.targetWords * 100));
+            document.getElementById('wordProgress').style.width = wordProgress + '%';
+            document.getElementById('speedProgress').style.width = Math.min(100, userData.stats.learningSpeed / 5 * 100) + '%';
+            document.getElementById('accuracyProgress').style.width = userData.stats.accuracy + '%';
+            document.getElementById('streakProgress').style.width = Math.min(100, userData.stats.streak / 30 * 100) + '%';
+        }
+
+        // Isı haritası oluştur
+        function renderHeatmap() {
+            const heatmapEl = document.getElementById('heatmap');
+            heatmapEl.innerHTML = '';
+            
+            // Örnek veri - gerçekte kullanıcının çalışma günleri olacak
+            for (let i = 0; i < 30; i++) {
+                const day = document.createElement('div');
+                day.className = 'heatmap-day';
+                
+                // Rastgele yoğunluk (gerçekte veriden gelecek)
+                const intensity = Math.floor(Math.random() * 5);
+                day.style.backgroundColor = `rgba(0, 95, 107, ${intensity * 0.2})`;
+                day.title = `${i+1} gün önce: ${intensity * 2} kelime`;
+                
+                heatmapEl.appendChild(day);
+            }
+        }
+
+        // Kelime performans tablosu
+        function renderWordPerformance() {
+            const tbody = document.getElementById('wordPerformance');
+            tbody.innerHTML = '';
+            
+            userData.stats.wordPerformance.forEach(word => {
+                const row = document.createElement('tr');
+                
+                // Doğruluk rengi
+                let accuracyClass = 'text-success';
+                if (word.accuracy < 50) accuracyClass = 'text-danger';
+                else if (word.accuracy < 75) accuracyClass = 'text-warning';
+                
+                row.innerHTML = `
+                    <td>${word.word}</td>
+                    <td class="osmanlica-font">${word.ottoman}</td>
+                    <td>
+                        <div class="progress progress-thin">
+                            <div class="progress-bar ${accuracyClass.replace('text', 'bg')}" 
+                                 role="progressbar" style="width: ${word.accuracy}%">
+                            </div>
+                        </div>
+                        <small class="${accuracyClass}">${word.accuracy}%</small>
+                    </td>
+                    <td>${word.lastAttempt}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" title="Tekrarla">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" title="Detay">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Grafik oluştur
+        function initChart(type) {
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            
+            // Eski grafiği temizle
+            if (window.analyticsChart) {
+                window.analyticsChart.destroy();
+            }
+            
+            let data, options;
+            const timeRange = parseInt(document.getElementById('timeRange').value);
+            
+            if (type === 'words') {
+                // Kelime ilerleme grafiği
+                const dates = Object.keys(userData.stats.dailyProgress).slice(-timeRange);
+                const values = Object.values(userData.stats.dailyProgress).slice(-timeRange);
+                
+                data = {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Öğrenilen Kelimeler',
+                        data: values,
+                        backgroundColor: 'rgba(0, 95, 107, 0.2)',
+                        borderColor: 'rgba(0, 95, 107, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                };
+                
+                options = {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Kelime Sayısı'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tarih'
+                            }
+                        }
+                    }
+                };
+            } 
+            else if (type === 'accuracy') {
+                // Doğruluk grafiği (örnek veri)
+                const dates = Object.keys(userData.stats.dailyProgress).slice(-timeRange);
+                const accuracyData = dates.map(() => Math.floor(Math.random() * 30) + 60);
+                
+                data = {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Doğruluk Oranı (%)',
+                        data: accuracyData,
+                        backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                        borderColor: 'rgba(212, 175, 55, 1)',
+                        borderWidth: 2,
+                        tension: 0.3
+                    }]
+                };
+                
+                options = {
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Doğruluk (%)'
+                            }
+                        }
+                    }
+                };
+            }
+            else {
+                // Çalışma süreleri (örnek veri)
+                const dates = Object.keys(userData.stats.dailyProgress).slice(-7);
+                const timeData = dates.map(() => Math.floor(Math.random() * 40) + 5);
+                
+                data = {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Çalışma Süresi (dk)',
+                        data: timeData,
+                        backgroundColor: 'rgba(200, 16, 46, 0.2)',
+                        borderColor: 'rgba(200, 16, 46, 1)',
+                        borderWidth: 2,
+                        type: 'bar'
+                    }]
+                };
+                
+                options = {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Dakika'
+                            }
+                        }
+                    }
+                };
+            }
+            
+            window.analyticsChart = new Chart(ctx, {
+                type: type === 'time' ? 'bar' : 'line',
+                data: data,
+                options: options
+            });
+        }
+// API'den veri çekme örneği
+async function fetchRecommendations() {
+    try {
+        const response = await fetch('/api/recommendations');
+        return await response.json();
+    } catch (error) {
+        console.error('API hatası:', error);
+        return []; // Fallback veri
+    }
+}
+  
+// Öneriler oluşturma fonksiyonu
+function generateRecommendations() {
+    try {
+        const container = document.getElementById('recommendations');
+        if (!container) {
+            console.error('Öneri containerı bulunamadı!');
+            return;
+        }
+
+        const recs = [
+            {
+                icon: 'bi-arrow-repeat',
+                color: 'danger',
+                title: 'Zor Kelimeler',
+                text: '5 kelimeniz %50 doğruluk altında. Tekrar etmek için tıklayın.',
+                action: '#'
+            },
+            {
+                icon: 'bi-calendar-check',
+                color: 'success',
+                title: '12 Günlük Seri',
+                text: 'Serinizi bozmamak için bugün 1 kelime öğrenin!',
+                action: '#'
+            },
+            {
+                icon: 'bi-trophy',
+                color: 'warning',
+                title: 'Haftalık Hedef',
+                text: 'Bu hafta hedefinizin %72\'si tamamlandı. 8 kelime daha öğrenerek tamamlayın!',
+                action: '#'
+            }
+        ];
+
+        container.innerHTML = '';
+        
+        recs.forEach(rec => {
+            const el = document.createElement('div');
+            el.className = `alert alert-${rec.color} alert-dismissible fade show mb-2`;
+            el.innerHTML = `
+                <i class="bi ${rec.icon} me-2"></i>
+                <strong>${rec.title}:</strong> ${rec.text}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(el);
+        });
+
+    } catch (error) {
+        console.error('Öneri oluşturma hatası:', error);
+    }
+}
+
+// Sayfa yüklendiğinde çalıştır
+document.addEventListener('DOMContentLoaded', function() {
+    loadMetrics();
+    renderHeatmap();
+    renderWordPerformance();
+    generateRecommendations(); // Burada çağırıyoruz
+    initChart('words');
+});
+    
+</body>
+
+</html>
