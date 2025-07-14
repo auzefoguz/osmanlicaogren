@@ -122,51 +122,10 @@
         }
         shuffle(words);
         showQuestion();
+      }).catch(err => {
+        console.error("Kelime yüklenirken hata:", err);
+        questionText.textContent = "Kelime verisi alınamadı.";
       });
-    }
-
-    function loadTopWords() {
-      db.collection("users").doc(userId).collection("bilinen_kelimeler")
-        .orderBy("sayac", "desc").limit(10).get()
-        .then(snapshot => {
-          topWordsList.innerHTML = "";
-          snapshot.forEach(doc => {
-            const li = document.createElement("li");
-            li.className = "list-group-item d-flex justify-content-between align-items-center";
-            li.textContent = doc.id;
-            const badge = document.createElement("span");
-            badge.className = "badge bg-success rounded-pill";
-            badge.textContent = doc.data().sayac;
-            li.appendChild(badge);
-            topWordsList.appendChild(li);
-          });
-        });
-    }
-
-    function loadDailyStats() {
-      db.collection("users").doc(userId).collection("quiz_sonuclari")
-        .orderBy("tarih", "desc").limit(7).get()
-        .then(snapshot => {
-          const labels = [], data = [];
-          snapshot.forEach(doc => {
-            const tarih = new Date(doc.data().tarih.toDate());
-            labels.unshift(tarih.toLocaleDateString());
-            data.unshift(doc.data().dogru);
-          });
-          new Chart(chartCanvas, {
-            type: 'line',
-            data: {
-              labels,
-              datasets: [{
-                label: 'Günlük Doğru Sayısı',
-                data,
-                borderColor: '#0d6efd',
-                tension: 0.3,
-                fill: false
-              }]
-            }
-          });
-        });
     }
 
     function shuffle(array) {
@@ -192,6 +151,17 @@
       }, 1000);
     }
 
+    function generateOptions(correct) {
+      const options = [correct];
+      const pool = words.flatMap(w => [w.meaning, ...(w.additional_meanings || [])])
+                        .filter(m => m !== correct);
+      shuffle(pool);
+      while (options.length < 4 && pool.length > 0) {
+        options.push(pool.pop());
+      }
+      return shuffle([...options]);
+    }
+
     function showQuestion() {
       if (current >= words.length) {
         clearInterval(timerInterval);
@@ -210,7 +180,9 @@
       startTimer();
       resultBox.textContent = "";
       const currentWord = words[current];
-      questionText.textContent = `"${currentWord.word}" kelimesinin anlamı nedir?`;
+      const currentMeaning = currentWord.meaning;
+
+      questionText.innerHTML = `"${currentWord.word}" (${currentWord.transliteration}) kelimesinin anlamı nedir?`;
       const audioBtn = document.createElement("button");
       audioBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i>';
       audioBtn.className = "btn btn-sm btn-outline-secondary ms-2";
@@ -221,38 +193,33 @@
       };
       questionText.appendChild(audioBtn);
 
-      const options = generateOptions(currentWord.meaning);
+      const options = generateOptions(currentMeaning);
       optionList.innerHTML = "";
       options.forEach(opt => {
         const btn = document.createElement("button");
         btn.className = "btn btn-outline-dark w-100";
         btn.textContent = opt;
-        btn.onclick = () => checkAnswer(opt, currentWord.meaning);
+        btn.onclick = () => checkAnswer(opt, currentMeaning);
         optionList.appendChild(btn);
       });
     }
 
-    function generateOptions(correct) {
-      const options = [correct];
-      const pool = words.map(w => w.meaning).filter(m => m !== correct);
-      shuffle(pool);
-      while (options.length < 4 && pool.length > 0) {
-        options.push(pool.pop());
-      }
-      return shuffle([...options]);
-    }
-
     function checkAnswer(selected, correct) {
       clearInterval(timerInterval);
+      const allCorrects = [correct, ...(words[current].additional_meanings || [])];
+
+      const isCorrect = allCorrects.some(m => m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
+
       [...optionList.children].forEach(btn => {
         btn.disabled = true;
-        if (btn.textContent === correct) {
+        if (allCorrects.includes(btn.textContent)) {
           btn.classList.add("btn-success");
         } else if (btn.textContent === selected) {
           btn.classList.add("btn-danger");
         }
       });
-      if (selected === correct) {
+
+      if (isCorrect) {
         score++;
         const kelimeRef = db.collection("users").doc(userId).collection("bilinen_kelimeler").doc(words[current].word);
         kelimeRef.get().then(doc => {
