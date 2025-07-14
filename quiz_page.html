@@ -114,7 +114,7 @@
 
     function loadWords() {
       db.collection("users").doc(userId).collection("kelimeListeleri").get().then(snapshot => {
-        words = snapshot.docs.map(doc => doc.data());
+        words = snapshot.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
         if (words.length === 0) {
           questionText.textContent = "Quiz için tanımlı kelime bulunamadı.";
           return;
@@ -196,7 +196,7 @@
 
     function generateOptions(correct) {
       const options = [correct];
-      const pool = words.flatMap(w => [w.meaning, ...(w.additional_meanings || [])])
+      const pool = words.flatMap(w => [w.meaning, ...(Array.isArray(w.additional_meanings) ? w.additional_meanings : [])])
                         .filter(m => typeof m === 'string' && m.trim() !== '' && m !== correct);
       shuffle(pool);
       while (options.length < 4 && pool.length > 0) {
@@ -225,7 +225,7 @@
       const currentWord = words[current];
       const currentMeaning = currentWord.meaning;
 
-      questionText.innerHTML = `"${currentWord.word}" (${currentWord.transliteration}) kelimesinin anlamı nedir?`;
+      questionText.innerHTML = `"${currentWord.word}" (${currentWord.transliteration || "-"}) kelimesinin anlamı nedir?`;
       const audioBtn = document.createElement("button");
       audioBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i>';
       audioBtn.className = "btn btn-sm btn-outline-secondary ms-2";
@@ -249,7 +249,8 @@
 
     function checkAnswer(selected, correct) {
       clearInterval(timerInterval);
-      const allCorrects = [correct, ...(words[current].additional_meanings || [])].filter(m => typeof m === 'string' && m.trim() !== '');
+      const allCorrects = [correct, ...(Array.isArray(words[current].additional_meanings) ? words[current].additional_meanings : [])]
+        .filter(m => typeof m === 'string' && m.trim() !== '');
 
       const isCorrect = allCorrects.some(m => m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
 
