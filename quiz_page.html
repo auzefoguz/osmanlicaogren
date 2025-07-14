@@ -71,7 +71,6 @@
     </div>
   </div>
 
-  <!-- Firebase ve Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -114,7 +113,7 @@
     });
 
     function loadWords() {
-      db.collection("users").doc(userId).collection("kelimeler").get().then(snapshot => {
+      db.collection("users").doc(userId).collection("kelimeListeleri").get().then(snapshot => {
         words = snapshot.docs.map(doc => doc.data());
         if (words.length === 0) {
           questionText.textContent = "Quiz için tanımlı kelime bulunamadı.";
@@ -126,6 +125,50 @@
         console.error("Kelime yüklenirken hata:", err);
         questionText.textContent = "Kelime verisi alınamadı.";
       });
+    }
+
+    function loadTopWords() {
+      db.collection("users").doc(userId).collection("bilinen_kelimeler")
+        .orderBy("sayac", "desc").limit(10).get()
+        .then(snapshot => {
+          topWordsList.innerHTML = "";
+          snapshot.forEach(doc => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.textContent = doc.id;
+            const badge = document.createElement("span");
+            badge.className = "badge bg-success rounded-pill";
+            badge.textContent = doc.data().sayac;
+            li.appendChild(badge);
+            topWordsList.appendChild(li);
+          });
+        });
+    }
+
+    function loadDailyStats() {
+      db.collection("users").doc(userId).collection("quiz_sonuclari")
+        .orderBy("tarih", "desc").limit(7).get()
+        .then(snapshot => {
+          const labels = [], data = [];
+          snapshot.forEach(doc => {
+            const tarih = new Date(doc.data().tarih.toDate());
+            labels.unshift(tarih.toLocaleDateString());
+            data.unshift(doc.data().dogru);
+          });
+          new Chart(chartCanvas, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Günlük Doğru Sayısı',
+                data,
+                borderColor: '#0d6efd',
+                tension: 0.3,
+                fill: false
+              }]
+            }
+          });
+        });
     }
 
     function shuffle(array) {
