@@ -105,8 +105,8 @@
       if (user) {
         userId = user.uid;
         loadWords();
-        loadTopWords();
-        loadDailyStats();
+        window.loadTopWords();
+        window.loadDailyStats();
       } else {
         window.location.href = "login.html";
       }
@@ -144,6 +144,7 @@
           });
         });
     }
+    window.loadTopWords = loadTopWords;
 
     function loadDailyStats() {
       db.collection("users").doc(userId).collection("quiz_sonuclari")
@@ -170,6 +171,7 @@
           });
         });
     }
+    window.loadDailyStats = loadDailyStats;
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
