@@ -128,7 +128,57 @@
         });
     }
 
-    // (geri kalan tüm fonksiyonlar aynı kalacak)
+    function loadTopWords() {
+      db.collection("users").doc(userId).collection("bilinen_kelimeler")
+        .orderBy("sayac", "desc").limit(10).get()
+        .then(snapshot => {
+          topWordsList.innerHTML = "";
+          snapshot.forEach(doc => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.textContent = doc.id;
+            const badge = document.createElement("span");
+            badge.className = "badge bg-success rounded-pill";
+            badge.textContent = doc.data().sayac;
+            li.appendChild(badge);
+            topWordsList.appendChild(li);
+          });
+        });
+    }
+
+    function loadDailyStats() {
+      db.collection("users").doc(userId).collection("quiz_sonuclari")
+        .orderBy("tarih", "desc").limit(7).get()
+        .then(snapshot => {
+          const labels = [], data = [];
+          snapshot.forEach(doc => {
+            const tarih = new Date(doc.data().tarih.toDate());
+            labels.unshift(tarih.toLocaleDateString());
+            data.unshift(doc.data().dogru);
+          });
+          new Chart(chartCanvas, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Günlük Doğru Sayısı',
+                data,
+                borderColor: '#0d6efd',
+                tension: 0.3,
+                fill: false
+              }]
+            }
+          });
+        });
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
   </script>
 </body>
 </html>
