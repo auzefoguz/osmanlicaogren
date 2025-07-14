@@ -182,5 +182,66 @@
       return array;
     }
   </script>
+  <script>
+  // JSON verisi: Sadece örnek 3 kelime
+  const jsonData = [
+    {
+      "word": "اقمار",
+      "transliteration": "Akmâr",
+      "meaning": "Aylar.",
+      "additional_meanings": ["Dolunaylar", "Aylar topluluğu"]
+    },
+    {
+      "word": "دهقان",
+      "transliteration": "Dihkân",
+      "meaning": "Çiftçi. Köy ağası.",
+      "additional_meanings": ["Toprak sahibi", "Ağa"]
+    },
+    {
+      "word": "زَابِح",
+      "transliteration": "Zâbih",
+      "meaning": "Boğazlayan.",
+      "additional_meanings": ["Kesici", "Kurban eden"]
+    }
+  ];
+
+  // Firebase'e veri yükleme fonksiyonu
+  function uploadDictionaryElif() {
+    auth.onAuthStateChanged(user => {
+      if (!user) return alert("Lütfen önce giriş yapınız.");
+      const userId = user.uid;
+      const entriesRef = db.collection("users").doc(userId)
+        .collection("kelimeListeleri").doc("dictionaryelif")
+        .collection("entries");
+
+      const batch = db.batch();
+      jsonData.forEach(entry => {
+        if (entry.word && entry.meaning) {
+          const docRef = entriesRef.doc(); // otomatik ID
+          batch.set(docRef, {
+            word: entry.word,
+            transliteration: entry.transliteration || "",
+            meaning: entry.meaning,
+            additional_meanings: entry.additional_meanings || []
+          });
+        }
+      });
+
+      batch.commit()
+        .then(() => {
+          alert("✅ Veriler başarıyla yüklendi!");
+          console.log("Yükleme tamamlandı.");
+        })
+        .catch(err => {
+          console.error("Yükleme hatası:", err);
+          alert("⛔ Hata oluştu. Konsolu kontrol edin.");
+        });
+    });
+  }
+
+  // İsteğe bağlı: Yorum satırını kaldırırsan otomatik yüklenir
+  // uploadDictionaryElif();
+</script>
+
 </body>
 </html>
