@@ -1,0 +1,29 @@
+<!-- hakkimizda.html -->
+
+<div class="container my-5">
+  <h2 class="mb-4">Hakkımızda</h2>
+  <p>
+    <strong>Osmanlıca Öğren</strong>, Osmanlı Türkçesini modern araçlarla öğrenmek isteyenler için geliştirilmiş interaktif bir web uygulamasıdır.
+  </p>
+  <p>
+    Amacımız, geçmişin zengin dil mirasını günümüzle buluşturmak ve her seviyeden kullanıcıya erişilebilir, eğlenceli ve verimli bir öğrenme deneyimi sunmaktır.
+  </p>
+  <p>
+    Uygulamamızda:
+    <ul>
+      <li>Osmanlıca kelimeler ve anlamlarıyla çalışma,</li>
+      <li>Transliterasyon desteği,</li>
+      <li>Testler, kaynaklar, sesli okuma özellikleri,</li>
+      <li>Gazete ve sözlük bağlantıları,</li>
+      <li>Kişisel profil ve kart sistemi</li>
+      gibi birçok yenilikçi araç sizlerle!
+    </ul>
+  </p>
+  <p>
+    <strong>Biz Kimiz?</strong><br>
+    Geliştirici ve tarih meraklısı bir ekip olarak, bu alanda içerik üretmeye ve dijital çözümler sunmaya devam ediyoruz.
+  </p>
+  <p>
+    Görüş, öneri veya iş birliği talepleriniz için bize <a href="destek.html">Destek</a> sayfasından ulaşabilirsiniz.
+  </p>
+</div>
