@@ -251,9 +251,9 @@
 
     function checkAnswer(selected, correct) {
       clearInterval(timerInterval);
-      const allCorrects = [correct, ...(words[current].additional_meanings || [])];
+      const allCorrects = [correct, ...(words[current].additional_meanings || [])].filter(Boolean);
 
-      const isCorrect = allCorrects.some(m => m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
+      const isCorrect = allCorrects.some(m => typeof m === 'string' && m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
 
       [...optionList.children].forEach(btn => {
         btn.disabled = true;
