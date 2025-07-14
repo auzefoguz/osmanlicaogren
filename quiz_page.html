@@ -196,8 +196,14 @@
 
     function generateOptions(correct) {
       const options = [correct];
-      const pool = words.flatMap(w => [w.meaning, ...(Array.isArray(w.additional_meanings) ? w.additional_meanings : [])])
-                        .filter(m => typeof m === 'string' && m.trim() !== '' && m !== correct);
+      const pool = words.flatMap(w => {
+        const list = [];
+        if (typeof w.meaning === 'string') list.push(w.meaning);
+        if (Array.isArray(w.additional_meanings)) {
+          list.push(...w.additional_meanings.filter(m => typeof m === 'string'));
+        }
+        return list;
+      }).filter(m => m && m !== correct);
       shuffle(pool);
       while (options.length < 4 && pool.length > 0) {
         options.push(pool.pop());
@@ -249,16 +255,22 @@
 
     function checkAnswer(selected, correct) {
       clearInterval(timerInterval);
-      const allCorrects = [correct, ...(Array.isArray(words[current].additional_meanings) ? words[current].additional_meanings : [])]
-        .filter(m => typeof m === 'string' && m.trim() !== '');
-
-      const isCorrect = allCorrects.some(m => m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
+      const allCorrects = [];
+      if (typeof correct === 'string') allCorrects.push(correct.trim().toLowerCase());
+      if (Array.isArray(words[current].additional_meanings)) {
+        words[current].additional_meanings.forEach(m => {
+          if (typeof m === 'string') allCorrects.push(m.trim().toLowerCase());
+        });
+      }
+      const selectedText = (selected || '').trim().toLowerCase();
+      const isCorrect = allCorrects.includes(selectedText);
 
       [...optionList.children].forEach(btn => {
+        const btnText = btn.textContent.trim().toLowerCase();
         btn.disabled = true;
-        if (allCorrects.includes(btn.textContent)) {
+        if (allCorrects.includes(btnText)) {
           btn.classList.add("btn-success");
-        } else if (btn.textContent === selected) {
+        } else if (btnText === selectedText) {
           btn.classList.add("btn-danger");
         }
       });
