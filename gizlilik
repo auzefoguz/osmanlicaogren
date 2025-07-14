@@ -1,0 +1,36 @@
+<div class="container my-5">
+  <h2 class="mb-4">Gizlilik Politikası</h2>
+
+  <p>
+    <strong>Osmanlıca Öğren</strong> uygulaması olarak, kullanıcı gizliliğine büyük önem veriyoruz. Bu sayfa, hangi bilgileri topladığımızı, nasıl kullandığımızı ve gizliliğinizi nasıl koruduğumuzu açıklar.
+  </p>
+
+  <h4 class="mt-4">🔐 Topladığımız Veriler</h4>
+  <ul>
+    <li>Kullanıcı adı ve e-posta (profil oluştururken)</li>
+    <li>Favori kelimeler, öğrenme istatistikleri (kişisel ilerleme takibi için)</li>
+    <li>IP adresi ve cihaz bilgileri (yalnızca anonim analiz amaçlı)</li>
+  </ul>
+
+  <h4 class="mt-4">💡 Verilerin Kullanım Amacı</h4>
+  <ul>
+    <li>Kullanıcı deneyimini kişiselleştirmek</li>
+    <li>İçerik ve performansı iyileştirmek</li>
+    <li>Hataları tespit etmek ve çözmek</li>
+  </ul>
+
+  <h4 class="mt-4">📁 Verilerin Saklanması</h4>
+  <p>
+    Tüm kullanıcı verileri güvenli bir şekilde Firebase üzerinde saklanır. Hiçbir veri izinsiz üçüncü kişilerle paylaşılmaz.
+  </p>
+
+  <h4 class="mt-4">🧹 Verilerin Silinmesi</h4>
+  <p>
+    Kullanıcılar diledikleri zaman hesaplarını silebilir ve tüm veriler kalıcı olarak kaldırılır.
+  </p>
+
+  <h4 class="mt-4">📞 İletişim</h4>
+  <p>
+    Gizlilikle ilgili sorularınız için lütfen <a href="destek.html">Destek</a> sayfamızdan bize ulaşın.
+  </p>
+</div>
