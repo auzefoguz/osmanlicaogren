@@ -105,8 +105,8 @@
       if (user) {
         userId = user.uid;
         loadWords();
-        window.loadTopWords();
-        window.loadDailyStats();
+        loadTopWords();
+        loadDailyStats();
       } else {
         window.location.href = "login.html";
       }
@@ -144,7 +144,6 @@
           });
         });
     }
-    window.loadTopWords = loadTopWords;
 
     function loadDailyStats() {
       db.collection("users").doc(userId).collection("quiz_sonuclari")
@@ -171,7 +170,6 @@
           });
         });
     }
-    window.loadDailyStats = loadDailyStats;
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -199,7 +197,7 @@
     function generateOptions(correct) {
       const options = [correct];
       const pool = words.flatMap(w => [w.meaning, ...(w.additional_meanings || [])])
-                        .filter(m => m !== correct);
+                        .filter(m => typeof m === 'string' && m.trim() !== '' && m !== correct);
       shuffle(pool);
       while (options.length < 4 && pool.length > 0) {
         options.push(pool.pop());
@@ -251,9 +249,9 @@
 
     function checkAnswer(selected, correct) {
       clearInterval(timerInterval);
-      const allCorrects = [correct, ...(words[current].additional_meanings || [])].filter(Boolean);
+      const allCorrects = [correct, ...(words[current].additional_meanings || [])].filter(m => typeof m === 'string' && m.trim() !== '');
 
-      const isCorrect = allCorrects.some(m => typeof m === 'string' && m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
+      const isCorrect = allCorrects.some(m => m.trim().toLowerCase() === (selected || '').trim().toLowerCase());
 
       [...optionList.children].forEach(btn => {
         btn.disabled = true;
