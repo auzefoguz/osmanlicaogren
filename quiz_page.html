@@ -15,7 +15,7 @@
       max-width: 600px;
       margin: 2rem auto;
       background: #fff;
-      padding: 2rem;
+      padding: 1.5rem;
       border-radius: 1rem;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
@@ -26,6 +26,8 @@
     }
     .options button {
       margin-bottom: 0.5rem;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
     }
     .result {
       font-weight: bold;
@@ -33,7 +35,7 @@
     }
     .timer {
       font-weight: bold;
-      color: #dc3545;
+      color: #212529;
     }
     .end-buttons {
       display: flex;
@@ -107,13 +109,17 @@
         loadTopWords();
         loadDailyStats();
       } else {
-        questionText.textContent = "Lütfen giriş yapınız.";
+        window.location.href = "login.html";
       }
     });
 
     function loadWords() {
       db.collection("users").doc(userId).collection("kelimeler").get().then(snapshot => {
         words = snapshot.docs.map(doc => doc.data());
+        if (words.length === 0) {
+          questionText.textContent = "Quiz için tanımlı kelime bulunamadı.";
+          return;
+        }
         shuffle(words);
         showQuestion();
       });
@@ -174,9 +180,11 @@
     function startTimer() {
       timeLeft = 10;
       timerDisplay.textContent = `⏱ ${timeLeft}`;
+      timerDisplay.style.color = "#212529";
       timerInterval = setInterval(() => {
         timeLeft--;
         timerDisplay.textContent = `⏱ ${timeLeft}`;
+        if (timeLeft <= 3) timerDisplay.style.color = "#dc3545";
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
           checkAnswer(null, words[current].meaning);
@@ -186,6 +194,7 @@
 
     function showQuestion() {
       if (current >= words.length) {
+        clearInterval(timerInterval);
         resultBox.textContent = `Quiz bitti! Doğru sayısı: ${score}/${words.length}`;
         db.collection("users").doc(userId).collection("quiz_sonuclari").add({
           tarih: new Date(),
@@ -202,6 +211,16 @@
       resultBox.textContent = "";
       const currentWord = words[current];
       questionText.textContent = `"${currentWord.word}" kelimesinin anlamı nedir?`;
+      const audioBtn = document.createElement("button");
+      audioBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i>';
+      audioBtn.className = "btn btn-sm btn-outline-secondary ms-2";
+      audioBtn.onclick = () => {
+        const utterance = new SpeechSynthesisUtterance(currentWord.word);
+        utterance.lang = 'tr-TR';
+        speechSynthesis.speak(utterance);
+      };
+      questionText.appendChild(audioBtn);
+
       const options = generateOptions(currentWord.meaning);
       optionList.innerHTML = "";
       options.forEach(opt => {
