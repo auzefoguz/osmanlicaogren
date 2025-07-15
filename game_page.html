@@ -160,35 +160,35 @@ function getCardCount() {
   return currentDifficulty === 'zor' ? 12 : currentDifficulty === 'orta' ? 8 : 6;
 }
 
-function initGame() {
-  clearInterval(timerInterval);
-  score = 0;
-  timeLeft = 60;
-  document.getElementById("scoreBox").textContent = Skor: ${score};
-  document.getElementById("timerBox").textContent = Süre: ${timeLeft};
-  document.getElementById("cardGrid").innerHTML = "";
-  document.getElementById("messageBox").textContent = "";
-  document.getElementById("restartBtn").style.display = "none";
+ function initGame() {
+      clearInterval(timerInterval);
+      score = 0;
+      timeLeft = 60;
+      document.getElementById("scoreBox").textContent = `Skor: ${score}`;
+      document.getElementById("timerBox").textContent = `Süre: ${timeLeft}`;
+      document.getElementById("cardGrid").innerHTML = "";
+      document.getElementById("messageBox").textContent = "";
+      document.getElementById("restartBtn").style.display = "none";
 
-  fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
-    .then(res => res.json())
-    .then(data => {
-      const kelimeler = data.map(item => ({
-        word: item.word,
-        meaning: item.meaning?.split(/[.;,،]/)[0].trim()
-      })).filter(k => k.word && k.meaning);
+      fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
+        .then(res => res.json())
+        .then(data => {
+          const kelimeler = data.map(item => ({
+            word: item.word,
+            meaning: item.meaning?.split(/[.;,،]/)[0].trim()
+          })).filter(k => k.word && k.meaning);
 
-      const sample = shuffle(kelimeler).slice(0, getCardCount());
-      cards = shuffle(sample.flatMap(item => [
-        { type: 'word', value: item.word, pair: item.meaning },
-        { type: 'meaning', value: item.meaning, pair: item.word }
-      ]));
+          const sample = shuffle(kelimeler).slice(0, getCardCount());
+          cards = shuffle(sample.flatMap(item => [
+            { type: 'word', value: item.word, pair: item.meaning },
+            { type: 'meaning', value: item.meaning, pair: item.word }
+          ]));
 
-      renderCards();
-      startTimer();
-      renderChart();
-    });
-}
+          renderCards();
+          startTimer();
+          renderChart();
+        });
+    }
 
 function renderCards() {
   const grid = document.getElementById("cardGrid");
