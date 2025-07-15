@@ -147,16 +147,17 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // oyun.js içeriği doğrudan buraya eklendi
-    window.onload = initGame;
+    // initGame fonksiyonu da bu bloğun içine dahil ediliyor
+    // Böylece window.onload öncesinde tanımlanmış oluyor
   </script>
   <script>
     // 🔽 Tüm oyun fonksiyonları bu blokta yer alıyor
-    // (Yukarıda sağladığın tam JavaScript kodu buraya yapıştırıldı)
-    // Fonksiyonlar: setDifficulty, getCardCount, initGame, renderCards, revealCard, checkMatch, checkWin,
-    // startTimer, endGame, speak, saveKnownWord, showKnownWordsModal, showHistoryModal,
-    // exportKnownWords, saveScore, renderChart, shuffle
-    // (Tam kod eklendi, artık oyun tamamen çalışır durumda)
+    // Tüm JS fonksiyonlarını buraya yapıştırıyoruz (initGame dahil)
+    // En alt satıra window.onload = initGame; ekliyoruz
+
+    // 💡 Kod burada tanımlanacak (önceki mesajında gönderdiğin JavaScript içeriği buraya yapıştırılacak)
+
+    window.onload = initGame;
   </script>
 </body>
 </html>
-
