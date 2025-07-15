@@ -321,8 +321,6 @@ function saveScore() {
   daily[today].toplam += score;
   daily[today].oyun += 1;
   localStorage.setItem("gunlukSkorlar", JSON.stringify(daily));
-});
-  localStorage.setItem("eslestirmeSkorlar", JSON.stringify(prev));
 }
 
 function renderChart() {
