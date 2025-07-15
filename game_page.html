@@ -240,7 +240,7 @@ function initGame() {
       const kelimeler = data.map(item => ({
   word: item.word,
   meaning: item.meaning?.split(/[.;،]/)[0].trim()
-})).filter(k => k.word && k.meaning);
+}))
 
       if (gameMode === 'anlamBul') {
         initMeaningGame(kelimeler);
