@@ -164,8 +164,8 @@ function initGame() {
   clearInterval(timerInterval);
   score = 0;
   timeLeft = 60;
-  document.getElementById("scoreBox").textContent = `Skor: ${score}`;
-  document.getElementById("timerBox").textContent = `Süre: ${timeLeft}`;
+  document.getElementById("scoreBox").textContent = Skor: ${score};
+  document.getElementById("timerBox").textContent = Süre: ${timeLeft};
   document.getElementById("cardGrid").innerHTML = "";
   document.getElementById("messageBox").textContent = "";
   document.getElementById("restartBtn").style.display = "none";
@@ -204,7 +204,7 @@ function renderCards() {
 
 function revealCard(index) {
   if (lockBoard || timeLeft <= 0) return;
-  const el = document.querySelector(`[data-index='${index}']`);
+  const el = document.querySelector([data-index='${index}']);
   const card = cards[index];
   if (card.matched || card.revealed) return;
 
@@ -227,8 +227,8 @@ function revealCard(index) {
 }
 
 function checkMatch(a, b) {
-  const aEl = document.querySelector(`[data-index='${a.index}']`);
-  const bEl = document.querySelector(`[data-index='${b.index}']`);
+  const aEl = document.querySelector([data-index='${a.index}']);
+  const bEl = document.querySelector([data-index='${b.index}']);
 
   if (a.card.pair === b.card.value && b.card.pair === a.card.value) {
     a.card.matched = true;
@@ -246,7 +246,7 @@ function checkMatch(a, b) {
     bEl.textContent = "";
     score -= 2;
   }
-  document.getElementById("scoreBox").textContent = `Skor: ${score}`;
+  document.getElementById("scoreBox").textContent = Skor: ${score};
   lockBoard = false;
   checkWin();
 }
@@ -255,7 +255,7 @@ function checkWin() {
   if (cards.every(card => card.matched)) {
     clearInterval(timerInterval);
     saveScore();
-    document.getElementById("messageBox").innerHTML = `✨ Tebrikler!<br>Skorunuz: ${score}<br><span style='font-size:1.5rem'>⭐⭐⭐</span>`;
+    document.getElementById("messageBox").innerHTML = ✨ Tebrikler!<br>Skorunuz: ${score}<br><span style='font-size:1.5rem'>⭐⭐⭐</span>;
     document.getElementById("restartBtn").style.display = "inline-block";
     renderChart();
   }
@@ -264,7 +264,7 @@ function checkWin() {
 function startTimer() {
   timerInterval = setInterval(() => {
     timeLeft--;
-    document.getElementById("timerBox").textContent = `Süre: ${timeLeft}`;
+    document.getElementById("timerBox").textContent = Süre: ${timeLeft};
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       endGame();
@@ -274,7 +274,7 @@ function startTimer() {
 
 function endGame() {
   saveScore();
-  document.getElementById("messageBox").innerHTML = `⏰ Süre doldu!<br>Skorunuz: ${score}`;
+  document.getElementById("messageBox").innerHTML = ⏰ Süre doldu!<br>Skorunuz: ${score};
   document.getElementById("restartBtn").style.display = "inline-block";
   renderChart();
 }
@@ -297,7 +297,7 @@ function showKnownWordsModal() {
   const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
   let html = '<table class="table"><thead><tr><th>Kelime</th><th>Anlam</th><th>Tarih</th></tr></thead><tbody>';
   list.forEach(k => {
-    html += `<tr><td>${k.word}</td><td>${k.meaning}</td><td>${k.tarih}</td></tr>`;
+    html += <tr><td>${k.word}</td><td>${k.meaning}</td><td>${k.tarih}</td></tr>;
   });
   html += '</tbody></table>';
   document.getElementById("bilinenKelimelerIcerik").innerHTML = html;
@@ -307,7 +307,7 @@ function showHistoryModal() {
   const list = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-20).reverse();
   let html = '<table class="table"><thead><tr><th>Tarih</th><th>Skor</th></tr></thead><tbody>';
   list.forEach(e => {
-    html += `<tr><td>${e.tarih}</td><td>${e.skor}</td></tr>`;
+    html += <tr><td>${e.tarih}</td><td>${e.skor}</td></tr>;
   });
   html += '</tbody></table>';
   document.getElementById("gecmisIcerik").innerHTML = html;
@@ -317,7 +317,7 @@ function exportKnownWords() {
   const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
   let csv = 'Kelime,Anlam,Tarih\n';
   list.forEach(k => {
-    csv += `${k.word},${k.meaning},${k.tarih}\n`;
+    csv += ${k.word},${k.meaning},${k.tarih}\n;
   });
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -375,11 +375,11 @@ function renderChart() {
   const hedefDurum = document.getElementById("hedefDurum");
   if (hedefDurum) {
     const durumYazi = bugun.toplam >= hedef
-      ? `🎉 Günlük hedef tamamlandı! (${bugun.toplam}/${hedef})`
-      : `🎯 Günlük Hedef: ${bugun.toplam}/${hedef}`;
+      ? 🎉 Günlük hedef tamamlandı! (${bugun.toplam}/${hedef})
+      : 🎯 Günlük Hedef: ${bugun.toplam}/${hedef};
     const renk = bugun.toplam >= hedef ? 'success' : 'info';
     hedefDurum.textContent = durumYazi;
-    hedefDurum.className = `badge bg-${renk} text-dark fw-semibold`;
+    hedefDurum.className = badge bg-${renk} text-dark fw-semibold;
   }
 
   const scoreData = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-7);
@@ -417,4 +417,3 @@ window.onload = initGame;
  
 </body>
 </html>
-
