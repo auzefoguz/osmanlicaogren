@@ -238,9 +238,9 @@ function initGame() {
     .then(res => res.json())
     .then(data => {
       const kelimeler = data.map(item => ({
-        word: item.word,
-        meaning: item.meaning?.split(/[.;،]/)[0].trim()
-      \}));
+  word: item.word,
+  meaning: item.meaning?.split(/[.;،]/)[0].trim()
+})).filter(k => k.word && k.meaning);
 
       if (gameMode === 'anlamBul') {
         initMeaningGame(kelimeler);
