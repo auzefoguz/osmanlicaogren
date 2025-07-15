@@ -307,48 +307,6 @@ function renderChart() {
   });
 }
 
-function exportKnownWords() {
-  const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
-  const csvHeader = 'Kelime,Anlam,Tarih
-';
-  const csvRows = list.map(k => `${k.word},${k.meaning},${k.tarih}`).join("
-");
-  const csv = csvHeader + csvRows;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "bilinen-kelimeler.csv";
-  a.click();
-},${k.meaning},${k.tarih}`).join("
-");
-  const csv = csvHeader + csvRows;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "bilinen-kelimeler.csv";
-  a.click();
-},${k.meaning},${k.tarih}`).join("
-");
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "bilinen-kelimeler.csv";
-  a.click();
-},${k.meaning},${k.tarih}`).join("
-");
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "bilinen-kelimeler.csv";
-  a.click();
-},${k.meaning},${k.tarih}`).join("
-");
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "bilinen-kelimeler.csv";
-  a.click();
-}
 
 function speak(text) {
   if ('speechSynthesis' in window) {
@@ -379,4 +337,3 @@ function shuffle(arr) {
   </script>
 </body>
 </html>
-
