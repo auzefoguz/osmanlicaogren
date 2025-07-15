@@ -258,43 +258,55 @@
       }, 1000);
     }
 
-    // Adam Asmaca
-    const kelimelerAsmaca = ["kitap", "kalem", "defter", "sözlük", "medrese", "ilim", "hoca"];
-    let secilenKelime = "", gorunen = "", tahminler = [], can = 6;
+let secilenKelime = "";
+let gorunen = "";
+let tahminler = [];
+let can = 6;
 
-    function yeniOyunAsmaca() {
-      secilenKelime = kelimelerAsmaca[Math.floor(Math.random() * kelimelerAsmaca.length)];
-      gorunen = "_".repeat(secilenKelime.length);
-      tahminler = [];
-      can = 6;
-      guncelleAsmaca();
-    }
+function yeniOyunAsmaca() {
+  const kelimeler = ["kalem", "kitap", "defter", "okul", "tahta", "masa"];
+  secilenKelime = kelimeler[Math.floor(Math.random() * kelimeler.length)].toUpperCase();
+  gorunen = "_".repeat(secilenKelime.length);
+  tahminler = [];
+  can = 6;
+  guncelleAsmaca();
+}
 
-    function tahminEt() {
-      const harf = document.getElementById("harfInput").value.toLowerCase();
-      document.getElementById("harfInput").value = "";
-      if (!harf || tahminler.includes(harf)) return;
-      tahminler.push(harf);
-      if (secilenKelime.includes(harf)) {
-        gorunen = secilenKelime.split("").map((h, i) => tahminler.includes(h) ? h : gorunen[i]).join("");
-      } else {
-        can--;
-      }
-      guncelleAsmaca();
-    }
+function tahminEt() {
+  const input = document.getElementById("harfInput");
+  const harf = input.value.toUpperCase();
+  input.value = "";
 
-    function guncelleAsmaca() {
+  if (!harf || tahminler.includes(harf)) return;
+
+  tahminler.push(harf);
+
+  if (secilenKelime.includes(harf)) {
+    gorunen = secilenKelime.split('').map((h, i) => gorunen[i] !== '_' ? gorunen[i] : (h === harf ? h : '_')).join('');
+  } else {
+    can--;
+  }
+
+  guncelleAsmaca();
+}
+
+function guncelleAsmaca() {
   document.getElementById("kelimeGizli").textContent = gorunen.split("").join(" ");
   document.getElementById("tahminler").textContent = `Tahminler: ${tahminler.join(", ")}`;
   document.getElementById("adamDurumu").textContent = can <= 0 ? `Kaybettiniz! Kelime: ${secilenKelime}` : gorunen === secilenKelime ? "Tebrikler, bildiniz!" : `Kalan hak: ${can}`;
 
   const parts = ["hg-head", "hg-body", "hg-arm-left", "hg-arm-right", "hg-leg-left", "hg-leg-right"];
   parts.forEach((id, index) => {
-    document.getElementById(id).style.display = (6 - can > index) ? 'block' : 'none';
+    const part = document.getElementById(id);
+    if (part) {
+      part.style.display = (6 - can > index) ? 'block' : 'none';
+    }
   });
 
   if (can <= 0 || gorunen === secilenKelime) setTimeout(yeniOyunAsmaca, 3000);
 }
+
+document.addEventListener("DOMContentLoaded", yeniOyunAsmaca);
 
   </script>
 </body>
