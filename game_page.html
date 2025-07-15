@@ -317,6 +317,13 @@ function exportKnownWords() {
   a.href = URL.createObjectURL(blob);
   a.download = "bilinen-kelimeler.csv";
   a.click();
+},${k.meaning},${k.tarih}`).join("
+");
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "bilinen-kelimeler.csv";
+  a.click();
 }
 
 function speak(text) {
@@ -348,3 +355,4 @@ function shuffle(arr) {
   </script>
 </body>
 </html>
+
