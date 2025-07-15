@@ -290,7 +290,7 @@ function renderChart() {
   const labels = data.map(e => e.tarih);
   const scores = data.map(e => e.skor);
   const ctx = document.getElementById("scoreChart").getContext("2d");
-  if (window.scoreChart) window.scoreChart.destroy();
+  if (window.scoreChart instanceof Chart) window.scoreChart.destroy();
   window.scoreChart = new Chart(ctx, {
     type: 'line',
     data: {
