@@ -261,16 +261,24 @@ function initGame() {
     .then(res => res.json())
     .then(data => {
       const kelimeler = data.map(item => ({
-  word: item.word,
-  meaning: item.meaning?.split(/[.;،]/)[0].trim()
-}))
+        word: item.word,
+        meaning: item.meaning?.split(/[.;،]/)[0].trim()
+      })).filter(k => k.word && k.meaning);
 
       if (gameMode === 'anlamBul') {
         initMeaningGame(kelimeler);
       } else {
         const sample = shuffle(kelimeler).slice(0, getCardCount());
-        
+        cards = shuffle(sample.flatMap(item => [
+          { type: 'word', value: item.word, pair: item.meaning },
+          { type: 'meaning', value: item.meaning, pair: item.word }
+        ]));
+        renderCards();
+        startTimer();
+        renderChart();
       }
+    });
+}
     });
 
       cards = shuffle(sample.flatMap(item => [
@@ -496,4 +504,3 @@ function shuffle(arr) {
   </script>
 </body>
 </html>
-
