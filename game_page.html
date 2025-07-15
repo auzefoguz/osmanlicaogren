@@ -182,7 +182,8 @@ function initMeaningGame(words) {
 </div>
     </div>
     <div class="text-center mb-3">
-      <button class="btn btn-outline-primary btn-sm" onclick="showKnownWordsModal()" data-bs-toggle="modal" data-bs-target="#kelimeModal">📋 Bilinen Kelimeler</button>
+  <button class="btn btn-outline-primary btn-sm" onclick="showKnownWordsModal()" data-bs-toggle="modal" data-bs-target="#kelimeModal">📋 Bilinen Kelimeler</button>
+  <button class="btn btn-outline-success btn-sm" onclick="showHistoryModal()" data-bs-toggle="modal" data-bs-target="#gecmisModal">🕓 Öğrenme Geçmişi</button>
       <button class="btn btn-outline-secondary btn-sm" onclick="exportKnownWords()">⬇️ CSV Aktar</button>
     </div>
     <div class="text-center mb-2">
@@ -207,6 +208,18 @@ function initMeaningGame(words) {
   </div>
 
   <!-- Modal: Bilinen Kelimeler -->
+<!-- Modal: Öğrenme Geçmişi -->
+<div class="modal fade" id="gecmisModal" tabindex="-1" aria-labelledby="gecmisModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="gecmisModalLabel">🕓 Öğrenme Geçmişi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body" id="gecmisIcerik">Yükleniyor...</div>
+    </div>
+  </div>
+</div>
   <div class="modal fade" id="kelimeModal" tabindex="-1" aria-labelledby="kelimeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -231,6 +244,20 @@ function showKnownWordsModal() {
   document.getElementById("bilinenKelimelerIcerik").innerHTML = html;
 }
 
+function showHistoryModal() {
+  const list = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-20).reverse();
+  let html = '<table class="table"><thead><tr><th>Tarih</th><th>Skor</th></tr></thead><tbody>';
+  list.forEach(e => {
+    html += `<tr><td>${e.tarih}</td><td>${e.skor}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById("gecmisIcerik").innerHTML = html;
+}</td><td>${k.meaning}</td><td>${k.tarih}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById("bilinenKelimelerIcerik").innerHTML = html;
+}
+
     changeGameMode("eslestirme");
 
 function initGame() {
@@ -246,13 +273,7 @@ function initGame() {
         initMeaningGame(kelimeler);
       } else {
         const sample = shuffle(kelimeler).slice(0, getCardCount());
-        cards = shuffle(sample.flatMap(item => [
-          { type: 'word', value: item.word, pair: item.meaning },
-          { type: 'meaning', value: item.meaning, pair: item.word }
-        ]));
-        renderCards();
-        startTimer();
-        renderChart();
+        
       }
     });
 
