@@ -414,6 +414,32 @@ function shuffle(arr) {
 
 window.onload = initGame;
   </script>
- 
+  <script>
+    const flipSound = new Audio('https://cdn.pixabay.com/download/audio/2023/03/01/audio_d5c2081663.mp3?filename=correct-choice-43861.mp3');
+    const matchSound = new Audio('https://cdn.pixabay.com/download/audio/2022/11/30/audio_c68d43d7e6.mp3?filename=game-level-complete-143022.mp3');
+
+    function playFlipSound() {
+      flipSound.currentTime = 0;
+      flipSound.play();
+    }
+
+    function playMatchSound() {
+      matchSound.currentTime = 0;
+      matchSound.play();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const mode = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      localStorage.setItem('theme', mode);
+    }
+
+    window.onload = () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+      initGame();
+    }
+  </script>
+  
 </body>
 </html>
