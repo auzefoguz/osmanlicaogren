@@ -309,15 +309,14 @@ function renderChart() {
 
 function exportKnownWords() {
   const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
-  const csv = 'Kelime,Anlam,Tarih
-' + list.map(k => `${k.word},${k.meaning},${k.tarih}`).join("
-");
+  const csv = 'Kelime,Anlam,Tarih\\n' + list.map(k => `${k.word},${k.meaning},${k.tarih}`).join("\\n");
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "bilinen-kelimeler.csv";
   a.click();
 }
+
 
 function speak(text) {
   if ('speechSynthesis' in window) {
