@@ -40,15 +40,28 @@
       font-weight: bold;
       font-size: 1.1rem;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: transform 0.3s ease, background 0.3s;
       user-select: none;
+    }
+    .card-item:hover {
+      transform: scale(1.05);
     }
     .card-item.matched {
       background: #c3e6cb;
       cursor: default;
+      animation: matchedFlash 0.4s ease-in-out;
     }
     .card-item.revealed {
       background: #fff3cd;
+      animation: flipCard 0.4s ease-in-out;
+    }
+    @keyframes flipCard {
+      0% { transform: rotateY(0); }
+      100% { transform: rotateY(180deg); }
+    }
+    @keyframes matchedFlash {
+      0% { background-color: #fff3cd; }
+      100% { background-color: #c3e6cb; }
     }
     .message-box {
       text-align: center;
@@ -62,6 +75,17 @@
     }
     #chartSection {
       margin-top: 3rem;
+    }
+    @media (max-width: 576px) {
+      .card-item {
+        font-size: 1rem;
+        padding: 1rem;
+      }
+      .header-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
     }
   </style>
 </head>
@@ -106,7 +130,10 @@
       <button class="btn btn-outline-primary btn-sm" onclick="showKnownWordsModal()" data-bs-toggle="modal" data-bs-target="#kelimeModal">📋 Bilinen Kelimeler</button>
       <button class="btn btn-outline-secondary btn-sm" onclick="exportKnownWords()">⬇️ CSV Aktar</button>
     </div>
-    <div class="header-info">
+    <div class="text-center mb-2">
+  <div id="hedefDurum" class="badge bg-info text-dark fw-semibold">🎯 Günlük Hedef: Yükleniyor...</div>
+</div>
+<div class="header-info">
       <span id="scoreBox">Skor: 0</span>
       <span id="timerBox">Süre: 60</span>
     </div>
@@ -116,6 +143,9 @@
       <button id="restartBtn" class="btn btn-primary restart-btn">Yeniden Oyna</button>
     </div>
     <div id="chartSection">
+  <h5 class="text-center mt-4">📅 Günlük İstatistik</h5>
+  <canvas id="dailyChart" height="100"></canvas>
+  <hr>
       <h5 class="text-center mt-4">📈 Skor Geçmişi</h5>
       <canvas id="scoreChart" height="100"></canvas>
     </div>
@@ -149,23 +179,25 @@ function showKnownWordsModal() {
     initGame();
 
 function initGame() {
-fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
-  .then(res => res.json())
-  .then(data => {
-    const kelimeler = data.map(item => ({
-      word: item.word,
-      meaning: item.meaning?.split(/[.;،]/)[0].trim()
-    })).filter(k => k.word && k.meaning);
+  fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
+    .then(res => res.json())
+    .then(data => {
+      const kelimeler = data.map(item => ({
+        word: item.word,
+        meaning: item.meaning?.split(/[.;،]/)[0].trim()
+      })).filter(k => k.word && k.meaning);
+      // devamında oyun mantığı çalışacak...
 
-    const sample = shuffle(kelimeler).slice(0, getCardCount());
-    cards = shuffle(sample.flatMap(item => [
-      { type: 'word', value: item.word, pair: item.meaning },
-      { type: 'meaning', value: item.meaning, pair: item.word }
-    ]));
-    renderCards();
-    startTimer();
-    renderChart();
-  });
+      const sample = shuffle(kelimeler).slice(0, getCardCount());
+      cards = shuffle(sample.flatMap(item => [
+        { type: 'word', value: item.word, pair: item.meaning },
+        { type: 'meaning', value: item.meaning, pair: item.word }
+      ]));
+      renderCards();
+      startTimer();
+      renderChart();
+    });
+}
 
 // Devamı: Tüm oyun işlevleri aşağıda
 let cards = [], firstCard = null, lockBoard = false;
@@ -281,9 +313,59 @@ function saveScore() {
   const prev = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]");
   prev.push({ tarih, skor: score });
   localStorage.setItem("eslestirmeSkorlar", JSON.stringify(prev));
+
+  // Günlük istatistik güncelle
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const daily = JSON.parse(localStorage.getItem("gunlukSkorlar") || "{}");
+  if (!daily[today]) daily[today] = { toplam: 0, oyun: 0 };
+  daily[today].toplam += score;
+  daily[today].oyun += 1;
+  localStorage.setItem("gunlukSkorlar", JSON.stringify(daily));
+});
+  localStorage.setItem("eslestirmeSkorlar", JSON.stringify(prev));
 }
 
 function renderChart() {
+  // Günlük bar chart oluştur
+  const dailyRaw = JSON.parse(localStorage.getItem("gunlukSkorlar") || "{}");
+  const dailyKeys = Object.keys(dailyRaw).slice(-7);
+  const dailyScores = dailyKeys.map(key => dailyRaw[key].toplam);
+
+  const ctxDaily = document.getElementById("dailyChart").getContext("2d");
+  if (window.dailyChart instanceof Chart) window.dailyChart.destroy();
+  window.dailyChart = new Chart(ctxDaily, {
+    type: 'bar',
+    data: {
+      labels: dailyKeys,
+      datasets: [{
+        label: 'Günlük Toplam Skor',
+        data: dailyScores,
+        backgroundColor: '#ffc107'
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 20 }
+        }
+      }
+    }
+  });
+  // Günlük hedef durumu göster
+  const daily = JSON.parse(localStorage.getItem("gunlukSkorlar") || "{}");
+  const today = new Date().toISOString().slice(0, 10);
+  const hedef = 100; // hedef puan
+  const bugun = daily[today] || { toplam: 0, oyun: 0 };
+  const durumYazi = bugun.toplam >= hedef 
+    ? `🎉 Günlük hedef tamamlandı! (${bugun.toplam}/${hedef})`
+    : `🎯 Günlük Hedef: ${bugun.toplam}/${hedef}`;
+  const durumRenk = bugun.toplam >= hedef ? 'success' : 'info';
+  const hedefDurum = document.getElementById("hedefDurum");
+  if (hedefDurum) {
+    hedefDurum.textContent = durumYazi;
+    hedefDurum.className = `badge bg-${durumRenk} text-dark fw-semibold`;
+  }
   const data = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-7);
   const labels = data.map(e => e.tarih);
   const scores = data.map(e => e.skor);
