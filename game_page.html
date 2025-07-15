@@ -46,6 +46,26 @@
     .message-box { margin-top: 15px; font-weight: bold; text-align: center; font-size: 1.2rem; color: #6b4226; }
     .header-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
     h2, h5 { color: #5a381e; }
+     /* Adam Asmaca görselliği */
+    .hangman-figure {
+      width: 100px;
+      height: 160px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    .hangman-figure div {
+      position: absolute;
+      background-color: #333;
+    }
+    .stand { width: 6px; height: 160px; left: 0; top: 0; }
+    .beam { width: 70px; height: 6px; left: 0; top: 0; }
+    .rope { width: 6px; height: 30px; left: 64px; top: 6px; }
+    .head { width: 30px; height: 30px; border-radius: 50%; border: 5px solid #333; top: 36px; left: 50px; background: none; }
+    .body { width: 6px; height: 40px; top: 66px; left: 64px; }
+    .arm-left { width: 30px; height: 6px; top: 80px; left: 34px; transform: rotate(-30deg); }
+    .arm-right { width: 30px; height: 6px; top: 80px; left: 64px; transform: rotate(30deg); }
+    .leg-left { width: 30px; height: 6px; top: 110px; left: 34px; transform: rotate(30deg); }
+    .leg-right { width: 30px; height: 6px; top: 110px; left: 64px; transform: rotate(-30deg); }
   </style>
 </head>
 <body>
@@ -264,16 +284,18 @@
     }
 
     function guncelleAsmaca() {
-      document.getElementById("kelimeGizli").textContent = gorunen.split("").join(" ");
-      document.getElementById("tahminler").textContent = `Tahminler: ${tahminler.join(", ")}`;
-      document.getElementById("adamDurumu").textContent = can <= 0 ? `Kaybettiniz! Kelime: ${secilenKelime}` : gorunen === secilenKelime ? "Tebrikler, bildiniz!" : `Kalan hak: ${can}`;
-      if (can <= 0 || gorunen === secilenKelime) setTimeout(yeniOyunAsmaca, 3000);
-    }
+  document.getElementById("kelimeGizli").textContent = gorunen.split("").join(" ");
+  document.getElementById("tahminler").textContent = `Tahminler: ${tahminler.join(", ")}`;
+  document.getElementById("adamDurumu").textContent = can <= 0 ? `Kaybettiniz! Kelime: ${secilenKelime}` : gorunen === secilenKelime ? "Tebrikler, bildiniz!" : `Kalan hak: ${can}`;
 
-    window.onload = () => {
-      initGame();
-      yeniOyunAsmaca();
-    };
+  const parts = ["hg-head", "hg-body", "hg-arm-left", "hg-arm-right", "hg-leg-left", "hg-leg-right"];
+  parts.forEach((id, index) => {
+    document.getElementById(id).style.display = (6 - can > index) ? 'block' : 'none';
+  });
+
+  if (can <= 0 || gorunen === secilenKelime) setTimeout(yeniOyunAsmaca, 3000);
+}
+
   </script>
 </body>
 </html>
