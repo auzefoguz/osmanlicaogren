@@ -321,6 +321,14 @@ function exportKnownWords() {
   a.click();
 },${k.meaning},${k.tarih}`).join("
 ");
+  const csv = csvHeader + csvRows;
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "bilinen-kelimeler.csv";
+  a.click();
+},${k.meaning},${k.tarih}`).join("
+");
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -371,3 +379,4 @@ function shuffle(arr) {
   </script>
 </body>
 </html>
+
