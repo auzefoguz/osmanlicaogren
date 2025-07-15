@@ -149,25 +149,23 @@ function showKnownWordsModal() {
     initGame();
 
 function initGame() {
-  fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
-    .then(res => res.json())
-    .then(data => {
-      const kelimeler = data.map(item => ({
-        word: item.word,
-        meaning: item.meaning?.split(/[.;،]/)[0].trim()
-      })).filter(k => k.word && k.meaning);
-      // devamında oyun mantığı çalışacak...
+fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
+  .then(res => res.json())
+  .then(data => {
+    const kelimeler = data.map(item => ({
+      word: item.word,
+      meaning: item.meaning?.split(/[.;،]/)[0].trim()
+    })).filter(k => k.word && k.meaning);
 
-      const sample = shuffle(kelimeler).slice(0, getCardCount());
-      cards = shuffle(sample.flatMap(item => [
-        { type: 'word', value: item.word, pair: item.meaning },
-        { type: 'meaning', value: item.meaning, pair: item.word }
-      ]));
-      renderCards();
-      startTimer();
-      renderChart();
-    });
-}
+    const sample = shuffle(kelimeler).slice(0, getCardCount());
+    cards = shuffle(sample.flatMap(item => [
+      { type: 'word', value: item.word, pair: item.meaning },
+      { type: 'meaning', value: item.meaning, pair: item.word }
+    ]));
+    renderCards();
+    startTimer();
+    renderChart();
+  });
 
 // Devamı: Tüm oyun işlevleri aşağıda
 let cards = [], firstCard = null, lockBoard = false;
