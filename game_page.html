@@ -334,6 +334,86 @@
 
     // TODO: renderChart ve saveScore fonksiyonları da eklenmeli.
     window.onload = initGame;
+function saveScore() {
+  const tarih = new Date().toLocaleString();
+  const prev = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]");
+  prev.push({ tarih, skor: score });
+  localStorage.setItem("eslestirmeSkorlar", JSON.stringify(prev));
+
+  // Günlük skorları güncelle
+  const today = new Date().toISOString().slice(0, 10);
+  const daily = JSON.parse(localStorage.getItem("gunlukSkorlar") || "{}");
+  if (!daily[today]) daily[today] = { toplam: 0, oyun: 0 };
+  daily[today].toplam += score;
+  daily[today].oyun += 1;
+  localStorage.setItem("gunlukSkorlar", JSON.stringify(daily));
+}
+
+function renderChart() {
+  // Günlük bar chart
+  const dailyRaw = JSON.parse(localStorage.getItem("gunlukSkorlar") || "{}");
+  const dailyKeys = Object.keys(dailyRaw).slice(-7);
+  const dailyScores = dailyKeys.map(key => dailyRaw[key].toplam);
+
+  const ctxDaily = document.getElementById("dailyChart").getContext("2d");
+  if (window.dailyChart instanceof Chart) window.dailyChart.destroy();
+  window.dailyChart = new Chart(ctxDaily, {
+    type: 'bar',
+    data: {
+      labels: dailyKeys,
+      datasets: [{
+        label: 'Günlük Toplam Skor',
+        data: dailyScores,
+        backgroundColor: '#ffc107'
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 20 }
+        }
+      }
+    }
+  });
+
+  // Günlük hedef badge güncelleme
+  const today = new Date().toISOString().slice(0, 10);
+  const bugun = dailyRaw[today] || { toplam: 0, oyun: 0 };
+  const hedef = 100;
+  const hedefDurum = document.getElementById("hedefDurum");
+  if (hedefDurum) {
+    const durumYazi = bugun.toplam >= hedef
+      ? `🎉 Günlük hedef tamamlandı! (${bugun.toplam}/${hedef})`
+      : `🎯 Günlük Hedef: ${bugun.toplam}/${hedef}`;
+    const renk = bugun.toplam >= hedef ? 'success' : 'info';
+    hedefDurum.textContent = durumYazi;
+    hedefDurum.className = `badge bg-${renk} text-dark fw-semibold`;
+  }
+
+  // Skor çizgi grafiği
+  const scoreData = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-7);
+  const labels = scoreData.map(e => e.tarih);
+  const scores = scoreData.map(e => e.skor);
+
+  const ctxScore = document.getElementById("scoreChart").getContext("2d");
+  if (window.scoreChart instanceof Chart) window.scoreChart.destroy();
+  window.scoreChart = new Chart(ctxScore, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Son 7 Skor',
+        data: scores,
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    }
+  });
+}
+
   </script>
 </body>
 </html>
