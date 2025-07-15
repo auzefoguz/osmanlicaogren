@@ -254,7 +254,7 @@ function showHistoryModal() {
   document.getElementById("gecmisIcerik").innerHTML = html;
 }
 
-    changeGameMode("eslestirme");
+    
 
 function initGame() {
   fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
@@ -279,16 +279,9 @@ function initGame() {
       }
     });
 }
-    });
+    );
 
-      cards = shuffle(sample.flatMap(item => [
-        { type: 'word', value: item.word, pair: item.meaning },
-        { type: 'meaning', value: item.meaning, pair: item.word }
-      ]));
-      renderCards();
-      startTimer();
-      renderChart();
-    });
+      initGame();
 }
 
 // Devamı: Tüm oyun işlevleri aşağıda
