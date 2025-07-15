@@ -6,54 +6,7 @@
   <title>Osmanlıca Eşleştirme Oyunu</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js">let gameMode = 'eslestirme';
-
-function changeGameMode(mode) {
-  gameMode = mode;
-  document.getElementById("cardGrid").innerHTML = "";
-  document.getElementById("messageBox").textContent = "";
-  document.getElementById("restartBtn").style.display = "none";
-  score = 0;
-  updateScore();
-  initGame();
-}
-
-function initMeaningGame(words) {
-  const sample = shuffle(words).slice(0, getCardCount());
-  cards = sample.map(item => ({ ...item, revealed: false, matched: false }));
-  const grid = document.getElementById("cardGrid");
-  grid.innerHTML = "";
-  cards.forEach((card, i) => {
-    const div = document.createElement("div");
-    div.className = "card-item";
-    div.dataset.index = i;
-    div.textContent = card.word;
-    div.onclick = () => {
-      if (card.revealed) return;
-      const userAnswer = prompt(`"${card.word}" kelimesinin anlamı nedir?`).trim();
-      if (!userAnswer) return;
-      if (userAnswer === card.meaning) {
-        div.classList.add("matched");
-        card.revealed = true;
-        score += 10;
-        saveKnownWord(card.word, card.meaning);
-      } else {
-        score -= 2;
-        alert(`❌ Doğru cevap: ${card.meaning}`);
-      }
-      updateScore();
-      if (cards.every(c => c.revealed)) {
-        saveScore();
-        document.getElementById("messageBox").innerHTML = `🎉 Tüm anlamlar doğru bulundu!<br>Skorunuz: ${score}`;
-        document.getElementById("restartBtn").style.display = "inline-block";
-        renderChart();
-      }
-    };
-    grid.appendChild(div);
-  });
-}
-
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -134,8 +87,55 @@ function initMeaningGame(words) {
         gap: 0.5rem;
       }
     }
-  </style>
-</head>
+  <script>
+let gameMode = 'eslestirme';
+
+function changeGameMode(mode) {
+  gameMode = mode;
+  document.getElementById("cardGrid").innerHTML = "";
+  document.getElementById("messageBox").textContent = "";
+  document.getElementById("restartBtn").style.display = "none";
+  score = 0;
+  updateScore();
+  initGame();
+}
+
+function initMeaningGame(words) {
+  const sample = shuffle(words).slice(0, getCardCount());
+  cards = sample.map(item => ({ ...item, revealed: false, matched: false }));
+  const grid = document.getElementById("cardGrid");
+  grid.innerHTML = "";
+  cards.forEach((card, i) => {
+    const div = document.createElement("div");
+    div.className = "card-item";
+    div.dataset.index = i;
+    div.textContent = card.word;
+    div.onclick = () => {
+      if (card.revealed) return;
+      const userAnswer = prompt(`"${card.word}" kelimesinin anlamı nedir?`).trim();
+      if (!userAnswer) return;
+      if (userAnswer === card.meaning) {
+        div.classList.add("matched");
+        card.revealed = true;
+        score += 10;
+        saveKnownWord(card.word, card.meaning);
+      } else {
+        score -= 2;
+        alert(`❌ Doğru cevap: ${card.meaning}`);
+      }
+      updateScore();
+      if (cards.every(c => c.revealed)) {
+        saveScore();
+        document.getElementById("messageBox").innerHTML = `🎉 Tüm anlamlar doğru bulundu!<br>Skorunuz: ${score}`;
+        document.getElementById("restartBtn").style.display = "inline-block";
+        renderChart();
+      }
+    };
+    grid.appendChild(div);
+  });
+}
+</script>
+$1
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-md bg-dark navbar-dark">
@@ -497,3 +497,4 @@ function shuffle(arr) {
   </script>
 </body>
 </html>
+
