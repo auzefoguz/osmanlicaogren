@@ -298,12 +298,12 @@ function yeniOyunAsmaca() {
   fetch("kelimeler.json")
     .then(res => res.json())
     .then(data => {
-      const gecerli = data.filter(item => item.transliteration && item.meaning);
+      const gecerli = data.filter(item => item.word && item.transliteration && item.meaning);
       const secilen = gecerli[Math.floor(Math.random() * gecerli.length)];
-
-      secilenKelime = secilen.transliteration.toUpperCase();
-      secilenAnlam = secilen.meaning;
-      gorunen = "_".repeat(secilenKelime.length);
+      const mod = Math.random() > 0.5 ? 'osmanlica' : 'turkce';
+      secilenKelime = (mod === 'osmanlica' ? secilen.transliteration : secilen.meaning).toUpperCase();
+      secilenAnlam = mod === 'osmanlica' ? secilen.meaning : secilen.transliteration;
+      gorunen = secilenKelime.replace(/[^\s]/g, '_');
       tahminler = [];
       can = 6;
       guncelleAsmaca();
@@ -314,27 +314,23 @@ function tahminEt() {
   const input = document.getElementById("harfInput");
   const harf = input.value.toUpperCase();
   input.value = "";
-
   if (!harf || tahminler.includes(harf)) return;
-
   tahminler.push(harf);
-
   if (secilenKelime.includes(harf)) {
     gorunen = secilenKelime.split('').map((h, i) => gorunen[i] !== '_' ? gorunen[i] : (h === harf ? h : '_')).join('');
   } else {
     can--;
   }
-
   guncelleAsmaca();
 }
 
 function guncelleAsmaca() {
-  document.getElementById("kelimeGizli").textContent = gorunen.split("").join(" ");
+  document.getElementById("kelimeGizli").textContent = gorunen.split('').join(' ');
   document.getElementById("tahminler").textContent = `Tahminler: ${tahminler.join(", ")}`;
   document.getElementById("adamDurumu").innerHTML = can <= 0
-    ? `❌ Kaybettiniz! Kelime: ${secilenKelime}<br><span class="text-secondary">📖 Anlamı: ${secilenAnlam}</span>`
+    ? `❌ Kaybettiniz! Kelime: <b>${secilenKelime}</b><br><span class="text-secondary">📖 Anlamı: ${secilenAnlam}</span>`
     : gorunen === secilenKelime
-      ? `✅ Tebrikler, bildiniz!<br><span class="text-success">📖 Anlamı: ${secilenAnlam}</span>`
+      ? `✅ Tebrikler! Kelime: <b>${secilenKelime}</b><br><span class="text-success">📖 Anlamı: ${secilenAnlam}</span>`
       : `Kalan hak: ${can}`;
 
   const parts = ["hg-head", "hg-body", "hg-arm-left", "hg-arm-right", "hg-leg-left", "hg-leg-right"];
@@ -343,7 +339,9 @@ function guncelleAsmaca() {
     if (part) part.style.display = (6 - can > index) ? 'block' : 'none';
   });
 
-  if (can <= 0 || gorunen === secilenKelime) setTimeout(yeniOyunAsmaca, 4000);
+  if (can <= 0 || gorunen === secilenKelime) {
+    setTimeout(yeniOyunAsmaca, 4000);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", yeniOyunAsmaca);
