@@ -255,10 +255,10 @@ function initGame() {
         renderChart();
       }
     });
-})).filter(k => k.word && k.meaning);
-      // devamında oyun mantığı çalışacak...
-
-      const sample = shuffle(kelimeler).slice(0, getCardCount());
+const kelimeler = data.map(item => ({
+  word: item.word,
+  meaning: item.meaning?.split(/[.;،]/)[0].trim()
+})).filter(k => k.word && k.meaning);.slice(0, getCardCount());
       cards = shuffle(sample.flatMap(item => [
         { type: 'word', value: item.word, pair: item.meaning },
         { type: 'meaning', value: item.meaning, pair: item.word }
