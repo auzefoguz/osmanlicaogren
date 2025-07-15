@@ -135,7 +135,17 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
+<script>
+function showKnownWordsModal() {
+  const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
+  let html = '<table class="table"><thead><tr><th>Kelime</th><th>Anlam</th><th>Tarih</th></tr></thead><tbody>';
+  list.forEach(k => {
+    html += `<tr><td>${k.word}</td><td>${k.meaning}</td><td>${k.tarih}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById("bilinenKelimelerIcerik").innerHTML = html;
+}
+
     initGame();
 
 function initGame() {
@@ -147,6 +157,192 @@ function initGame() {
         meaning: item.meaning?.split(/[.;،]/)[0].trim()
       })).filter(k => k.word && k.meaning);
       // devamında oyun mantığı çalışacak...
+
+      const sample = shuffle(kelimeler).slice(0, getCardCount());
+      cards = shuffle(sample.flatMap(item => [
+        { type: 'word', value: item.word, pair: item.meaning },
+        { type: 'meaning', value: item.meaning, pair: item.word }
+      ]));
+      renderCards();
+      startTimer();
+      renderChart();
+    });
+}
+
+// Devamı: Tüm oyun işlevleri aşağıda
+let cards = [], firstCard = null, lockBoard = false;
+let score = 0, timeLeft = 60, timerInterval;
+let currentDifficulty = 'kolay';
+
+function setDifficulty(level) {
+  currentDifficulty = level;
+  document.getElementById("seviyeGoster").textContent = `Seviye: ${level.toUpperCase()}`;
+  initGame();
+}
+
+function getCardCount() {
+  return currentDifficulty === 'zor' ? 12 : currentDifficulty === 'orta' ? 8 : 6;
+}
+
+function renderCards() {
+  const grid = document.getElementById("cardGrid");
+  grid.innerHTML = "";
+  cards.forEach((card, i) => {
+    const div = document.createElement("div");
+    div.className = "card-item";
+    div.dataset.index = i;
+    div.onclick = () => revealCard(i);
+    grid.appendChild(div);
+  });
+}
+
+function revealCard(index) {
+  if (lockBoard || timeLeft <= 0) return;
+  const el = document.querySelector(`[data-index='${index}']`);
+  const card = cards[index];
+  if (card.matched || card.revealed) return;
+
+  card.revealed = true;
+  el.classList.add("revealed");
+  el.textContent = card.value;
+
+  if (card.type === "word") speak(card.value);
+
+  if (!firstCard) {
+    firstCard = { card, index };
+  } else {
+    lockBoard = true;
+    setTimeout(() => {
+      const second = { card: cards[index], index };
+      checkMatch(firstCard, second);
+      firstCard = null;
+    }, 800);
+  }
+}
+
+function checkMatch(a, b) {
+  const aEl = document.querySelector(`[data-index='${a.index}']`);
+  const bEl = document.querySelector(`[data-index='${b.index}']`);
+
+  if (a.card.pair === b.card.value && b.card.pair === a.card.value) {
+    a.card.matched = true;
+    b.card.matched = true;
+    aEl.classList.add("matched");
+    bEl.classList.add("matched");
+    score += 10;
+    saveKnownWord(a.card.value, a.card.pair);
+  } else {
+    a.card.revealed = false;
+    b.card.revealed = false;
+    aEl.classList.remove("revealed");
+    bEl.classList.remove("revealed");
+    aEl.textContent = "";
+    bEl.textContent = "";
+    score -= 2;
+  }
+  updateScore();
+  lockBoard = false;
+  checkWin();
+}
+
+function updateScore() {
+  document.getElementById("scoreBox").textContent = `Skor: ${score}`;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timerBox").textContent = `Süre: ${timeLeft}`;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      endGame();
+    }
+  }, 1000);
+}
+
+function checkWin() {
+  if (cards.every(card => card.matched)) {
+    clearInterval(timerInterval);
+    saveScore();
+    document.getElementById("messageBox").innerHTML = `✨ Tebrikler!<br>Skorunuz: ${score}<br><span style='font-size:1.5rem'>⭐⭐⭐</span>`;
+    document.getElementById("restartBtn").style.display = "inline-block";
+    renderChart();
+  }
+}
+
+function endGame() {
+  saveScore();
+  document.getElementById("messageBox").innerHTML = `⏰ Süre doldu!<br>Skorunuz: ${score}`;
+  document.getElementById("restartBtn").style.display = "inline-block";
+  renderChart();
+}
+
+function saveScore() {
+  const tarih = new Date().toLocaleString();
+  const prev = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]");
+  prev.push({ tarih, skor: score });
+  localStorage.setItem("eslestirmeSkorlar", JSON.stringify(prev));
+}
+
+function renderChart() {
+  const data = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-7);
+  const labels = data.map(e => e.tarih);
+  const scores = data.map(e => e.skor);
+  const ctx = document.getElementById("scoreChart").getContext("2d");
+  if (window.scoreChart) window.scoreChart.destroy();
+  window.scoreChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Son 7 Skor',
+        data: scores,
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    }
+  });
+}
+
+function exportKnownWords() {
+  const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
+  const csv = 'Kelime,Anlam,Tarih
+' + list.map(k => `${k.word},${k.meaning},${k.tarih}`).join("
+");
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "bilinen-kelimeler.csv";
+  a.click();
+}
+
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'tr-TR';
+    window.speechSynthesis.speak(msg);
+  }
+}
+
+function saveKnownWord(word, meaning) {
+  const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
+  list.push({ word, meaning, tarih: new Date().toLocaleString() });
+  localStorage.setItem("bilinenKelimeler", JSON.stringify(list));
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}`
+    }
+  ]
+}
     });
 }
   </script>
