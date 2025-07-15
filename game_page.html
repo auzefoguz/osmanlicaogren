@@ -289,17 +289,25 @@
     }
 
 let secilenKelime = "";
+let secilenAnlam = "";
 let gorunen = "";
 let tahminler = [];
 let can = 6;
 
 function yeniOyunAsmaca() {
-  const kelimeler = ["kalem", "kitap", "defter", "okul", "tahta", "masa"];
-  secilenKelime = kelimeler[Math.floor(Math.random() * kelimeler.length)].toUpperCase();
-  gorunen = "_".repeat(secilenKelime.length);
-  tahminler = [];
-  can = 6;
-  guncelleAsmaca();
+  fetch("kelimeler.json")
+    .then(res => res.json())
+    .then(data => {
+      const gecerli = data.filter(item => item.transliteration && item.meaning);
+      const secilen = gecerli[Math.floor(Math.random() * gecerli.length)];
+
+      secilenKelime = secilen.transliteration.toUpperCase();
+      secilenAnlam = secilen.meaning;
+      gorunen = "_".repeat(secilenKelime.length);
+      tahminler = [];
+      can = 6;
+      guncelleAsmaca();
+    });
 }
 
 function tahminEt() {
@@ -323,17 +331,19 @@ function tahminEt() {
 function guncelleAsmaca() {
   document.getElementById("kelimeGizli").textContent = gorunen.split("").join(" ");
   document.getElementById("tahminler").textContent = `Tahminler: ${tahminler.join(", ")}`;
-  document.getElementById("adamDurumu").textContent = can <= 0 ? `Kaybettiniz! Kelime: ${secilenKelime}` : gorunen === secilenKelime ? "Tebrikler, bildiniz!" : `Kalan hak: ${can}`;
+  document.getElementById("adamDurumu").innerHTML = can <= 0
+    ? `❌ Kaybettiniz! Kelime: ${secilenKelime}<br><span class="text-secondary">📖 Anlamı: ${secilenAnlam}</span>`
+    : gorunen === secilenKelime
+      ? `✅ Tebrikler, bildiniz!<br><span class="text-success">📖 Anlamı: ${secilenAnlam}</span>`
+      : `Kalan hak: ${can}`;
 
   const parts = ["hg-head", "hg-body", "hg-arm-left", "hg-arm-right", "hg-leg-left", "hg-leg-right"];
   parts.forEach((id, index) => {
     const part = document.getElementById(id);
-    if (part) {
-      part.style.display = (6 - can > index) ? 'block' : 'none';
-    }
+    if (part) part.style.display = (6 - can > index) ? 'block' : 'none';
   });
 
-  if (can <= 0 || gorunen === secilenKelime) setTimeout(yeniOyunAsmaca, 3000);
+  if (can <= 0 || gorunen === secilenKelime) setTimeout(yeniOyunAsmaca, 4000);
 }
 
 document.addEventListener("DOMContentLoaded", yeniOyunAsmaca);
