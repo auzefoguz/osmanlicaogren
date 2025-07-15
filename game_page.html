@@ -19,6 +19,13 @@
       border-radius: 1rem;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
+    .header-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
     .card-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -78,22 +85,25 @@
   </nav>
 
   <div class="container game-container">
-    <h2 class="text-center mb-4">Eşleştirme Oyunu</h2>
+    <h2 class="text-center mb-3">Eşleştirme Oyunu</h2>
+    <div class="header-info">
+      <span id="scoreBox">Skor: 0</span>
+      <span id="timerBox">Süre: 60</span>
+    </div>
     <div class="card-grid" id="cardGrid"></div>
     <div class="message-box" id="messageBox"></div>
   </div>
 
   <script>
-    let cards = [];
-    let firstCard = null;
-    let lockBoard = false;
+    let cards = [], firstCard = null, lockBoard = false;
+    let score = 0, timeLeft = 60, timerInterval;
 
     fetch('kelimeler.json')
       .then(response => response.json())
       .then(data => {
         const simplified = data.map(item => ({
           word: item.word,
-          meaning: item.meaning.split(/[.;،]/)[0].trim() // İlk anlamı al
+          meaning: item.meaning.split(/[.;،]/)[0].trim()
         })).filter(item => item.word && item.meaning);
 
         const sample = shuffle(simplified).slice(0, 6);
@@ -102,6 +112,7 @@
           { type: 'meaning', value: item.meaning, pair: item.word }
         ]));
         renderCards();
+        startTimer();
       });
 
     function renderCards() {
@@ -117,7 +128,7 @@
     }
 
     function revealCard(index) {
-      if (lockBoard) return;
+      if (lockBoard || timeLeft <= 0) return;
       const cardEl = document.querySelector(`[data-index='${index}']`);
       const card = cards[index];
       if (card.matched || card.revealed) return;
@@ -147,6 +158,7 @@
         b.card.matched = true;
         aEl.classList.add("matched");
         bEl.classList.add("matched");
+        score += 10;
       } else {
         a.card.revealed = false;
         b.card.revealed = false;
@@ -154,16 +166,38 @@
         bEl.classList.remove("revealed");
         aEl.textContent = "";
         bEl.textContent = "";
+        score -= 2;
       }
 
+      updateScore();
       lockBoard = false;
       checkWin();
     }
 
+    function updateScore() {
+      document.getElementById("scoreBox").textContent = `Skor: ${score}`;
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timerBox").textContent = `Süre: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
     function checkWin() {
       if (cards.every(card => card.matched)) {
-        document.getElementById("messageBox").textContent = "✨ Tebrikler! Tüm kartları eşleştirdiniz.";
+        clearInterval(timerInterval);
+        document.getElementById("messageBox").textContent = `✨ Tebrikler! Tüm kartları eşleştirdiniz. Toplam Skor: ${score}`;
       }
+    }
+
+    function endGame() {
+      document.getElementById("messageBox").textContent = `⏰ Süre doldu! Toplam Skor: ${score}`;
     }
 
     function shuffle(array) {
@@ -176,3 +210,4 @@
   </script>
 </body>
 </html>
+
