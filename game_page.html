@@ -57,6 +57,7 @@
   </style>
 </head>
 <body>
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-md bg-dark navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="index.html"><i class="bi bi-house-door-fill"></i> Anasayfa</a>
@@ -76,14 +77,6 @@
 
   <div class="container game-container">
     <h2 class="text-center mb-3">Eşleştirme Oyunu</h2>
-
-    <div class="text-center mb-3">
-      <label for="oyunTuru" class="fw-bold me-2">Oyun Türü:</label>
-      <select id="oyunTuru" class="form-select form-select-sm d-inline-block w-auto" onchange="changeGameMode(this.value)">
-        <option value="eslestirme">Eşleştirme</option>
-        <option value="anlamBul">Anlam Bul</option>
-      </select>
-    </div>
 
     <div class="text-center mb-3">
       <label for="seviyeSec" class="fw-bold me-2">Seviye:</label>
@@ -151,10 +144,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // OYUN DEĞİŞKENLERİ
     let cards = [], firstCard = null, lockBoard = false;
     let score = 0, timeLeft = 60, timerInterval;
-    let gameMode = 'eslestirme';
     let currentDifficulty = 'kolay';
 
     function shuffle(arr) {
@@ -165,28 +156,23 @@
       return arr;
     }
 
-    function getCardCount() {
-      return currentDifficulty === 'zor' ? 12 : currentDifficulty === 'orta' ? 8 : 6;
-    }
-
     function setDifficulty(level) {
       currentDifficulty = level;
       initGame();
     }
 
-    function changeGameMode(mode) {
-      gameMode = mode;
-      document.getElementById("cardGrid").innerHTML = "";
-      document.getElementById("messageBox").textContent = "";
-      document.getElementById("restartBtn").style.display = "none";
-      score = 0;
-      updateScore();
-      initGame();
+    function getCardCount() {
+      return currentDifficulty === 'zor' ? 12 : currentDifficulty === 'orta' ? 8 : 6;
     }
 
     function initGame() {
       clearInterval(timerInterval);
+      score = 0;
       timeLeft = 60;
+      updateScore();
+      document.getElementById("messageBox").textContent = "";
+      document.getElementById("restartBtn").style.display = "none";
+
       fetch("https://auzefoguz.github.io/osmanlicaogren/kelimeler.json")
         .then(res => res.json())
         .then(data => {
@@ -195,18 +181,15 @@
             meaning: item.meaning?.split(/[.;،]/)[0].trim()
           })).filter(k => k.word && k.meaning);
 
-          if (gameMode === 'anlamBul') {
-            initMeaningGame(kelimeler);
-          } else {
-            const sample = shuffle(kelimeler).slice(0, getCardCount());
-            cards = shuffle(sample.flatMap(item => [
-              { type: 'word', value: item.word, pair: item.meaning },
-              { type: 'meaning', value: item.meaning, pair: item.word }
-            ]));
-            renderCards();
-            startTimer();
-            renderChart();
-          }
+          const sample = shuffle(kelimeler).slice(0, getCardCount());
+          cards = shuffle(sample.flatMap(item => [
+            { type: 'word', value: item.word, pair: item.meaning },
+            { type: 'meaning', value: item.meaning, pair: item.word }
+          ]));
+
+          renderCards();
+          startTimer();
+          renderChart();
         });
     }
 
@@ -231,7 +214,6 @@
       card.revealed = true;
       el.classList.add("revealed");
       el.textContent = card.value;
-
       if (card.type === "word") speak(card.value);
 
       if (!firstCard) {
@@ -299,6 +281,7 @@
       saveScore();
       document.getElementById("messageBox").innerHTML = `⏰ Süre doldu!<br>Skorunuz: ${score}`;
       document.getElementById("restartBtn").style.display = "inline-block";
+      renderChart();
     }
 
     function speak(text) {
@@ -315,6 +298,26 @@
       localStorage.setItem("bilinenKelimeler", JSON.stringify(list));
     }
 
+    function showKnownWordsModal() {
+      const list = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
+      let html = '<table class="table"><thead><tr><th>Kelime</th><th>Anlam</th><th>Tarih</th></tr></thead><tbody>';
+      list.forEach(k => {
+        html += `<tr><td>${k.word}</td><td>${k.meaning}</td><td>${k.tarih}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById("bilinenKelimelerIcerik").innerHTML = html;
+    }
+
+    function showHistoryModal() {
+      const list = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]").slice(-20).reverse();
+      let html = '<table class="table"><thead><tr><th>Tarih</th><th>Skor</th></tr></thead><tbody>';
+      list.forEach(e => {
+        html += `<tr><td>${e.tarih}</td><td>${e.skor}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById("gecmisIcerik").innerHTML = html;
+    }
+
     function exportKnownWords() {
       const data = JSON.parse(localStorage.getItem("bilinenKelimeler") || "[]");
       let csv = "Kelime,Anlam,Tarih\n";
@@ -329,8 +332,7 @@
       link.click();
     }
 
-    // Diğer fonksiyonlar: initMeaningGame, showKnownWordsModal, showHistoryModal, saveScore, renderChart burada eklenmeye devam edebilir...
-    
+    // TODO: renderChart ve saveScore fonksiyonları da eklenmeli.
     window.onload = initGame;
   </script>
 </body>
