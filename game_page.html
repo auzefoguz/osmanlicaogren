@@ -119,12 +119,13 @@
   <div class="container game-container">
     <h2 class="text-center mb-3">Eşleştirme Oyunu</h2>
     <div class="text-center mb-3">
-      <span id="seviyeGoster" class="fw-bold">Seviye: KOLAY</span>
-      <div class="btn-group mt-2" role="group">
-        <button onclick="setDifficulty('kolay')" class="btn btn-outline-success btn-sm">Kolay</button>
-        <button onclick="setDifficulty('orta')" class="btn btn-outline-warning btn-sm">Orta</button>
-        <button onclick="setDifficulty('zor')" class="btn btn-outline-danger btn-sm">Zor</button>
-      </div>
+  <label for="seviyeSec" class="fw-bold me-2">Seviye:</label>
+  <select id="seviyeSec" class="form-select form-select-sm d-inline-block w-auto" onchange="setDifficulty(this.value)">
+    <option value="kolay">Kolay</option>
+    <option value="orta">Orta</option>
+    <option value="zor">Zor</option>
+  </select>
+</div>
     </div>
     <div class="text-center mb-3">
       <button class="btn btn-outline-primary btn-sm" onclick="showKnownWordsModal()" data-bs-toggle="modal" data-bs-target="#kelimeModal">📋 Bilinen Kelimeler</button>
@@ -206,7 +207,10 @@ let currentDifficulty = 'kolay';
 
 function setDifficulty(level) {
   currentDifficulty = level;
-  document.getElementById("seviyeGoster").textContent = `Seviye: ${level.toUpperCase()}`;
+  const select = document.getElementById("seviyeSec");
+  if (select) select.value = level;
+  initGame();
+}`;
   initGame();
 }
 
