@@ -6,6 +6,7 @@
   <title>Osmanlıca Eşleştirme Oyunu</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -55,6 +56,13 @@
       font-size: 1.2rem;
       font-weight: bold;
     }
+    .restart-btn {
+      margin-top: 1rem;
+      display: none;
+    }
+    #chartSection {
+      margin-top: 3rem;
+    }
   </style>
 </head>
 <body>
@@ -92,28 +100,49 @@
     </div>
     <div class="card-grid" id="cardGrid"></div>
     <div class="message-box" id="messageBox"></div>
+    <div class="text-center">
+      <button id="restartBtn" class="btn btn-primary restart-btn">Yeniden Oyna</button>
+    </div>
+
+    <div id="chartSection">
+      <h5 class="text-center mt-4">📈 Skor Geçmişi</h5>
+      <canvas id="scoreChart" height="100"></canvas>
+    </div>
   </div>
 
   <script>
     let cards = [], firstCard = null, lockBoard = false;
     let score = 0, timeLeft = 60, timerInterval;
 
-    fetch('kelimeler.json')
-      .then(response => response.json())
-      .then(data => {
-        const simplified = data.map(item => ({
-          word: item.word,
-          meaning: item.meaning.split(/[.;،]/)[0].trim()
-        })).filter(item => item.word && item.meaning);
+    document.getElementById("restartBtn").onclick = () => initGame();
 
-        const sample = shuffle(simplified).slice(0, 6);
-        cards = shuffle(sample.flatMap(item => [
-          { type: 'word', value: item.word, pair: item.meaning },
-          { type: 'meaning', value: item.meaning, pair: item.word }
-        ]));
-        renderCards();
-        startTimer();
-      });
+    function initGame() {
+      clearInterval(timerInterval);
+      score = 0;
+      timeLeft = 60;
+      document.getElementById("messageBox").textContent = "";
+      document.getElementById("restartBtn").style.display = "none";
+      updateScore();
+      document.getElementById("timerBox").textContent = `Süre: ${timeLeft}`;
+
+      fetch('kelimeler.json')
+        .then(response => response.json())
+        .then(data => {
+          const simplified = data.map(item => ({
+            word: item.word,
+            meaning: item.meaning.split(/[.;،]/)[0].trim()
+          })).filter(item => item.word && item.meaning);
+
+          const sample = shuffle(simplified).slice(0, 6);
+          cards = shuffle(sample.flatMap(item => [
+            { type: 'word', value: item.word, pair: item.meaning },
+            { type: 'meaning', value: item.meaning, pair: item.word }
+          ]));
+          renderCards();
+          startTimer();
+        });
+      renderChart();
+    }
 
     function renderCards() {
       const grid = document.getElementById("cardGrid");
@@ -192,12 +221,48 @@
     function checkWin() {
       if (cards.every(card => card.matched)) {
         clearInterval(timerInterval);
-        document.getElementById("messageBox").textContent = `✨ Tebrikler! Tüm kartları eşleştirdiniz. Toplam Skor: ${score}`;
+        saveScore();
+        document.getElementById("messageBox").innerHTML = `✨ Tebrikler!<br>Skorunuz: ${score}<br><span style='font-size: 1.5rem;'>⭐⭐⭐</span>`;
+        document.getElementById("restartBtn").style.display = "inline-block";
+        renderChart();
       }
     }
 
     function endGame() {
-      document.getElementById("messageBox").textContent = `⏰ Süre doldu! Toplam Skor: ${score}`;
+      saveScore();
+      document.getElementById("messageBox").innerHTML = `⏰ Süre doldu!<br>Skorunuz: ${score}`;
+      document.getElementById("restartBtn").style.display = "inline-block";
+      renderChart();
+    }
+
+    function saveScore() {
+      const tarih = new Date().toLocaleString();
+      const previous = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]");
+      previous.push({ tarih, skor: score });
+      localStorage.setItem("eslestirmeSkorlar", JSON.stringify(previous));
+    }
+
+    function renderChart() {
+      const data = JSON.parse(localStorage.getItem("eslestirmeSkorlar") || "[]");
+      const labels = data.slice(-7).map(x => x.tarih);
+      const scores = data.slice(-7).map(x => x.skor);
+
+      const ctx = document.getElementById("scoreChart").getContext("2d");
+      if (window.scoreChart) window.scoreChart.destroy();
+      window.scoreChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Son 7 Skor',
+            data: scores,
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13, 110, 253, 0.2)',
+            fill: true,
+            tension: 0.3
+          }]
+        }
+      });
     }
 
     function shuffle(array) {
@@ -207,7 +272,9 @@
       }
       return array;
     }
+
+    // İlk başlatma
+    initGame();
   </script>
 </body>
 </html>
-
