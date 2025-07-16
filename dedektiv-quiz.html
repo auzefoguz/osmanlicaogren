@@ -2,82 +2,138 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>🕵️ Osmanlıca Dedektif - Gelişmiş Quiz</title>
+  <title>🕵️ Osmanlıca Dedektif - Zarif Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lateef&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New&display=swap');
+
     body {
-      font-family: 'Lateef', serif;
-      background: radial-gradient(circle at center, #fffbe6, #f3ead7);
+      font-family: 'Scheherazade New', serif;
+      background: radial-gradient(circle at center, #f9f5ed, #e8dfc7);
       margin: 0; padding: 2rem;
-      color: #3a2c00;
+      color: #4a3c1a;
       text-align: center;
+      user-select: none;
     }
     h1 {
-      font-size: 2.5rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 0 0 8px #a67c00, 0 0 20px #d4af37;
-      animation: glow 3s infinite alternate;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 8px #a67c00; }
-      to { text-shadow: 0 0 20px #d4af37, 0 0 30px #fff2b2; }
+      font-family: 'Lateef', serif;
+      font-size: 3rem;
+      letter-spacing: 3px;
+      color: #7a5c00;
+      text-shadow: 0 0 6px #a57e00;
+      margin-bottom: 1rem;
     }
     #chapter {
-      font-weight: bold;
-      font-size: 1.3rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #705e1e;
       margin-bottom: 1rem;
+      border-bottom: 2px solid #a57e00;
+      display: inline-block;
+      padding-bottom: 6px;
+      font-style: italic;
     }
     #story {
       font-style: italic;
       margin-bottom: 1rem;
-      background: #fff6c4;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 8px #d4af37aa;
+      background: #fff9dfcc;
+      padding: 1rem 2rem;
+      border-radius: 14px;
+      box-shadow: 0 0 12px #d4b74daa;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+      font-size: 1.15rem;
     }
     #question {
       font-size: 1.8rem;
-      margin: 1rem 0;
+      margin: 1.5rem 0 1rem 0;
+      font-weight: 700;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    ul { list-style: none; padding: 0; }
-    li {
-      background: #f7e7aa;
-      margin: .5rem 0;
-      padding: .8rem 1rem;
-      border-radius: 10px;
+    ul {
+      list-style: none;
+      padding: 0;
+      max-width: 650px;
+      margin: 0 auto 1.5rem auto;
+    }
+    ul li {
+      background: #fff4b7;
+      margin: 0.5rem 0;
+      padding: 1rem 1.3rem;
+      border-radius: 15px;
       cursor: pointer;
       font-size: 1.3rem;
-      transition: all .3s;
+      font-weight: 600;
+      color: #5d4d00;
+      border: 2px solid transparent;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      box-shadow: 0 3px 6px #cbb85288;
+      user-select: none;
     }
-    li:hover { background: #e1c85b; }
-    li.selected { background: #4b3200; color: #f5ecce; }
+    ul li:hover {
+      background-color: #d9c33a;
+      border-color: #b89917;
+      color: #362e00;
+    }
+    ul li.selected {
+      background-color: #7a6500;
+      color: #fffbe0;
+      border-color: #a67c00;
+      box-shadow: 0 0 12px #c3a700aa;
+      font-weight: 800;
+      cursor: default;
+    }
     #feedback {
-      margin: 1rem 0;
-      font-weight: bold;
-      background: #fff1a3;
-      padding: 1rem;
-      border-radius: 8px;
+      margin: 1rem auto;
+      max-width: 650px;
+      font-weight: 700;
+      background: #fff7b1;
+      padding: 1rem 2rem;
+      border-radius: 14px;
+      box-shadow: 0 0 10px #a57e0011;
+      min-height: 55px;
+      color: #6c5a00;
+      font-style: italic;
+      user-select: none;
     }
     button {
-      background: #4b3200;
-      color: #f5ecce;
+      background: transparent;
       border: none;
-      padding: .8rem 1.5rem;
-      margin: .5rem;
-      border-radius: 8px;
+      margin: 0 0.7rem;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 1rem;
+      color: #7a6500;
+      font-size: 2.2rem;
+      transition: color 0.3s;
+      vertical-align: middle;
+      user-select: none;
     }
-    button:hover { background: #7a5c00; }
+    button:hover {
+      color: #a67c00;
+    }
     #result {
       margin-top: 2rem;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #5d4700;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+      white-space: pre-line;
     }
-    audio { display: block; margin: 1rem auto; }
+    audio {
+      margin: 1.5rem auto;
+      display: block;
+      outline: none;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #d4b74d88;
+    }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -87,120 +143,140 @@
   <div id="question"></div>
   <ul id="options"></ul>
   <div id="feedback"></div>
-  <button id="next-btn" disabled>Sonraki İpucu</button>
-
-  <div id="result"></div>
+  <button id="next-btn" disabled title="Sonraki İpucu">➡️</button>
 
   <div>
-    <button onclick="location.href='index.html'">Ana Sayfaya Dön</button>
-    <button onclick="location.reload()">Yeniden Başla</button>
-    <button onclick="finishQuiz()">Bitir</button>
+    <button onclick="goHome()" title="Ana Sayfa">🏠</button>
+    <button onclick="restartQuiz()" title="Yeniden Başla">🔄</button>
+    <button onclick="finishQuiz()" title="Bitir">🏁</button>
   </div>
 
-  <audio id="ney" controls loop>
+  <audio id="ney" controls loop preload="auto">
     <source src="haunting-middle-eastern-piece-188714.mp3" type="audio/mp3">
     Tarayıcınız audio etiketini desteklemiyor.
   </audio>
 
-  <script>
-    let kelimeler = [];
-    let currentIndex = 0;
-    let score = 0;
+<script>
+  let kelimeler = [];
+  let currentIndex = 0;
+  let score = 0;
 
-    const chapters = [
-      "Bölüm 1: Başlangıç",
-      "Bölüm 2: Kayıp Parşömen",
-      "Bölüm 3: Gölgeler Arasında",
-      "Bölüm 4: Son Sır",
-      "Bölüm 5: Çözülüş"
-    ];
+  const chapters = [
+    "Bölüm 1: Başlangıç",
+    "Bölüm 2: Kayıp Parşömen",
+    "Bölüm 3: Gölgeler Arasında",
+    "Bölüm 4: Son Sır",
+    "Bölüm 5: Çözülüş"
+  ];
 
-    const chapterEl = document.getElementById('chapter');
-    const storyEl = document.getElementById('story');
-    const questionEl = document.getElementById('question');
-    const optionsEl = document.getElementById('options');
-    const feedbackEl = document.getElementById('feedback');
-    const nextBtn = document.getElementById('next-btn');
-    const resultEl = document.getElementById('result');
+  const chapterEl = document.getElementById('chapter');
+  const storyEl = document.getElementById('story');
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const feedbackEl = document.getElementById('feedback');
+  const nextBtn = document.getElementById('next-btn');
+  const resultEl = document.getElementById('result');
 
-    fetch('kelimeler.json')
-      .then(res => res.json())
-      .then(data => {
-        kelimeler = data;
-        renderQuestion();
-      })
-      .catch(err => {
-        storyEl.textContent = 'Hata: kelimeler.json yüklenemedi.';
-        console.error(err);
-      });
+  fetch('kelimeler.json')
+    .then(res => res.json())
+    .then(data => {
+      kelimeler = data;
+      renderQuestion();
+    })
+    .catch(err => {
+      storyEl.textContent = 'Hata: kelimeler.json yüklenemedi.';
+      console.error(err);
+    });
 
-    function renderQuestion() {
-      nextBtn.disabled = true;
-      feedbackEl.textContent = '';
-      optionsEl.innerHTML = '';
+  function renderQuestion() {
+    nextBtn.disabled = true;
+    feedbackEl.textContent = '';
+    optionsEl.innerHTML = '';
+    resultEl.textContent = '';
 
-      // Bölüm belirle
-      const bolum = Math.floor(currentIndex / 5);
-      chapterEl.textContent = chapters[bolum] || "Bilinmeyen Bölüm";
+    // Bölüm güncelle
+    const bolum = Math.floor(currentIndex / 5);
+    chapterEl.textContent = chapters[bolum] || "Bilinmeyen Bölüm";
 
-      const kelime = kelimeler[currentIndex];
-      storyEl.textContent = `📜 ${kelime.context || "Dedektif eski bir arşivde bu kelimeyi buldu..."} (${kelime.transliteration})`;
+    const kelime = kelimeler[currentIndex];
+    storyEl.textContent = `📜 ${kelime.context || "Dedektif eski bir arşivde bu kelimeyi buldu..."} (${kelime.transliteration})`;
 
-      // 1 şık doğru, diğerleri rastgele
-      const allMeanings = kelimeler.map(k => k.meaning);
-      const wrongs = allMeanings.filter(m => m !== kelime.meaning).sort(() => 0.5 - Math.random()).slice(0, 3);
-      const options = [{ text: kelime.meaning, correct: true }].concat(wrongs.map(w => ({ text: w, correct: false })))
-        .sort(() => 0.5 - Math.random());
+    // 1 doğru, 3 yanlış seçenek
+    const allMeanings = kelimeler.map(k => k.meaning);
+    const wrongs = allMeanings.filter(m => m !== kelime.meaning).sort(() => 0.5 - Math.random()).slice(0, 3);
+    const options = [{ text: kelime.meaning, correct: true }].concat(wrongs.map(w => ({ text: w, correct: false })))
+      .sort(() => 0.5 - Math.random());
 
-      // Bazen farklı soru tipi (örnek: "Cümlede boşluğu doldur")
-      if (currentIndex % 5 === 2) {
-        questionEl.textContent = `Cümleyi tamamla: "${kelime.transliteration} ____ anlamına gelir."`;
-      } else {
-        questionEl.textContent = `Bu kelimenin anlamı nedir?`;
-      }
-
-      options.forEach(opt => {
-        const li = document.createElement('li');
-        li.textContent = opt.text;
-        li.onclick = () => {
-          if ([...optionsEl.children].some(el => el.classList.contains('selected'))) return;
-
-          li.classList.add('selected');
-          [...optionsEl.children].forEach(el => el.style.pointerEvents = 'none');
-
-          if (opt.correct) {
-            score++;
-            feedbackEl.textContent = `✅ Doğru! Gizli ipucu: "${kelime.word}"`;
-          } else {
-            feedbackEl.textContent = `❌ Yanlış. Doğru cevap: ${kelime.meaning}`;
-          }
-          nextBtn.disabled = false;
-        };
-        optionsEl.appendChild(li);
-      });
+    // Bazen farklı soru tipi
+    if (currentIndex % 5 === 2) {
+      questionEl.textContent = `Cümleyi tamamla: "${kelime.transliteration} ____ anlamına gelir."`;
+    } else if (currentIndex % 5 === 4) {
+      questionEl.textContent = `Bu kelime hangi cümlede doğru kullanılmıştır?`;
+      // Örnek, şimdilik aynı seçenekler veriyoruz
+    } else {
+      questionEl.textContent = `Bu kelimenin anlamı nedir?`;
     }
 
-    nextBtn.onclick = () => {
-      currentIndex++;
-      if (currentIndex < kelimeler.length) {
-        renderQuestion();
-      } else {
-        finishQuiz();
-      }
-    };
+    options.forEach(opt => {
+      const li = document.createElement('li');
+      li.textContent = opt.text;
+      li.onclick = () => {
+        if ([...optionsEl.children].some(el => el.classList.contains('selected'))) return;
 
-    function finishQuiz() {
-      chapterEl.style.display = "none";
-      storyEl.style.display = "none";
-      questionEl.style.display = "none";
-      optionsEl.style.display = "none";
-      feedbackEl.style.display = "none";
-      nextBtn.style.display = "none";
+        li.classList.add('selected');
+        [...optionsEl.children].forEach(el => el.style.pointerEvents = 'none');
 
-      resultEl.textContent = `🕵️ Dedektif! ${kelimeler.length} kelimeden ${score} tanesini doğru çözdün.
-      Tüm bölümler tamamlandı!`;
+        if (opt.correct) {
+          score++;
+          feedbackEl.textContent = `✅ Doğru! Gizli ipucu: "${kelime.word}"`;
+        } else {
+          feedbackEl.textContent = `❌ Yanlış. Doğru cevap: ${kelime.meaning}`;
+        }
+        nextBtn.disabled = false;
+      };
+      optionsEl.appendChild(li);
+    });
+  }
+
+  nextBtn.onclick = () => {
+    currentIndex++;
+    if (currentIndex < kelimeler.length) {
+      renderQuestion();
+    } else {
+      finishQuiz();
     }
-  </script>
+  };
+
+  function finishQuiz() {
+    chapterEl.style.display = "none";
+    storyEl.style.display = "none";
+    questionEl.style.display = "none";
+    optionsEl.style.display = "none";
+    feedbackEl.style.display = "none";
+    nextBtn.style.display = "none";
+
+    resultEl.textContent = `🕵️ Dedektif! ${kelimeler.length} kelimeden ${score} tanesini doğru çözdün.
+    Tüm bölümler tamamlandı! 🎉`;
+  }
+
+  function goHome() {
+    // Ana sayfa linkini buraya yaz
+    window.location.href = 'index.html';
+  }
+
+  function restartQuiz() {
+    currentIndex = 0;
+    score = 0;
+    chapterEl.style.display = "block";
+    storyEl.style.display = "block";
+    questionEl.style.display = "block";
+    optionsEl.style.display = "block";
+    feedbackEl.style.display = "block";
+    nextBtn.style.display = "inline-block";
+    renderQuestion();
+  }
+
+</script>
 
 </body>
 </html>
