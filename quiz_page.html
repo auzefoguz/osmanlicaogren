@@ -101,23 +101,21 @@
     const chartCanvas = document.getElementById("dailyChart").getContext('2d');
     const endButtons = document.getElementById("endButtons");
 
-   auth.onAuthStateChanged(user => {
+  // Firebase oturum kontrolü ve veri yükleme
+
+auth.onAuthStateChanged(user => {
+  console.log("auth kontrol ediliyor...");
   if (user) {
     userId = user.uid;
-    console.log("Kullanıcı oturumu bulundu:", userId); // bunu ekle
+    console.log("Kullanıcı oturumu bulundu:", userId);
     loadWords();
     loadTopWords();
     loadDailyStats();
   } else {
+    console.log("Giriş yapılmamış. login.html sayfasına yönlendiriliyor.");
     window.location.href = "login.html";
   }
 });
-
-    });
-
-  // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries' ve '/kelimeListeleri/default/liste' yolları da desteklensin:
-
-// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
 
 // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
 
@@ -127,52 +125,49 @@ async function loadWords() {
     // 1. dictionaryelif > entries
     const dictSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryelif").collection("entries").get();
     words = dictSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-console.log("Kelime kaynağından gelen veriler:", words);
+    console.log("dictionaryelif > entries:", words);
 
     // 2. entries > entries
     if (words.length === 0) {
       const altSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("entries").collection("entries").get();
       words = altSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-   console.log("Kelime kaynağından gelen veriler:", words);
-
-}
-
+      console.log("entries > entries:", words);
+    }
 
     // 3. default > entries
     if (words.length === 0) {
       const defaultSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("entries").get();
       words = defaultSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-    console.log("Kelime kaynağından gelen veriler:", words);
-
-}
+      console.log("default > entries:", words);
+    }
 
     // 4. default > liste
     if (words.length === 0) {
       const listeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("liste").get();
       words = listeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+      console.log("default > liste:", words);
     }
 
     // 5. dictionaryHA > kelimeler
     if (words.length === 0) {
       const haSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryHA").collection("kelimeler").get();
       words = haSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-   
-}console.log("Kelime kaynağından gelen veriler:", words);
-
+      console.log("dictionaryHA > kelimeler:", words);
+    }
 
     // 6. dictionaryayn > entries
     if (words.length === 0) {
       const aynSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("entries").get();
       words = aynSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+      console.log("dictionaryayn > entries:", words);
     }
 
     // 7. dictionaryayn > kelimeler
     if (words.length === 0) {
       const aynKelimeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("kelimeler").get();
       words = aynKelimeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-   console.log("Kelime kaynağından gelen veriler:", words);
-
-}
+      console.log("dictionaryayn > kelimeler:", words);
+    }
 
     if (words.length < 4) {
       questionText.textContent = "Quiz için yeterli kelime yok.";
@@ -186,6 +181,7 @@ console.log("Kelime kaynağından gelen veriler:", words);
     questionText.textContent = "Kelime verisi alınamadı.";
   }
 }
+
 
 
 
