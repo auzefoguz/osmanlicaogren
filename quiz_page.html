@@ -111,14 +111,19 @@ auth.onAuthStateChanged(user => {
     userId = user.uid;
     console.log("Kullanıcı oturumu bulundu:", userId);
 
-    // 🔥 TEST: dictionaryayn > kelimeler (alan olarak)
+    // 🔥 TEST: dictionaryayn > kelimeler (alan veya map)
     db.collection("users").doc(userId)
       .collection("kelimeListeleri").doc("dictionaryayn")
       .get()
       .then(doc => {
         const data = doc.data();
-        if (data && Array.isArray(data.kelimeler)) {
-          console.log("🔥 TEST - dictionaryayn > kelimeler (alan):", data.kelimeler);
+        if (data && data.kelimeler) {
+          if (Array.isArray(data.kelimeler)) {
+            console.log("🔥 TEST - dictionaryayn > kelimeler (array):", data.kelimeler);
+          } else if (typeof data.kelimeler === 'object') {
+            const arr = Object.values(data.kelimeler);
+            console.log("🔥 TEST - dictionaryayn > kelimeler (map to array):", arr);
+          }
         } else {
           console.warn("⚠️ dictionaryayn belgesinde 'kelimeler' alanı yok veya geçersiz.");
         }
@@ -181,13 +186,19 @@ async function loadWords() {
       console.log("dictionaryayn > entries:", words);
     }
 
-    // 7. dictionaryayn > kelimeler (koleksiyon değil, alan olarak)
+    // 7. dictionaryayn > kelimeler (koleksiyon değil, alan veya map)
     if (words.length === 0) {
       const aynDoc = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").get();
       const data = aynDoc.data();
-      if (data && Array.isArray(data.kelimeler)) {
-        words = data.kelimeler.filter(w => w.word && w.meaning);
-        console.log("dictionaryayn > kelimeler (alan):", words);
+      if (data && data.kelimeler) {
+        if (Array.isArray(data.kelimeler)) {
+          words = data.kelimeler.filter(w => w.word && w.meaning);
+          console.log("dictionaryayn > kelimeler (array):", words);
+        } else if (typeof data.kelimeler === 'object') {
+          const arr = Object.values(data.kelimeler);
+          words = arr.filter(w => w.word && w.meaning);
+          console.log("dictionaryayn > kelimeler (map to array):", words);
+        }
       }
     }
 
