@@ -103,19 +103,25 @@
 
 // Firebase oturum kontrolü ve veri yükleme
 
+// Firebase oturum kontrolü ve veri yükleme
+
 auth.onAuthStateChanged(user => {
+  console.log("auth kontrol ediliyor...");
   if (user) {
     userId = user.uid;
     console.log("Kullanıcı oturumu bulundu:", userId);
 
-    // 🔥 TEST: dictionaryayn > kelimeler
+    // 🔥 TEST: dictionaryayn > kelimeler (alan olarak)
     db.collection("users").doc(userId)
       .collection("kelimeListeleri").doc("dictionaryayn")
-      .collection("kelimeler")
       .get()
-      .then(snap => {
-        const kelimeler = snap.docs.map(doc => doc.data());
-        console.log("🔥 TEST - dictionaryayn > kelimeler:", kelimeler);
+      .then(doc => {
+        const data = doc.data();
+        if (data && Array.isArray(data.kelimeler)) {
+          console.log("🔥 TEST - dictionaryayn > kelimeler (alan):", data.kelimeler);
+        } else {
+          console.warn("⚠️ dictionaryayn belgesinde 'kelimeler' alanı yok veya geçersiz.");
+        }
       })
       .catch(err => {
         console.error("❌ HATA - test:", err);
@@ -125,27 +131,10 @@ auth.onAuthStateChanged(user => {
     loadTopWords();
     loadDailyStats();
   } else {
+    console.log("Giriş yapılmamış. login.html sayfasına yönlendiriliyor.");
     window.location.href = "login.html";
   }
 });
-
-
-// dictionaryayn > kelimeler koleksiyonu test logu (sayfa yüklendikten 2 saniye sonra çalışır)
-setTimeout(() => {
-  const uid = firebase.auth().currentUser?.uid;
-  if (!uid) return console.warn("❗ Kullanıcı oturumda değil.");
-  db.collection("users").doc(uid)
-    .collection("kelimeListeleri").doc("dictionaryayn")
-    .collection("kelimeler")
-    .get()
-    .then(snap => {
-      const kelimeler = snap.docs.map(doc => doc.data());
-      console.log("🔥 dictionaryayn > kelimeler test sonucu:", kelimeler);
-    })
-    .catch(err => {
-      console.error("❌ Test sorgusunda hata:", err);
-    });
-}, 2000);
 
 // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
 
@@ -192,11 +181,14 @@ async function loadWords() {
       console.log("dictionaryayn > entries:", words);
     }
 
-    // 7. dictionaryayn > kelimeler
+    // 7. dictionaryayn > kelimeler (koleksiyon değil, alan olarak)
     if (words.length === 0) {
-      const aynKelimeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("kelimeler").get();
-      words = aynKelimeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-      console.log("dictionaryayn > kelimeler:", words);
+      const aynDoc = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").get();
+      const data = aynDoc.data();
+      if (data && Array.isArray(data.kelimeler)) {
+        words = data.kelimeler.filter(w => w.word && w.meaning);
+        console.log("dictionaryayn > kelimeler (alan):", words);
+      }
     }
 
     if (words.length < 4) {
