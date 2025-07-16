@@ -2,237 +2,205 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>🕵️ Osmanlıca Dedektif Gizemi</title>
+  <title>🕵️ Osmanlıca Dedektif - Gelişmiş Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Lateef', serif;
-      background: radial-gradient(ellipse at center, #0b0b0b 0%, #1b1b1b 100%);
-      color: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 2rem;
-      background-size: cover;
-    }
-    header {
-      font-size: 2.8rem;
+      background: radial-gradient(circle at center, #fffbe6, #f3ead7);
+      margin: 0; padding: 2rem;
+      color: #3a2c00;
       text-align: center;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 10px rgba(173, 216, 230, 0.6);
     }
-    main {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2rem;
-      border-radius: 12px;
-      max-width: 800px;
-      width: 100%;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
+    h1 {
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px #a67c00, 0 0 20px #d4af37;
+      animation: glow 3s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 8px #a67c00; }
+      to { text-shadow: 0 0 20px #d4af37, 0 0 30px #fff2b2; }
+    }
+    #chapter {
+      font-weight: bold;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
     }
     #story {
       font-style: italic;
-      font-size: 1.2rem;
-      border-left: 4px solid #0ff;
-      padding-left: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+      background: #fff6c4;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #d4af37aa;
     }
     #question {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 5px cyan;
+      font-size: 1.8rem;
+      margin: 1rem 0;
     }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
+    ul { list-style: none; padding: 0; }
     li {
-      background: rgba(0, 255, 255, 0.1);
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border: 1px solid #0ff;
-      border-radius: 8px;
+      background: #f7e7aa;
+      margin: .5rem 0;
+      padding: .8rem 1rem;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+      font-size: 1.3rem;
+      transition: all .3s;
     }
-    li:hover {
-      background: rgba(0, 255, 255, 0.2);
-      transform: scale(1.02);
-    }
-    li.selected {
-      background: #0ff;
-      color: #000;
-      font-weight: bold;
-    }
+    li:hover { background: #e1c85b; }
+    li.selected { background: #4b3200; color: #f5ecce; }
     #feedback {
       margin: 1rem 0;
-      min-height: 60px;
+      font-weight: bold;
+      background: #fff1a3;
+      padding: 1rem;
+      border-radius: 8px;
     }
     button {
-      background: #0ff;
-      color: #000;
-      padding: 0.8rem 1.5rem;
+      background: #4b3200;
+      color: #f5ecce;
       border: none;
+      padding: .8rem 1.5rem;
+      margin: .5rem;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 1rem;
     }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
+    button:hover { background: #7a5c00; }
     #result {
       margin-top: 2rem;
       font-size: 1.5rem;
-      text-align: center;
     }
-    #music-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #0ff;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    audio { display: block; margin: 1rem auto; }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>🕵️ Osmanlıca Dedektif Gizemi</header>
-  <main>
-    <div id="story"></div>
-    <div id="question"></div>
-    <ul id="options"></ul>
-    <div id="feedback"></div>
-    <button id="next-btn" disabled>Sonraki Bölüm</button>
-    <div id="result"></div>
-  </main>
 
-  <!-- Osmanlı Ney Müziği -->
- <audio id="bg-music" src="https://<kullanici_adin>.github.io/osmanlicaogren/haunting-middle-eastern-piece-188714.mp3" autoplay loop></audio>
+  <h1>🕵️ Osmanlıca Dedektif</h1>
+  <div id="chapter">Bölüm 1: Başlangıç</div>
+  <div id="story"></div>
+  <div id="question"></div>
+  <ul id="options"></ul>
+  <div id="feedback"></div>
+  <button id="next-btn" disabled>Sonraki İpucu</button>
 
-  <button id="music-btn">🔈 Müzik Aç/Kapa</button>
+  <div id="result"></div>
+
+  <div>
+    <button onclick="location.href='index.html'">Ana Sayfaya Dön</button>
+    <button onclick="location.reload()">Yeniden Başla</button>
+    <button onclick="finishQuiz()">Bitir</button>
+  </div>
+
+  <audio id="ney" controls loop>
+    <source src="haunting-middle-eastern-piece-188714.mp3" type="audio/mp3">
+    Tarayıcınız audio etiketini desteklemiyor.
+  </audio>
 
   <script>
-    const quizData = [
-      {
-        story: "BÖLÜM 1: 🗝️ Dedektif, Osmanlı arşivlerinin tozlu raflarında eski bir belge buldu. Üzerinde silik bir kelime: ‘اقمار’. Bu ilk ipucu...",
-        question: "Bu kelimenin anlamı nedir?",
-        options: [
-          { text: "Aylar", correct: true, explanation: "Doğru! ‘اقمار’ ‘Aylar’ demektir." },
-          { text: "Yıldızlar", correct: false, explanation: "Hayır, yıldızlar değil." },
-          { text: "Güneşler", correct: false, explanation: "Yanlış tahmin." }
-        ]
-      },
-      {
-        story: "BÖLÜM 2: 📜 Dedektif ipuçlarını takip ederken eski bir mektup bulur. Mektupta şu satır var: 'Bu sır ancak *كتاب* ile açılır.'",
-        question: "‘كتاب’ kelimesi ne anlama gelir?",
-        options: [
-          { text: "Kitap", correct: true, explanation: "Doğru! ‘كتاب’ kitap demektir." },
-          { text: "Kalem", correct: false, explanation: "Yanlış, kalem değil." },
-          { text: "Kâğıt", correct: false, explanation: "Hayır, kâğıt değil." }
-        ]
-      },
-      {
-        story: "BÖLÜM 3: 🔍 Mektubun altında küçük bir holografik yazı belirir: 'Kılıcını kullan, yoksa sır kapalı kalır...' Kelime: ‘سيف’.",
-        question: "Bu kelimenin anlamı nedir?",
-        options: [
-          { text: "Kılıç", correct: true, explanation: "Doğru! ‘سيف’ kılıç demektir." },
-          { text: "Kale", correct: false, explanation: "Yanlış, kale değil." },
-          { text: "At", correct: false, explanation: "Yanlış, at değil." }
-        ]
-      },
-      {
-        story: "BÖLÜM 4: ✒️ Dedektif eski defterde eksik bir cümle bulur: 'Sırlar *____* ile yazılır.' Boşluğa hangi kelime gelir?",
-        question: "Doğru kelime nedir?",
-        options: [
-          { text: "قلم", correct: true, explanation: "Doğru! ‘قلم’ kalem demektir." },
-          { text: "كتاب", correct: false, explanation: "Hayır, kitap olmaz." },
-          { text: "سيف", correct: false, explanation: "Yanlış, kılıç değil." }
-        ]
-      },
-      {
-        story: "BÖLÜM 5: 🏫 Sonunda dedektif bir okulun gizli bölmesinde ‘مدرسة’ kelimesini görür. Sır burada çözülür...",
-        question: "Bu kelimenin anlamı nedir?",
-        options: [
-          { text: "Okul", correct: true, explanation: "Doğru! ‘مدرسة’ okul demektir." },
-          { text: "Kütüphane", correct: false, explanation: "Hayır, kütüphane değil." },
-          { text: "Ev", correct: false, explanation: "Yanlış, ev değil." }
-        ]
-      }
-    ];
-
-    let index = 0;
+    let kelimeler = [];
+    let currentIndex = 0;
     let score = 0;
 
-    const storyEl = document.getElementById("story");
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const feedbackEl = document.getElementById("feedback");
-    const nextBtn = document.getElementById("next-btn");
-    const resultEl = document.getElementById("result");
-    const bgMusic = document.getElementById("bg-music");
-    const musicBtn = document.getElementById("music-btn");
+    const chapters = [
+      "Bölüm 1: Başlangıç",
+      "Bölüm 2: Kayıp Parşömen",
+      "Bölüm 3: Gölgeler Arasında",
+      "Bölüm 4: Son Sır",
+      "Bölüm 5: Çözülüş"
+    ];
 
-    musicBtn.addEventListener("click", () => {
-      if (bgMusic.paused) {
-        bgMusic.play();
-      } else {
-        bgMusic.pause();
-      }
-    });
+    const chapterEl = document.getElementById('chapter');
+    const storyEl = document.getElementById('story');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const feedbackEl = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const resultEl = document.getElementById('result');
+
+    fetch('kelimeler.json')
+      .then(res => res.json())
+      .then(data => {
+        kelimeler = data;
+        renderQuestion();
+      })
+      .catch(err => {
+        storyEl.textContent = 'Hata: kelimeler.json yüklenemedi.';
+        console.error(err);
+      });
 
     function renderQuestion() {
-      feedbackEl.textContent = "";
       nextBtn.disabled = true;
-      optionsEl.innerHTML = "";
+      feedbackEl.textContent = '';
+      optionsEl.innerHTML = '';
 
-      const current = quizData[index];
-      storyEl.textContent = current.story;
-      questionEl.textContent = current.question;
+      // Bölüm belirle
+      const bolum = Math.floor(currentIndex / 5);
+      chapterEl.textContent = chapters[bolum] || "Bilinmeyen Bölüm";
 
-      current.options.forEach(opt => {
-        const li = document.createElement("li");
+      const kelime = kelimeler[currentIndex];
+      storyEl.textContent = `📜 ${kelime.context || "Dedektif eski bir arşivde bu kelimeyi buldu..."} (${kelime.transliteration})`;
+
+      // 1 şık doğru, diğerleri rastgele
+      const allMeanings = kelimeler.map(k => k.meaning);
+      const wrongs = allMeanings.filter(m => m !== kelime.meaning).sort(() => 0.5 - Math.random()).slice(0, 3);
+      const options = [{ text: kelime.meaning, correct: true }].concat(wrongs.map(w => ({ text: w, correct: false })))
+        .sort(() => 0.5 - Math.random());
+
+      // Bazen farklı soru tipi (örnek: "Cümlede boşluğu doldur")
+      if (currentIndex % 5 === 2) {
+        questionEl.textContent = `Cümleyi tamamla: "${kelime.transliteration} ____ anlamına gelir."`;
+      } else {
+        questionEl.textContent = `Bu kelimenin anlamı nedir?`;
+      }
+
+      options.forEach(opt => {
+        const li = document.createElement('li');
         li.textContent = opt.text;
-        li.addEventListener("click", () => {
-          if (li.classList.contains("selected")) return;
-          [...optionsEl.children].forEach(el => el.style.pointerEvents = "none");
-          li.classList.add("selected");
+        li.onclick = () => {
+          if ([...optionsEl.children].some(el => el.classList.contains('selected'))) return;
+
+          li.classList.add('selected');
+          [...optionsEl.children].forEach(el => el.style.pointerEvents = 'none');
+
           if (opt.correct) {
             score++;
-            feedbackEl.textContent = `✅ ${opt.explanation}`;
+            feedbackEl.textContent = `✅ Doğru! Gizli ipucu: "${kelime.word}"`;
           } else {
-            const correctOpt = current.options.find(o => o.correct);
-            feedbackEl.textContent = `❌ ${opt.explanation} Doğru: ${correctOpt.text}`;
+            feedbackEl.textContent = `❌ Yanlış. Doğru cevap: ${kelime.meaning}`;
           }
           nextBtn.disabled = false;
-        });
+        };
         optionsEl.appendChild(li);
       });
     }
 
-    nextBtn.addEventListener("click", () => {
-      index++;
-      if (index < quizData.length) {
+    nextBtn.onclick = () => {
+      currentIndex++;
+      if (currentIndex < kelimeler.length) {
         renderQuestion();
       } else {
-        showResult();
+        finishQuiz();
       }
-    });
+    };
 
-    function showResult() {
+    function finishQuiz() {
+      chapterEl.style.display = "none";
       storyEl.style.display = "none";
       questionEl.style.display = "none";
       optionsEl.style.display = "none";
       feedbackEl.style.display = "none";
       nextBtn.style.display = "none";
-      resultEl.textContent = `🎉 Dedektif! ${quizData.length} bölümden ${score} tanesini doğru tamamladın!`;
-    }
 
-    renderQuestion();
+      resultEl.textContent = `🕵️ Dedektif! ${kelimeler.length} kelimeden ${score} tanesini doğru çözdün.
+      Tüm bölümler tamamlandı!`;
+    }
   </script>
+
 </body>
 </html>
