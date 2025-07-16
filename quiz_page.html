@@ -104,18 +104,31 @@
 // Firebase oturum kontrolü ve veri yükleme
 
 auth.onAuthStateChanged(user => {
-  console.log("auth kontrol ediliyor...");
   if (user) {
     userId = user.uid;
     console.log("Kullanıcı oturumu bulundu:", userId);
+
+    // 🔥 TEST: dictionaryayn > kelimeler
+    db.collection("users").doc(userId)
+      .collection("kelimeListeleri").doc("dictionaryayn")
+      .collection("kelimeler")
+      .get()
+      .then(snap => {
+        const kelimeler = snap.docs.map(doc => doc.data());
+        console.log("🔥 TEST - dictionaryayn > kelimeler:", kelimeler);
+      })
+      .catch(err => {
+        console.error("❌ HATA - test:", err);
+      });
+
     loadWords();
     loadTopWords();
     loadDailyStats();
   } else {
-    console.log("Giriş yapılmamış. login.html sayfasına yönlendiriliyor.");
     window.location.href = "login.html";
   }
 });
+
 
 // dictionaryayn > kelimeler koleksiyonu test logu (sayfa yüklendikten 2 saniye sonra çalışır)
 setTimeout(() => {
