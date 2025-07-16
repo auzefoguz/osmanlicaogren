@@ -57,73 +57,52 @@
     </style>
 </head>
 <!-- Navbar -->
-<nav class="navbar navbar-expand-md bg-osmanli-blue navbar-dark shadow-sm position-relative">
-
+<nav class="navbar navbar-expand-md bg-osmanli-blue navbar-dark shadow-sm">
   <div class="container-fluid">
+    <a class="navbar-brand osmanli-logo" href="index.html">Osmanlıca öğreniyorum</a>
 
-    <!-- Logo ve Menü Butonu (Mobil) -->
-   <div class="position-absolute top-50 start-50 translate-middle">
-  <a class="navbar-brand osmanli-logo" href="index.html">Osmanlıca öğreniyorum</a>
-</div>
-    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Menüyü aç">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Masaüstü Menü -->
     <div class="collapse navbar-collapse justify-content-end">
       <ul class="navbar-nav gap-2">
-
-        <!-- Öğrenme -->
         <li class="nav-item"><a href="hat-sanati.html" class="nav-link text-osmanli-gold">Hat Sanatı</a></li>
         <li class="nav-item"><a href="https://www.osmanlicagazeteler.org/Sozluk.php" target="_blank" class="nav-link text-white">Sözlük</a></li>
         <li class="nav-item"><a href="https://www.osmanlicagazeteler.org/" target="_blank" class="nav-link text-white">Gazeteler</a></li>
 
-        <!-- Testler -->
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">Testler</a>
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Testler</a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="https://osmanlicaogren.com/1-kur-sorulari/" target="_blank">1. Kur</a></li>
             <li><a class="dropdown-item" href="https://osmanlicaogren.com/ikinci-kur-osmanlica-testler/" target="_blank">2. Kur</a></li>
           </ul>
         </li>
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">Etkinlikler</a>
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
-    <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
-    <li><a class="dropdown-item" href="dedektiv-quiz.html"><i class="bi bi-search"></i> Dedektif Quiz</a></li> <!-- Yeni -->
-  </ul>
-</li>
 
-        <!-- Kaynaklar -->
-       <li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">Kaynaklar</a>
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/matbu-hat/" target="_blank">Matbu Hat</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-hatti/" target="_blank">Rika Hattı</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-matbu-karsilastirmali/" target="_blank">Rika & Matbu</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/category/kitabeler/" target="_blank">Kitabeler</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/mezar-taslari/" target="_blank">Mezar Taşları</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/husnu-hat/" target="_blank">Hüsn-ü Hat</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/osmanlica-cuma-mesajlari-ve-tebrik-mesajlari/" target="_blank">Mesajlar</a></li>
-  </ul>
-</li>
-
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">Etkinlikler</a>
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
-    <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
-  </ul>
-</li>
-
-        <!-- Kullanıcı -->
-        <li class="nav-item"><a href="profile.html" class="nav-link text-osmanli-gold">Profil</a></li>
-        <li class="nav-item"><a href="premium.html" class="nav-link text-osmanli-gold">Premium</a></li>
-
-        <!-- Bilgilendirme -->
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">Bilgi</a>
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Etkinlikler</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
+            <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
+            <li><a class="dropdown-item" href="dedektiv-quiz.html"><i class="bi bi-search"></i> Dedektif Quiz</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Kaynaklar</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/matbu-hat/" target="_blank">Matbu Hat</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-hatti/" target="_blank">Rika Hattı</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-matbu-karsilastirmali/" target="_blank">Rika & Matbu</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/category/kitabeler/" target="_blank">Kitabeler</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/mezar-taslari/" target="_blank">Mezar Taşları</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/husnu-hat/" target="_blank">Hüsn-ü Hat</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/osmanlica-cuma-mesajlari-ve-tebrik-mesajlari/" target="_blank">Mesajlar</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Bilgi</a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="hakkimizda.html">Hakkımızda</a></li>
             <li><a class="dropdown-item" href="sss.html">SSS</a></li>
@@ -132,11 +111,9 @@
           </ul>
         </li>
 
-        <!-- İstatistik -->
+        <li class="nav-item"><a href="profile.html" class="nav-link text-osmanli-gold">Profil</a></li>
+        <li class="nav-item"><a href="premium.html" class="nav-link text-osmanli-gold">Premium</a></li>
         <li class="nav-item"><a href="analytics.html" class="nav-link text-white">İstatistik</a></li>
-        
-
-
       </ul>
     </div>
   </div>
