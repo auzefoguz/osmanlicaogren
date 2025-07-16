@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Osmanlıca Dedektif Quiz</title>
+<style>
+  body {
+    font-family: 'Lateef', serif, Arial, sans-serif;
+    background: #f4f4f0;
+    color: #1a3b5d;
+    margin: 0; padding: 0;
+  }
+  header {
+    background: #1a3b5d;
+    color: #c9a343;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  }
+  main {
+    max-width: 700px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  .question {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .options {
+    list-style: none;
+    padding: 0;
+  }
+  .options li {
+    background: #e9e7d9;
+    margin-bottom: 0.8rem;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: 2px solid transparent;
+  }
+  .options li:hover {
+    background-color: #c9a343;
+    color: white;
+  }
+  .options li.selected {
+    background-color: #1a3b5d;
+    color: #c9a343;
+    font-weight: bold;
+    border-color: #c9a343;
+  }
+  button {
+    background-color: #1a3b5d;
+    color: #c9a343;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #c9a343;
+    color: #1a3b5d;
+  }
+  #result {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-top: 1.5rem;
+    font-weight: bold;
+  }
+  #story {
+    font-style: italic;
+    margin-bottom: 1rem;
+    color: #555;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<header>Osmanlıca Dedektif Quiz</header>
+
+<main>
+  <div id="story"></div>
+  <div id="question-container">
+    <div class="question" id="question"></div>
+    <ul class="options" id="options"></ul>
+    <button id="next-btn" disabled>Sonraki Soru</button>
+  </div>
+  <div id="result"></div>
+</main>
+
+<script>
+  const quizData = [
+    {
+      story: "Bir eski Osmanlı el yazmasında gizemli bir kelime bulundu...",
+      question: "Bu kelimenin anlamı nedir? ‘اقمار’",
+      options: [
+        { text: "Yıldızlar", correct: false },
+        { text: "Aylar", correct: true },
+        { text: "Güneşler", correct: false },
+        { text: "Dağlar", correct: false }
+      ]
+    },
+    {
+      story: "El yazmasının bir diğer sayfasında şu kelime var: ‘كتاب’",
+      question: "Bu kelimenin anlamı nedir?",
+      options: [
+        { text: "Kitap", correct: true },
+        { text: "Kalem", correct: false },
+        { text: "Kâğıt", correct: false },
+        { text: "Defter", correct: false }
+      ]
+    },
+    {
+      story: "Bir mektupta 'سيف' kelimesi geçiyor.",
+      question: "Bu kelimenin karşılığı hangisidir?",
+      options: [
+        { text: "Kılıç", correct: true },
+        { text: "At", correct: false },
+        { text: "Kale", correct: false },
+        { text: "Kale", correct: false }
+      ]
+    },
+    {
+      story: "Eski belgede ‘قلم’ kelimesi var.",
+      question: "Bu kelime ne anlama gelir?",
+      options: [
+        { text: "Mürekkep", correct: false },
+        { text: "Kalem", correct: true },
+        { text: "Yazı", correct: false },
+        { text: "Kağıt", correct: false }
+      ]
+    },
+    {
+      story: "Bir tarihçinin notunda 'مدرسة' kelimesi dikkat çekiyor.",
+      question: "Bu kelimenin anlamı nedir?",
+      options: [
+        { text: "Okul", correct: true },
+        { text: "Ev", correct: false },
+        { text: "Kütüphane", correct: false },
+        { text: "Müze", correct: false }
+      ]
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  const storyEl = document.getElementById("story");
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  const nextBtn = document.getElementById("next-btn");
+  const resultEl = document.getElementById("result");
+
+  function showQuestion() {
+    nextBtn.disabled = true;
+    const currentData = quizData[currentQuestionIndex];
+    storyEl.textContent = currentData.story;
+    questionEl.textContent = currentData.question;
+    optionsEl.innerHTML = "";
+
+    currentData.options.forEach((option, index) => {
+      const li = document.createElement("li");
+      li.textContent = option.text;
+      li.addEventListener("click", () => selectOption(li, option));
+      optionsEl.appendChild(li);
+    });
+  }
+
+  function selectOption(selectedLi, option) {
+    // Seçenek seçildikten sonra diğerlerini pasifleştir
+    [...optionsEl.children].forEach(li => li.classList.remove("selected"));
+    selectedLi.classList.add("selected");
+
+    // Doğru cevabı kontrol et ve puanlama
+    if (option.correct) {
+      score++;
+    } else {
+      // Doğru değilse puan eklemez
+    }
+
+    nextBtn.disabled = false;
+
+    // Birden fazla seçim yapılmaması için eventleri kaldır
+    [...optionsEl.children].forEach(li => {
+      li.style.pointerEvents = "none";
+    });
+  }
+
+  nextBtn.addEventListener("click", () => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  });
+
+  function showResult() {
+    storyEl.style.display = "none";
+    questionEl.style.display = "none";
+    optionsEl.style.display = "none";
+    nextBtn.style.display = "none";
+    resultEl.textContent = `Test tamamlandı! Puanınız: ${score} / ${quizData.length}`;
+  }
+
+  // Başlangıçta ilk soruyu göster
+  showQuestion();
+</script>
+
+</body>
+</html>
