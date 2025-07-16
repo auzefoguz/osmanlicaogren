@@ -112,7 +112,9 @@
       }
     });
 
-   async function loadWords() {
+  // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries' ve '/kelimeListeleri/default/liste' yolları da desteklensin:
+
+async function loadWords() {
   words = [];
   try {
     // 1. Yeni yapı: dictionaryelif > entries
@@ -125,10 +127,16 @@
       words = altSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
-    // 3. Yeni yapı: default > entries
+    // 3. Yapı: default > entries
     if (words.length === 0) {
       const defaultSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("entries").get();
       words = defaultSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+    }
+
+    // 4. Yapı: default > liste
+    if (words.length === 0) {
+      const listeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("liste").get();
+      words = listeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
     if (words.length < 4) {
