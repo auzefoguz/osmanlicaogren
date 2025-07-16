@@ -90,7 +90,7 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    let words = [], current = 0, score = 0, userId = null, timerInterval, timeLeft = 10;
+    let words = [], questions = [], current = 0, score = 0, userId = null, timerInterval, timeLeft = 10;
     const questionText = document.getElementById("questionText");
     const optionList = document.getElementById("optionList");
     const nextBtn = document.getElementById("nextBtn");
@@ -116,16 +116,96 @@
       db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryelif").collection("entries").get()
         .then(snapshot => {
           words = snapshot.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-          if (words.length === 0) {
-            questionText.textContent = "Quiz için tanımlı kelime bulunamadı.";
+          if (words.length < 4) {
+            questionText.textContent = "Quiz için yeterli kelime bulunamadı.";
             return;
           }
-          shuffle(words);
+          questions = createQuestionsFromWords(words);
           showQuestion();
         }).catch(err => {
           console.error("Kelime yüklenirken hata:", err);
           questionText.textContent = "Kelime verisi alınamadı.";
         });
+    }
+
+    function createQuestionsFromWords(words) {
+      const shuffled = shuffle([...words]);
+      return shuffled.map(word => {
+        const correct = word.meaning;
+        const wrongs = shuffle(words.filter(w => w.meaning !== correct).map(w => w.meaning)).slice(0, 3);
+        const options = shuffle([correct, ...wrongs]);
+        return {
+          question: word.word,
+          correctAnswer: correct,
+          options
+        };
+      });
+    }
+
+    function showQuestion() {
+      if (current >= questions.length) return endQuiz();
+      const q = questions[current];
+      questionText.textContent = `${current + 1}. ${q.question} kelimesinin anlamı nedir?`;
+      optionList.innerHTML = "";
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "btn btn-outline-secondary w-100";
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(opt, q.correctAnswer);
+        optionList.appendChild(btn);
+      });
+      nextBtn.disabled = true;
+      resultBox.textContent = "";
+      startTimer();
+    }
+
+    function selectAnswer(selected, correct) {
+      clearInterval(timerInterval);
+      const buttons = optionList.querySelectorAll("button");
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correct) btn.classList.add("btn-success");
+        else if (btn.textContent === selected) btn.classList.add("btn-danger");
+      });
+      if (selected === correct) score++;
+      scoreInfo.textContent = `Skor: ${score}/${questions.length}`;
+      nextBtn.disabled = false;
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      showQuestion();
+    }
+
+    function endQuiz() {
+      questionText.textContent = "✅ Test tamamlandı!";
+      optionList.innerHTML = "";
+      resultBox.textContent = `Toplam Skor: ${score} / ${questions.length}`;
+      nextBtn.style.display = "none";
+      timerDisplay.style.display = "none";
+      endButtons.classList.remove("d-none");
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 10;
+      timerDisplay.textContent = `⏱ ${timeLeft}`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `⏱ ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          selectAnswer("", questions[current].correctAnswer);
+        }
+      }, 1000);
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
 
     function loadTopWords() {
@@ -145,7 +225,6 @@
           });
         });
     }
-    window.loadTopWords = loadTopWords;
 
     function loadDailyStats() {
       db.collection("users").doc(userId).collection("quiz_sonuclari")
@@ -172,88 +251,6 @@
           });
         });
     }
-    window.loadDailyStats = loadDailyStats;
-
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-  
-
-</script>
- 
+  </script>
 </body>
-  <script>
-  const jsonData = [
-    {
-      "word": "اقمار",
-      "transliteration": "Akmâr",
-      "meaning": "Aylar.",
-      "additional_meanings": ["Dolunaylar", "Aylar topluluğu"]
-    },
-    {
-      "word": "دهقان",
-      "transliteration": "Dihkân",
-      "meaning": "Çiftçi. Köy ağası.",
-      "additional_meanings": ["Toprak sahibi", "Ağa"]
-    },
-    {
-      "word": "زَابِح",
-      "transliteration": "Zâbih",
-      "meaning": "Boğazlayan.",
-      "additional_meanings": ["Kesici", "Kurban eden"]
-    },
-    {
-      "word": "اقلا",
-      "transliteration": "Aklen",
-      "meaning": "Akılca.",
-      "additional_meanings": []
-    },
-    {
-      "word": "اغتشاش",
-      "transliteration": "İğtişâş",
-      "meaning": "Karışıklık, kargaşa, anarşi.",
-      "additional_meanings": []
-    }
-  ];
-
-  function uploadDictionaryElif() {
-    auth.onAuthStateChanged(user => {
-      if (!user) return alert("Lütfen önce giriş yapınız.");
-      const userId = user.uid;
-      const entriesRef = db.collection("users").doc(userId)
-        .collection("kelimeListeleri").doc("dictionaryelif")
-        .collection("entries");
-
-      const batch = db.batch();
-      jsonData.forEach(entry => {
-        if (entry.word && entry.meaning) {
-          const docRef = entriesRef.doc();
-          batch.set(docRef, {
-            word: entry.word,
-            transliteration: entry.transliteration || "",
-            meaning: entry.meaning,
-            additional_meanings: entry.additional_meanings || []
-          });
-        }
-      });
-
-      batch.commit()
-        .then(() => {
-          alert("✅ dictionaryelif verileri başarıyla yüklendi!");
-          console.log("Tüm veriler Firestore'a kaydedildi.");
-        })
-        .catch(err => {
-          console.error("Yükleme hatası:", err);
-          alert("⛔ Yükleme sırasında hata oluştu.");
-        });
-    });
-  }
-
-  // uploadDictionaryElif(); // Otomatik yükleme istersen bu satırın başındaki "//" kaldır
-</script>
-
 </html>
