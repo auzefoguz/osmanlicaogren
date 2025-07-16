@@ -1,281 +1,303 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>🕵️ Osmanlıca Dedektif - Zarif Quiz</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Lateef&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Osmanlıca Dedektif Quiz - Gelişmiş</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lateef&display=swap');
 
-    body {
-      font-family: 'Scheherazade New', serif;
-      background: radial-gradient(circle at center, #f9f5ed, #e8dfc7);
-      margin: 0; padding: 2rem;
-      color: #4a3c1a;
-      text-align: center;
-      user-select: none;
-    }
-    h1 {
-      font-family: 'Lateef', serif;
-      font-size: 3rem;
-      letter-spacing: 3px;
-      color: #7a5c00;
-      text-shadow: 0 0 6px #a57e00;
-      margin-bottom: 1rem;
-    }
-    #chapter {
-      font-weight: 600;
-      font-size: 1.2rem;
-      color: #705e1e;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid #a57e00;
-      display: inline-block;
-      padding-bottom: 6px;
-      font-style: italic;
-    }
-    #story {
-      font-style: italic;
-      margin-bottom: 1rem;
-      background: #fff9dfcc;
-      padding: 1rem 2rem;
-      border-radius: 14px;
-      box-shadow: 0 0 12px #d4b74daa;
-      max-width: 650px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.6;
-      font-size: 1.15rem;
-    }
-    #question {
-      font-size: 1.8rem;
-      margin: 1.5rem 0 1rem 0;
-      font-weight: 700;
-      max-width: 650px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      max-width: 650px;
-      margin: 0 auto 1.5rem auto;
-    }
-    ul li {
-      background: #fff4b7;
-      margin: 0.5rem 0;
-      padding: 1rem 1.3rem;
-      border-radius: 15px;
-      cursor: pointer;
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #5d4d00;
-      border: 2px solid transparent;
-      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-      box-shadow: 0 3px 6px #cbb85288;
-      user-select: none;
-    }
-    ul li:hover {
-      background-color: #d9c33a;
-      border-color: #b89917;
-      color: #362e00;
-    }
-    ul li.selected {
-      background-color: #7a6500;
-      color: #fffbe0;
-      border-color: #a67c00;
-      box-shadow: 0 0 12px #c3a700aa;
-      font-weight: 800;
-      cursor: default;
-    }
-    #feedback {
-      margin: 1rem auto;
-      max-width: 650px;
-      font-weight: 700;
-      background: #fff7b1;
-      padding: 1rem 2rem;
-      border-radius: 14px;
-      box-shadow: 0 0 10px #a57e0011;
-      min-height: 55px;
-      color: #6c5a00;
-      font-style: italic;
-      user-select: none;
-    }
-    button {
-      background: transparent;
-      border: none;
-      margin: 0 0.7rem;
-      cursor: pointer;
-      color: #7a6500;
-      font-size: 2.2rem;
-      transition: color 0.3s;
-      vertical-align: middle;
-      user-select: none;
-    }
-    button:hover {
-      color: #a67c00;
-    }
-    #result {
-      margin-top: 2rem;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #5d4700;
-      max-width: 650px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.5;
-      white-space: pre-line;
-    }
-    audio {
-      margin: 1.5rem auto;
-      display: block;
-      outline: none;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #d4b74d88;
-    }
-  </style>
+  body {
+    font-family: 'Lateef', serif, Arial, sans-serif;
+    background: #fdf9f3;
+    color: #1a3b5d;
+    margin: 0; padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  main {
+    background: #fffdf9;
+    max-width: 720px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.12);
+    padding: 2rem 2.5rem;
+  }
+  header {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #a67c00;
+    text-align: center;
+    text-shadow: 0 0 3px #7a5c00;
+    margin-bottom: 1.5rem;
+    letter-spacing: 3px;
+  }
+  #story {
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #444;
+    margin-bottom: 1.8rem;
+    min-height: 120px;
+    line-height: 1.5;
+    border-left: 4px solid #a67c00;
+    padding-left: 1rem;
+    background: #fff7cc88;
+    border-radius: 8px;
+  }
+  #question {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    min-height: 80px;
+    color: #4b3200;
+    text-shadow: 0 1px 2px #f0e68c88;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  #question svg {
+    width: 36px;
+    height: 36px;
+    fill: #a67c00;
+  }
+  ul.options {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+  }
+  ul.options li {
+    background: #fef8d8;
+    border: 2px solid transparent;
+    margin-bottom: 1rem;
+    padding: 1rem 1.3rem;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    font-weight: 600;
+    transition: background-color 0.3s, border-color 0.3s;
+    box-shadow: 1px 1px 4px #e2d48f88;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  ul.options li:hover {
+    background-color: #a67c00;
+    color: white;
+    border-color: #7a5c00;
+  }
+  ul.options li.selected {
+    background-color: #4b3200;
+    color: #f7e58d;
+    font-weight: 900;
+    border-color: #a67c00;
+    box-shadow: 0 0 10px #b39b00;
+  }
+  #feedback {
+    background: #fff4b7;
+    border-left: 6px solid #a67c00;
+    padding: 1rem 1.2rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #6b4f00;
+    border-radius: 8px;
+    min-height: 60px;
+    margin-bottom: 1.8rem;
+    box-shadow: 1px 1px 5px #a67c0033;
+  }
+  button {
+    background-color: #a67c00;
+    color: #fffdf9;
+    border: none;
+    padding: 1rem 2.2rem;
+    font-size: 1.3rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 900;
+    letter-spacing: 1px;
+    transition: background-color 0.3s;
+    box-shadow: 0 3px 7px #7a5c0055;
+    user-select: none;
+  }
+  button:disabled {
+    background-color: #d4c57f88;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  button:hover:not(:disabled) {
+    background-color: #7a5c00;
+  }
+  #result {
+    margin-top: 2rem;
+    font-size: 1.7rem;
+    font-weight: 800;
+    text-align: center;
+    color: #4b3200;
+    line-height: 1.4;
+  }
+  /* Scrollbar for options if needed */
+  ul.options {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  ul.options::-webkit-scrollbar {
+    width: 8px;
+  }
+  ul.options::-webkit-scrollbar-thumb {
+    background-color: #a67c00cc;
+    border-radius: 4px;
+  }
+</style>
 </head>
 <body>
-
-  <h1>🕵️ Osmanlıca Dedektif</h1>
-  <div id="chapter">Bölüm 1: Başlangıç</div>
+<main>
+  <header>🕵️ Osmanlıca Dedektif Gizemi</header>
   <div id="story"></div>
-  <div id="question"></div>
-  <ul id="options"></ul>
+  <div id="question"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 16a2 2 0 1 1 2-2 2 2 0 0 1-2 2Zm2-6h-4v-6h4Z"/></svg><span id="question-text"></span></div>
+  <ul class="options" id="options"></ul>
   <div id="feedback"></div>
-  <button id="next-btn" disabled title="Sonraki İpucu">➡️</button>
-
-  <div>
-    <button onclick="goHome()" title="Ana Sayfa">🏠</button>
-    <button onclick="restartQuiz()" title="Yeniden Başla">🔄</button>
-    <button onclick="finishQuiz()" title="Bitir">🏁</button>
-  </div>
-
-  <audio id="ney" controls loop preload="auto">
-    <source src="haunting-middle-eastern-piece-188714.mp3" type="audio/mp3">
-    Tarayıcınız audio etiketini desteklemiyor.
-  </audio>
+  <button id="next-btn" disabled>Sonraki İpucu</button>
+  <div id="result"></div>
+</main>
 
 <script>
-  let kelimeler = [];
-  let currentIndex = 0;
-  let score = 0;
-
-  const chapters = [
-    "Bölüm 1: Başlangıç",
-    "Bölüm 2: Kayıp Parşömen",
-    "Bölüm 3: Gölgeler Arasında",
-    "Bölüm 4: Son Sır",
-    "Bölüm 5: Çözülüş"
+document.addEventListener('DOMContentLoaded', () => {
+  const quizData = [
+    {
+      story: "📜 Eski Osmanlı arşivinde gizemli bir kutu açıldı. Kutudan çıkan tozlu el yazmasında belirsiz bir kelime vardı: ‘اقمار’. Dedektif, ipucu peşinde...",
+      question: "Bu kelimenin anlamı nedir?",
+      options: [
+        { text: "Yıldızlar", correct: false, explanation: "‘اقمار’ kelimesi Arapça’da 'Aylar' anlamına gelir, yıldızlar değil." },
+        { text: "Aylar", correct: true, explanation: "Doğru! ‘اقمار’ kelimesi Osmanlıca’da ‘Aylar’ demektir." },
+        { text: "Güneşler", correct: false, explanation: "Yanlış. ‘Güneşler’ için farklı bir kelime kullanılır." },
+        { text: "Dağlar", correct: false, explanation: "Yanlış. Bu kelime ‘Dağlar’ anlamına gelmez." }
+      ]
+    },
+    {
+      story: "🕰️ El yazmasının ikinci sayfasında ‘كتاب’ kelimesi dikkat çekiyor. Bu, önemli bir sırra kapı açabilir.",
+      question: "Bu kelimenin anlamı nedir?",
+      options: [
+        { text: "Kitap", correct: true, explanation: "Tebrikler! ‘كتاب’ kelimesi ‘Kitap’ anlamına gelir." },
+        { text: "Kalem", correct: false, explanation: "Hayır, ‘Kalem’ başka bir kelime ile ifade edilir." },
+        { text: "Kâğıt", correct: false, explanation: "Yanlış, ‘Kâğıt’ için farklı bir kelime vardır." },
+        { text: "Defter", correct: false, explanation: "Yanlış, bu kelime ‘Defter’ anlamına gelmez." }
+      ]
+    },
+    {
+      story: "✉️ Dedektif eski bir mektupta ‘سيف’ kelimesini fark etti. Bu, belki de gizli bir nesnenin adıdır.",
+      question: "Bu kelimenin anlamı nedir?",
+      options: [
+        { text: "Kılıç", correct: true, explanation: "Doğru! ‘سيف’ kelimesi ‘Kılıç’ anlamına gelir." },
+        { text: "At", correct: false, explanation: "Hayır, bu kelime ‘At’ demek değildir." },
+        { text: "Kale", correct: false, explanation: "Yanlış, ‘Kale’ kelimesi farklıdır." },
+        { text: "Kale", correct: false, explanation: "Yanlış, aynı seçenek iki kere yazılmış, dikkat." }
+      ]
+    },
+    {
+      story: "📚 Arşivde ‘قلم’ kelimesi yer almakta. Bu kelime, günlük hayatımızda sık kullanılan bir eşyaya işaret ediyor.",
+      question: "Bu kelime ne anlama gelir?",
+      options: [
+        { text: "Mürekkep", correct: false, explanation: "Yanlış, bu kelime ‘Mürekkep’ anlamına gelmez." },
+        { text: "Kalem", correct: true, explanation: "Tebrikler! ‘قلم’ kelimesi ‘Kalem’ demektir." },
+        { text: "Yazı", correct: false, explanation: "Yanlış, ‘Yazı’ başka bir terimle ifade edilir." },
+        { text: "Kağıt", correct: false, explanation: "Hayır, bu kelime ‘Kağıt’ anlamına gelmez." }
+      ]
+    },
+    {
+      story: "🏫 Son ipucu, tarihçinin eski defterinde saklı: ‘مدرسة’. Bu kelime önemli bir mekanı temsil ediyor.",
+      question: "Bu kelimenin anlamı nedir?",
+      options: [
+        { text: "Okul", correct: true, explanation: "Doğru! ‘مدرسة’ kelimesi ‘Okul’ anlamındadır." },
+        { text: "Ev", correct: false, explanation: "Hayır, bu kelime ‘Ev’ değil." },
+        { text: "Kütüphane", correct: false, explanation: "Yanlış, ‘Kütüphane’ için farklı bir kelime kullanılır." },
+        { text: "Müze", correct: false, explanation: "Yanlış, ‘Müze’ anlamına gelmez." }
+      ]
+    }
   ];
 
-  const chapterEl = document.getElementById('chapter');
-  const storyEl = document.getElementById('story');
-  const questionEl = document.getElementById('question');
-  const optionsEl = document.getElementById('options');
-  const feedbackEl = document.getElementById('feedback');
-  const nextBtn = document.getElementById('next-btn');
-  const resultEl = document.getElementById('result');
+  const storyEl = document.getElementById("story");
+  const questionEl = document.getElementById("question-text");
+  const optionsEl = document.getElementById("options");
+  const feedbackEl = document.getElementById("feedback");
+  const nextBtn = document.getElementById("next-btn");
+  const resultEl = document.getElementById("result");
 
-  fetch('kelimeler.json')
-    .then(res => res.json())
-    .then(data => {
-      kelimeler = data;
-      renderQuestion();
-    })
-    .catch(err => {
-      storyEl.textContent = 'Hata: kelimeler.json yüklenemedi.';
-      console.error(err);
-    });
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
 
   function renderQuestion() {
+    answered = false;
+    feedbackEl.textContent = "";
     nextBtn.disabled = true;
-    feedbackEl.textContent = '';
-    optionsEl.innerHTML = '';
-    resultEl.textContent = '';
+    optionsEl.innerHTML = "";
 
-    // Bölüm güncelle
-    const bolum = Math.floor(currentIndex / 5);
-    chapterEl.textContent = chapters[bolum] || "Bilinmeyen Bölüm";
+    const current = quizData[currentIndex];
+    storyEl.textContent = current.story;
+    questionEl.textContent = current.question;
 
-    const kelime = kelimeler[currentIndex];
-    storyEl.textContent = `📜 ${kelime.context || "Dedektif eski bir arşivde bu kelimeyi buldu..."} (${kelime.transliteration})`;
-
-    // 1 doğru, 3 yanlış seçenek
-    const allMeanings = kelimeler.map(k => k.meaning);
-    const wrongs = allMeanings.filter(m => m !== kelime.meaning).sort(() => 0.5 - Math.random()).slice(0, 3);
-    const options = [{ text: kelime.meaning, correct: true }].concat(wrongs.map(w => ({ text: w, correct: false })))
-      .sort(() => 0.5 - Math.random());
-
-    // Bazen farklı soru tipi
-    if (currentIndex % 5 === 2) {
-      questionEl.textContent = `Cümleyi tamamla: "${kelime.transliteration} ____ anlamına gelir."`;
-    } else if (currentIndex % 5 === 4) {
-      questionEl.textContent = `Bu kelime hangi cümlede doğru kullanılmıştır?`;
-      // Örnek, şimdilik aynı seçenekler veriyoruz
-    } else {
-      questionEl.textContent = `Bu kelimenin anlamı nedir?`;
-    }
-
-    options.forEach(opt => {
-      const li = document.createElement('li');
+    current.options.forEach((opt, i) => {
+      const li = document.createElement("li");
       li.textContent = opt.text;
-      li.onclick = () => {
-        if ([...optionsEl.children].some(el => el.classList.contains('selected'))) return;
+      li.addEventListener("click", () => {
+        if (answered) return;
+        answered = true;
+        li.classList.add("selected");
 
-        li.classList.add('selected');
-        [...optionsEl.children].forEach(el => el.style.pointerEvents = 'none');
+        // Kilitle diğer seçenekler
+        [...optionsEl.children].forEach(el => el.style.pointerEvents = "none");
 
+        // Puanlama
         if (opt.correct) {
           score++;
-          feedbackEl.textContent = `✅ Doğru! Gizli ipucu: "${kelime.word}"`;
+          feedbackEl.textContent = `✅ Doğru! ${opt.explanation}`;
+          feedbackEl.style.color = "#2a5d1a";
         } else {
-          feedbackEl.textContent = `❌ Yanlış. Doğru cevap: ${kelime.meaning}`;
+          const correctOpt = current.options.find(o => o.correct);
+          feedbackEl.textContent = `❌ Yanlış! ${opt.explanation}`;
+          feedbackEl.style.color = "#a62a2a";
+          // Ayrıca doğru cevabı belirtelim:
+          feedbackEl.textContent += ` Doğru cevap: "${correctOpt.text}"`;
         }
+
         nextBtn.disabled = false;
-      };
+      });
       optionsEl.appendChild(li);
     });
   }
 
-  nextBtn.onclick = () => {
+  nextBtn.addEventListener("click", () => {
     currentIndex++;
-    if (currentIndex < kelimeler.length) {
+    if (currentIndex < quizData.length) {
       renderQuestion();
     } else {
-      finishQuiz();
+      showFinalResult();
     }
-  };
+  });
 
-  function finishQuiz() {
-    chapterEl.style.display = "none";
+  function showFinalResult() {
     storyEl.style.display = "none";
-    questionEl.style.display = "none";
+    questionEl.parentElement.style.display = "none";
     optionsEl.style.display = "none";
     feedbackEl.style.display = "none";
     nextBtn.style.display = "none";
 
-    resultEl.textContent = `🕵️ Dedektif! ${kelimeler.length} kelimeden ${score} tanesini doğru çözdün.
-    Tüm bölümler tamamlandı! 🎉`;
+    let message = `🕵️ Osmanlıca Dedektif Gizemini çözdün!\n\nToplam ${quizData.length} ipucundan ${score} doğru cevap verdin.`;
+
+    if(score === quizData.length){
+      message += "\n\n🎉 Harika! Tüm sırları çözdün ve büyük bir Osmanlıca dedektifi oldun!";
+    } else if(score >= quizData.length / 2){
+      message += "\n\n👍 İyi iş çıkardın, bazı gizemler hala çözülmeyi bekliyor.";
+    } else {
+      message += "\n\n😕 Biraz daha çalışmalısın, Osmanlıca sırları zorlu olabilir.";
+    }
+    resultEl.style.whiteSpace = "pre-line";
+    resultEl.textContent = message;
   }
 
-  function goHome() {
-    // Ana sayfa linkini buraya yaz
-    window.location.href = 'index.html';
-  }
-
-  function restartQuiz() {
-    currentIndex = 0;
-    score = 0;
-    chapterEl.style.display = "block";
-    storyEl.style.display = "block";
-    questionEl.style.display = "block";
-    optionsEl.style.display = "block";
-    feedbackEl.style.display = "block";
-    nextBtn.style.display = "inline-block";
-    renderQuestion();
-  }
-
+  // Başlangıç
+  renderQuestion();
+});
 </script>
 
 </body>
