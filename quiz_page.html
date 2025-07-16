@@ -114,9 +114,7 @@
 
   // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries' ve '/kelimeListeleri/default/liste' yolları da desteklensin:
 
-// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste' ve '/kelimeListeleri/dictionaryHA/kelimeler' yolları da desteklensin:
-
-// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler' ve '/kelimeListeleri/dictionaryayn' yolları da desteklensin:
+// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
 
 async function loadWords() {
   words = [];
@@ -149,10 +147,16 @@ async function loadWords() {
       words = haSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
-    // 6. dictionaryayn > (tüm belgeler doğrudan altında)
+    // 6. dictionaryayn > entries
     if (words.length === 0) {
       const aynSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("entries").get();
       words = aynSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+    }
+
+    // 7. dictionaryayn > kelimeler
+    if (words.length === 0) {
+      const aynKelimeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("kelimeler").get();
+      words = aynKelimeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
     if (words.length < 4) {
