@@ -103,7 +103,7 @@
 
     function generateQuestions(wordList) {
       const allMeanings = wordList.map(w => w.meaning);
-      return wordList.map(entry => {
+      return shuffle(wordList.map(entry => {
         const correct = entry.meaning;
         const wrongs = shuffle(allMeanings.filter(m => m !== correct)).slice(0, 3);
         const options = shuffle([correct, ...wrongs]);
@@ -112,7 +112,7 @@
           correct,
           options
         };
-      });
+      }));
     }
 
     function showQuestion() {
