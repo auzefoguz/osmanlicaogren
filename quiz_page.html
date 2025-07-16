@@ -101,7 +101,7 @@
     const chartCanvas = document.getElementById("dailyChart").getContext('2d');
     const endButtons = document.getElementById("endButtons");
 
-  // Firebase oturum kontrolü ve veri yükleme
+// Firebase oturum kontrolü ve veri yükleme
 
 auth.onAuthStateChanged(user => {
   console.log("auth kontrol ediliyor...");
@@ -116,6 +116,23 @@ auth.onAuthStateChanged(user => {
     window.location.href = "login.html";
   }
 });
+
+// dictionaryayn > kelimeler koleksiyonu test logu (sayfa yüklendikten 2 saniye sonra çalışır)
+setTimeout(() => {
+  const uid = firebase.auth().currentUser?.uid;
+  if (!uid) return console.warn("❗ Kullanıcı oturumda değil.");
+  db.collection("users").doc(uid)
+    .collection("kelimeListeleri").doc("dictionaryayn")
+    .collection("kelimeler")
+    .get()
+    .then(snap => {
+      const kelimeler = snap.docs.map(doc => doc.data());
+      console.log("🔥 dictionaryayn > kelimeler test sonucu:", kelimeler);
+    })
+    .catch(err => {
+      console.error("❌ Test sorgusunda hata:", err);
+    });
+}, 2000);
 
 // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
 
