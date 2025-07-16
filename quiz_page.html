@@ -101,15 +101,18 @@
     const chartCanvas = document.getElementById("dailyChart").getContext('2d');
     const endButtons = document.getElementById("endButtons");
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        userId = user.uid;
-        loadWords();
-        loadTopWords();
-        loadDailyStats();
-      } else {
-        window.location.href = "login.html";
-      }
+   auth.onAuthStateChanged(user => {
+  if (user) {
+    userId = user.uid;
+    console.log("Kullanıcı oturumu bulundu:", userId); // bunu ekle
+    loadWords();
+    loadTopWords();
+    loadDailyStats();
+  } else {
+    window.location.href = "login.html";
+  }
+});
+
     });
 
   // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries' ve '/kelimeListeleri/default/liste' yolları da desteklensin:
