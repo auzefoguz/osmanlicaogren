@@ -7,79 +7,127 @@
 <style>
   body {
     font-family: 'Lateef', serif, Arial, sans-serif;
-    background: #f4f4f0;
+    background: linear-gradient(135deg, #e2d8b7, #c9a343);
     color: #1a3b5d;
     margin: 0; padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   header {
     background: #1a3b5d;
-    color: #c9a343;
-    padding: 1rem;
+    color: #f7d775;
+    padding: 1.2rem;
     text-align: center;
-    font-size: 1.8rem;
-    letter-spacing: 1.5px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    font-size: 2.2rem;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    font-weight: 700;
   }
   main {
+    flex-grow: 1;
     max-width: 700px;
-    margin: 2rem auto;
+    margin: 2rem auto 3rem;
     background: white;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 18px;
+    padding: 2rem 3rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+  #story {
+    font-style: italic;
+    font-size: 1.1rem;
+    margin-bottom: 1.8rem;
+    color: #555;
+    border-left: 5px solid #c9a343;
+    padding-left: 15px;
   }
   .question {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1a3b5d;
+    line-height: 1.3;
+    min-height: 4.5rem;
   }
   .options {
     list-style: none;
     padding: 0;
   }
   .options li {
-    background: #e9e7d9;
-    margin-bottom: 0.8rem;
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
+    background: #f2f0df;
+    margin-bottom: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.3s;
-    border: 2px solid transparent;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a3b5d;
+    border: 3px solid transparent;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
   }
-  .options li:hover {
+  .options li:hover:not(.selected) {
     background-color: #c9a343;
-    color: white;
+    color: #fff;
   }
   .options li.selected {
     background-color: #1a3b5d;
-    color: #c9a343;
-    font-weight: bold;
-    border-color: #c9a343;
+    color: #f7d775;
+    font-weight: 700;
+    border-color: #f7d775;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   }
   button {
     background-color: #1a3b5d;
-    color: #c9a343;
+    color: #f7d775;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-size: 1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: 700;
     cursor: pointer;
-    margin-top: 1rem;
-    transition: background-color 0.3s;
+    margin-top: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: background-color 0.3s, color 0.3s;
+    user-select: none;
+    display: inline-block;
   }
-  button:hover {
+  button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  button:hover:not(:disabled) {
     background-color: #c9a343;
     color: #1a3b5d;
   }
   #result {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     text-align: center;
-    margin-top: 1.5rem;
-    font-weight: bold;
+    margin-top: 2rem;
+    font-weight: 800;
+    color: #1a3b5d;
+    user-select: none;
   }
-  #story {
-    font-style: italic;
-    margin-bottom: 1rem;
-    color: #555;
+  @media (max-width: 480px) {
+    main {
+      padding: 1.5rem 1.8rem;
+      margin: 1rem auto 2rem;
+    }
+    .question {
+      font-size: 1.4rem;
+      min-height: 4rem;
+    }
+    .options li {
+      font-size: 1rem;
+      padding: 0.8rem 1rem;
+    }
+    button {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 0.8rem;
+      border-radius: 12px;
+    }
   }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet" />
@@ -154,6 +202,7 @@
 
   let currentQuestionIndex = 0;
   let score = 0;
+  let answered = false;
 
   const storyEl = document.getElementById("story");
   const questionEl = document.getElementById("question");
@@ -162,21 +211,32 @@
   const resultEl = document.getElementById("result");
 
   function showQuestion() {
+    answered = false;
     nextBtn.disabled = true;
     const currentData = quizData[currentQuestionIndex];
     storyEl.textContent = currentData.story;
     questionEl.textContent = currentData.question;
     optionsEl.innerHTML = "";
 
-    currentData.options.forEach((option, index) => {
+    currentData.options.forEach((option) => {
       const li = document.createElement("li");
       li.textContent = option.text;
+      li.tabIndex = 0;
       li.addEventListener("click", () => selectOption(li, option));
+      li.addEventListener("keypress", e => {
+        if(e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectOption(li, option);
+        }
+      });
       optionsEl.appendChild(li);
     });
   }
 
   function selectOption(selectedLi, option) {
+    if(answered) return;
+    answered = true;
+
     // Seçenek seçildikten sonra diğerlerini pasifleştir
     [...optionsEl.children].forEach(li => li.classList.remove("selected"));
     selectedLi.classList.add("selected");
@@ -184,8 +244,6 @@
     // Doğru cevabı kontrol et ve puanlama
     if (option.correct) {
       score++;
-    } else {
-      // Doğru değilse puan eklemez
     }
 
     nextBtn.disabled = false;
