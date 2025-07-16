@@ -116,6 +116,8 @@
 
 // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste' ve '/kelimeListeleri/dictionaryHA/kelimeler' yolları da desteklensin:
 
+// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler' ve '/kelimeListeleri/dictionaryayn' yolları da desteklensin:
+
 async function loadWords() {
   words = [];
   try {
@@ -147,6 +149,12 @@ async function loadWords() {
       words = haSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
+    // 6. dictionaryayn > (tüm belgeler doğrudan altında)
+    if (words.length === 0) {
+      const aynSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("entries").get();
+      words = aynSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+    }
+
     if (words.length < 4) {
       questionText.textContent = "Quiz için yeterli kelime yok.";
       return;
@@ -159,6 +167,7 @@ async function loadWords() {
     questionText.textContent = "Kelime verisi alınamadı.";
   }
 }
+
 
 
     function createQuestionsFromWords(wordList) {
