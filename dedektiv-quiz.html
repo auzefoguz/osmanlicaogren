@@ -148,8 +148,6 @@
     line-height: 1.4;
     white-space: pre-line;
   }
-
-  /* Butonlar ikon şeklinde ve küçük, alt kısımda sabit */
   #controls {
     position: fixed;
     bottom: 16px;
@@ -175,7 +173,6 @@
   #controls button:hover {
     background-color: #7a5c00;
   }
-
 </style>
 </head>
 <body>
@@ -206,40 +203,7 @@
 </audio>
 
 <script>
-  // 25 kelime, 5 bölüm (her bölüm 5 kelime)
-  const allWords = [
-    { word: "اقمار", transliteration: "Aqmār", meaning: "Aylar", explanation: "‘اقمار’ kelimesi Osmanlıca’da ‘Aylar’ demektir." },
-    { word: "كتاب", transliteration: "Kitāb", meaning: "Kitap", explanation: "‘كتاب’ kelimesi ‘Kitap’ anlamına gelir." },
-    { word: "سيف", transliteration: "Sayf", meaning: "Kılıç", explanation: "‘سيف’ kelimesi ‘Kılıç’ anlamına gelir." },
-    { word: "قلم", transliteration: "Qalam", meaning: "Kalem", explanation: "‘قلم’ kelimesi ‘Kalem’ demektir." },
-    { word: "مدرسة", transliteration: "Madrasa", meaning: "Okul", explanation: "‘مدرسة’ kelimesi ‘Okul’ anlamındadır." },
-
-    { word: "نور", transliteration: "Nūr", meaning: "Işık", explanation: "‘نور’ kelimesi ‘Işık’ anlamına gelir." },
-    { word: "بحر", transliteration: "Baḥr", meaning: "Deniz", explanation: "‘بحر’ kelimesi ‘Deniz’ demektir." },
-    { word: "قصر", transliteration: "Qaṣr", meaning: "Saray", explanation: "‘قصر’ kelimesi ‘Saray’ anlamına gelir." },
-    { word: "حديقة", transliteration: "Ḥadīqa", meaning: "Bahçe", explanation: "‘حديقة’ kelimesi ‘Bahçe’ demektir." },
-    { word: "مدينة", transliteration: "Madīna", meaning: "Şehir", explanation: "‘مدينة’ kelimesi ‘Şehir’ anlamındadır." },
-
-    { word: "صقر", transliteration: "Ṣaqr", meaning: "Şahin", explanation: "‘صقر’ kelimesi ‘Şahin’ demektir." },
-    { word: "ذهب", transliteration: "Dhahab", meaning: "Altın", explanation: "‘ذهب’ kelimesi ‘Altın’ anlamına gelir." },
-    { word: "رجل", transliteration: "Rajul", meaning: "Adam", explanation: "‘رجل’ kelimesi ‘Adam’ demektir." },
-    { word: "عين", transliteration: "ʿAyn", meaning: "Göz", explanation: "‘عين’ kelimesi ‘Göz’ anlamına gelir." },
-    { word: "قلم", transliteration: "Qalam", meaning: "Kalem", explanation: "‘قلم’ kelimesi ‘Kalem’ demektir." },
-
-    { word: "ليل", transliteration: "Layl", meaning: "Gece", explanation: "‘ليل’ kelimesi ‘Gece’ anlamına gelir." },
-    { word: "شمس", transliteration: "Shams", meaning: "Güneş", explanation: "‘شمس’ kelimesi ‘Güneş’ demektir." },
-    { word: "نور", transliteration: "Nūr", meaning: "Işık", explanation: "‘نور’ kelimesi ‘Işık’ anlamına gelir." },
-    { word: "قمر", transliteration: "Qamar", meaning: "Ay", explanation: "‘قمر’ kelimesi ‘Ay’ demektir." },
-    { word: "بيت", transliteration: "Bayt", meaning: "Ev", explanation: "‘بيت’ kelimesi ‘Ev’ anlamındadır." },
-
-    { word: "كتاب", transliteration: "Kitāb", meaning: "Kitap", explanation: "‘كتاب’ kelimesi ‘Kitap’ anlamına gelir." },
-    { word: "مدينة", transliteration: "Madīna", meaning: "Şehir", explanation: "‘مدينة’ kelimesi ‘Şehir’ anlamındadır." },
-    { word: "قصر", transliteration: "Qaṣr", meaning: "Saray", explanation: "‘قصر’ kelimesi ‘Saray’ anlamına gelir." },
-    { word: "بحر", transliteration: "Baḥr", meaning: "Deniz", explanation: "‘بحر’ kelimesi ‘Deniz’ demektir." },
-    { word: "حديقة", transliteration: "Ḥadīqa", meaning: "Bahçe", explanation: "‘حديقة’ kelimesi ‘Bahçe’ demektir." }
-  ];
-
-  // Hikaye bölümleri (5 bölüm)
+  // Hikayeler 5 bölüm
   const chapters = [
     `📜 Eski Osmanlı arşivinde başlayan gizemli dava. Dedektifimiz ilk ipucuna ulaştı.`,
     `🕰️ Tarih tozları arasında yeni ipuçları keşfediliyor. Dikkatli olmalı!`,
@@ -248,146 +212,153 @@
     `🏫 Son ipucu bulundu. Osmanlı sırları çözülmek üzere...`
   ];
 
+  // HTML elementleri
   const storyEl = document.getElementById("story");
   const questionEl = document.getElementById("question-text");
   const optionsEl = document.getElementById("options");
   const feedbackEl = document.getElementById("feedback");
   const nextBtn = document.getElementById("next-btn");
   const resultEl = document.getElementById("result");
-
   const homeBtn = document.getElementById("home-btn");
   const restartBtn = document.getElementById("restart-btn");
   const finishBtn = document.getElementById("finish-btn");
 
-  let currentIndex = 0; // global soru indeksi (0-24)
+  let allWords = [];
+  let currentIndex = 0;
   let score = 0;
   let answered = false;
 
-  // Müzik kontrol
+  // Müzik
   const music = document.getElementById("background-music");
   music.volume = 0.15;
   music.play().catch(() => {
-    // Otomatik çalma engellenirse kullanıcı etkileşimi bekle
     console.log("Müzik otomatik başlamadı.");
   });
 
+  // Bölüm bulucu
   function getChapterByIndex(idx) {
     return chapters[Math.floor(idx / 5)] || "";
   }
 
-  // Rastgele 3 yanlış seçenek getir
-  function getWrongOptions(correctMeaning) {
-    const allMeanings = allWords.map(k => k.meaning);
-    const wrongs = allMeanings.filter(m => m !== correctMeaning);
-    const shuffled = wrongs.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3);
+  // Yanlış seçenekler anlam için
+  function getWrongMeanings(correctMeaning) {
+    const meanings = allWords.map(k => k.meaning);
+    return meanings.filter(m => m !== correctMeaning)
+      .sort(() => 0.5 - Math.random())
+      .slice(0,3);
+  }
+  // Yanlış kelimeler eksik kelime için
+  function getWrongWords(correctWord) {
+    const words = allWords.map(k => k.word);
+    return words.filter(w => w !== correctWord)
+      .sort(() => 0.5 - Math.random())
+      .slice(0,3);
   }
 
-  // Soru tipleri (kelime anlamı, cümlede hangi kelime?)
+  // Yeni soru tipleri için (3 tip)
   function generateQuestion(wordObj) {
-    // %50 ihtimal ile anlam sorusu, %50 cümlede eksik kelime sorusu
-    if(Math.random() < 0.5){
+    const rnd = Math.random();
+    if (rnd < 0.33) {
+      // Anlam sorusu
       return {
         type: "meaning",
         question: `Bu kelimenin anlamı nedir? (${wordObj.transliteration})`,
         correctAnswer: wordObj.meaning,
         explanation: wordObj.explanation
       };
-    } else {
-      // Cümlede boşluk bırak ve doğru kelimeyi sor
-      const sentence = `Dedektifin notlarında şu cümle yer alıyor: "Bugün ${wordObj.meaning} çok önemli." Hangi kelime eksiktir?`;
+    } else if (rnd < 0.66) {
+      // Eksik kelime cümlede
       return {
         type: "missing_word",
-        question: sentence,
+        question: `Dedektifin notlarında şu cümle var: "Bugün ${wordObj.meaning} çok önemli." Hangi kelime eksiktir?`,
         correctAnswer: wordObj.word,
         explanation: `Doğru kelime: '${wordObj.word}' (${wordObj.transliteration})`
+      };
+    } else {
+      // Eşleştirme (kelime anlam eşleştir)
+      return {
+        type: "match",
+        question: `Bu kelimenin Osmanlıca karşılığı hangisidir? (${wordObj.meaning})`,
+        correctAnswer: wordObj.word,
+        explanation: `Doğru cevap: '${wordObj.word}' (${wordObj.transliteration})`
       };
     }
   }
 
+  // Render soru ve seçenekler
   function renderQuestion() {
     answered = false;
     feedbackEl.textContent = "";
     nextBtn.disabled = true;
     optionsEl.innerHTML = "";
+    resultEl.textContent = "";
 
+    const wordObj = allWords[currentIndex];
     const chapter = getChapterByIndex(currentIndex);
     storyEl.textContent = chapter;
 
-    const wordObj = allWords[currentIndex];
-    const qData = generateQuestion(wordObj);
+    const q = generateQuestion(wordObj);
+    questionEl.textContent = q.question;
 
-    questionEl.textContent = qData.question;
+    let options = [];
 
-    // Doğru cevabı ve 3 yanlış seçeneği hazırla
-    let optionsTexts = [];
-    if(qData.type === "meaning"){
-      optionsTexts = [qData.correctAnswer].concat(getWrongOptions(qData.correctAnswer));
-    } else {
-      // eksik kelime sorusu, doğru kelime + 3 yanlış kelime
-      const allWordsList = allWords.map(w => w.word);
-      const wrongWords = allWordsList.filter(w => w !== qData.correctAnswer).sort(() => 0.5 - Math.random()).slice(0,3);
-      optionsTexts = [qData.correctAnswer].concat(wrongWords);
+    if (q.type === "meaning") {
+      options = [q.correctAnswer, ...getWrongMeanings(q.correctAnswer)];
+    } else if (q.type === "missing_word") {
+      options = [q.correctAnswer, ...getWrongWords(q.correctAnswer)];
+    } else if (q.type === "match") {
+      options = [q.correctAnswer, ...getWrongMeanings(q.correctAnswer)];
     }
 
-    // Karışık sırala
-    optionsTexts.sort(() => Math.random() - 0.5);
+    options = options.sort(() => 0.5 - Math.random());
 
-    optionsTexts.forEach(text => {
+    options.forEach(opt => {
       const li = document.createElement("li");
-      li.textContent = text;
-      li.onclick = () => {
-        if(answered) return;
+      li.textContent = opt;
+      li.addEventListener("click", () => {
+        if (answered) return;
         answered = true;
         li.classList.add("selected");
-
         // Kilitle diğerleri
         [...optionsEl.children].forEach(el => el.style.pointerEvents = "none");
 
-        if(text === qData.correctAnswer){
+        if (opt === q.correctAnswer) {
           score++;
+          feedbackEl.textContent = `✅ Doğru! ${q.explanation}`;
           feedbackEl.style.color = "#2a5d1a";
-          feedbackEl.textContent = `✅ Doğru! ${qData.explanation}`;
         } else {
+          feedbackEl.textContent = `❌ Yanlış! ${q.explanation} Doğru cevap: "${q.correctAnswer}"`;
           feedbackEl.style.color = "#a62a2a";
-          feedbackEl.textContent = `❌ Yanlış! Doğru cevap: ${qData.correctAnswer}`;
         }
-
         nextBtn.disabled = false;
-      };
+      });
       optionsEl.appendChild(li);
     });
   }
 
-  nextBtn.onclick = () => {
+  nextBtn.addEventListener("click", () => {
     currentIndex++;
-    if(currentIndex >= allWords.length){
-      showFinalResult();
-    } else {
+    if(currentIndex < allWords.length){
       renderQuestion();
+    } else {
+      showFinalResult();
     }
-  };
+  });
 
-  homeBtn.onclick = () => {
-    location.reload();
-  };
-
-  restartBtn.onclick = () => {
+  // Buton olayları
+  homeBtn.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+  restartBtn.addEventListener("click", () => {
     currentIndex = 0;
     score = 0;
+    renderQuestion();
     feedbackEl.textContent = "";
     resultEl.textContent = "";
-    storyEl.style.display = "";
-    questionEl.parentElement.style.display = "";
-    optionsEl.style.display = "";
-    feedbackEl.style.display = "";
-    nextBtn.style.display = "";
-    renderQuestion();
-  };
-
-  finishBtn.onclick = () => {
+  });
+  finishBtn.addEventListener("click", () => {
     showFinalResult();
-  };
+  });
 
   function showFinalResult(){
     storyEl.style.display = "none";
@@ -409,8 +380,14 @@
     resultEl.textContent = message;
   }
 
-  // Başlangıç
-  renderQuestion();
+  // JSON dosyasını yükle ve başlat
+  fetch("kelimeler.json")
+    .then(res => res.json())
+    .then(data => {
+      allWords = data.slice(0,25); // sadece 25 kelime
+      renderQuestion();
+    })
+    .catch(() => alert("Kelime verisi yüklenemedi."));
 
 </script>
 </body>
