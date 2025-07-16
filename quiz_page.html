@@ -114,29 +114,37 @@
 
   // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries' ve '/kelimeListeleri/default/liste' yolları da desteklensin:
 
+// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste' ve '/kelimeListeleri/dictionaryHA/kelimeler' yolları da desteklensin:
+
 async function loadWords() {
   words = [];
   try {
-    // 1. Yeni yapı: dictionaryelif > entries
+    // 1. dictionaryelif > entries
     const dictSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryelif").collection("entries").get();
     words = dictSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
 
-    // 2. Eski yapı: entries > entries
+    // 2. entries > entries
     if (words.length === 0) {
       const altSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("entries").collection("entries").get();
       words = altSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
-    // 3. Yapı: default > entries
+    // 3. default > entries
     if (words.length === 0) {
       const defaultSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("entries").get();
       words = defaultSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
-    // 4. Yapı: default > liste
+    // 4. default > liste
     if (words.length === 0) {
       const listeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("liste").get();
       words = listeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+    }
+
+    // 5. dictionaryHA > kelimeler
+    if (words.length === 0) {
+      const haSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryHA").collection("kelimeler").get();
+      words = haSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
     }
 
     if (words.length < 4) {
@@ -151,6 +159,7 @@ async function loadWords() {
     questionText.textContent = "Kelime verisi alınamadı.";
   }
 }
+
 
     function createQuestionsFromWords(wordList) {
       const result = [];
