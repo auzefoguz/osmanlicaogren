@@ -2,19 +2,21 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>🕌 Osmanlı Dedektif Hikayesi</title>
+  <title>Osmanlı Dedektifi - Gelişmiş</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lateef&family=Scheherazade+New&display=swap');
+
     body {
-      font-family: 'Lateef', serif;
-      background: radial-gradient(ellipse at center, #fdf6e3 0%, #d4bfa1 100%);
-      margin: 0; padding: 0;
+      font-family: 'Scheherazade New', 'Lateef', serif;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/8/80/Old_paper_texture.jpg') repeat;
+      background-size: cover;
       color: #3b2f00;
       text-align: center;
     }
     main {
       max-width: 800px;
       margin: 2rem auto;
-      background: rgba(255, 249, 231, 0.95);
+      background: rgba(255, 249, 231, 0.92);
       border-radius: 20px;
       padding: 2rem;
       border: 5px double #6b4f00;
@@ -22,9 +24,9 @@
       position: relative;
     }
     header {
-      font-size: 2.5rem;
+      font-size: 2.8rem;
       font-weight: bold;
-      text-shadow: 1px 1px 3px #7a5c00;
+      text-shadow: 2px 2px 5px #7a5c00;
       margin-bottom: 1rem;
     }
     #section {
@@ -37,7 +39,7 @@
       line-height: 1.6;
     }
     #question {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: bold;
       margin: 1rem 0;
     }
@@ -77,6 +79,7 @@
       cursor: pointer;
       font-size: 1.2rem;
       transition: 0.3s;
+      margin: 0.5rem;
     }
     button:disabled {
       background: #aaa;
@@ -90,19 +93,6 @@
       font-size: 1.5rem;
       white-space: pre-line;
     }
-    /* Holografik efekt */
-    .hologram {
-      background: linear-gradient(135deg, #fff7d6, #e5d6b1, #fff7d6);
-      background-size: 400% 400%;
-      animation: holo 6s ease infinite;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    @keyframes holo {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
     #secret {
       display: none;
       background: #fff7d6;
@@ -112,148 +102,88 @@
       margin-top: 1rem;
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <main>
-    <header class="hologram">🕵️ Osmanlı Dedektifi: Kaybolan Ferman</header>
-    <div id="section"></div>
-    <div id="story"></div>
-    <div id="question"></div>
-    <ul id="options"></ul>
-    <div id="feedback"></div>
-    <button id="next-btn" disabled>Sonraki Bölüm</button>
-    <div id="secret"></div>
-    <div id="result"></div>
-  </main>
+<main>
+  <header>🕌 Osmanlı Dedektifi: Kayıp Ferman</header>
+  <div id="section"></div>
+  <div id="story"></div>
+  <div id="question"></div>
+  <ul id="options"></ul>
+  <div id="feedback"></div>
+  <button id="next-btn" disabled>Sonraki Bölüm</button>
+  <button id="mute-btn">🔊 Müzik Kapat</button>
+  <div id="secret"></div>
+  <div id="result"></div>
+</main>
 
-  <script>
-    const quizData = [
-      {
-        section: "Bölüm 1",
-        story: "Dedektif Ali, Topkapı Sarayı'nın gizli odasında kaybolan padişah fermanını ararken bir kelimeye rastladı: 'كتاب'.",
-        question: "Bu kelimenin anlamı nedir?",
-        options: [
-          { text: "Kitap", correct: true, explanation: "Doğru! 'كتاب' kitap demektir." },
-          { text: "Kalem", correct: false, explanation: "Hayır, bu kelime 'Kalem' değil." },
-          { text: "Saray", correct: false, explanation: "Yanlış, bu kelime saray değildir." }
-        ],
-        secret: "📜 Ali, bu kelimenin ipucunu kullanarak eski bir raf buldu."
-      },
-      {
-        section: "Bölüm 2",
-        story: "Rafın arkasında bir not buldu: '... ile gizli kapıyı aç.' Eksik kelimeyi bulmalı.",
-        question: "Cümleyi tamamlayan kelime hangisi olmalı?",
-        options: [
-          { text: "با", correct: true, explanation: "'با' Osmanlıca'da 'ile' demektir." },
-          { text: "قلم", correct: false, explanation: "Bu kelime 'Kalem' anlamına gelir." },
-          { text: "مدرسة", correct: false, explanation: "Bu kelime 'Okul' demektir." }
-        ],
-        secret: "🔑 Gizli kapının ardında ikinci ipucu ortaya çıktı."
-      },
-      {
-        section: "Bölüm 3",
-        story: "Gizli odada duvarda 'قلم' kelimesi kazınmıştı.",
-        question: "Bu kelimenin anlamı nedir?",
-        options: [
-          { text: "Kalem", correct: true, explanation: "Doğru! 'قلم' kalem demektir." },
-          { text: "Kılıç", correct: false, explanation: "Hayır, kılıç değil." },
-          { text: "Kitap", correct: false, explanation: "Bu kelime kitap değildir." }
-        ],
-        secret: "✒️ Ali duvardan çıkan kalemle not defterine yeni bir şifre yazdı."
-      },
-      {
-        section: "Bölüm 4",
-        story: "Şifre notunda bir satır: 'Bilgeliğin yuvası...' Bu ipucu hangi kelimeyi işaret eder?",
-        question: "Hangi kelime uygundur?",
-        options: [
-          { text: "مدرسة", correct: true, explanation: "'مدرسة' okul demektir." },
-          { text: "كتاب", correct: false, explanation: "Bu kitap demektir." },
-          { text: "قلم", correct: false, explanation: "Bu kalem demektir." }
-        ],
-        secret: "🏫 Ali gizli okula giden tüneli buldu!"
-      },
-      {
-        section: "Bölüm 5",
-        story: "Tünelin ucunda Ali'yi eski bir sandık bekliyordu. Üzerinde 'سيف' yazıyordu.",
-        question: "Sandıkta ne var? 'سيف' kelimesinin anlamı nedir?",
-        options: [
-          { text: "Kılıç", correct: true, explanation: "Doğru! 'سيف' kılıç demektir." },
-          { text: "Kitap", correct: false, explanation: "Hayır, kitap değil." },
-          { text: "Kalem", correct: false, explanation: "Kalem değil." }
-        ],
-        secret: "⚔️ Ali fermanı koruyan kılıcı buldu."
-      }
-    ];
+<audio id="bg-music" src="sounds/ney.mp3" loop autoplay></audio>
 
-    const sectionEl = document.getElementById('section');
-    const storyEl = document.getElementById('story');
-    const questionEl = document.getElementById('question');
-    const optionsEl = document.getElementById('options');
-    const feedbackEl = document.getElementById('feedback');
-    const nextBtn = document.getElementById('next-btn');
-    const secretEl = document.getElementById('secret');
-    const resultEl = document.getElementById('result');
+<script>
+  const quizData = [
+    { section: "Bölüm 1", story: "Dedektif Ali gizli fermanın ilk parçasını bulmak için sarayda araştırma yapıyor.", question: "‘كتاب’ kelimesinin anlamı nedir?", options: [{ text: "Kitap", correct: true, explanation: "Doğru!" }, { text: "Kalem", correct: false, explanation: "Yanlış." }], secret: "📜 İlk ipucu!" },
+    { section: "Bölüm 2", story: "Bir cümlede eksik kelime: '... ile kapı açılır'.", question: "Hangi kelime?", options: [{ text: "با", correct: true, explanation: "Doğru!" }, { text: "قلم", correct: false, explanation: "Yanlış." }], secret: "🔑 Kapı açıldı." },
+    { section: "Bölüm 3", story: "Kazınmış yazı: ‘قلم’", question: "Bu kelimenin anlamı?", options: [{ text: "Kalem", correct: true, explanation: "Doğru!" }, { text: "Kitap", correct: false, explanation: "Yanlış." }], secret: "✒️ Kalem ipucu!" },
+    { section: "Bölüm 4", story: "Şifre: 'Bilgeliğin yuvası...'", question: "Hangi kelime?", options: [{ text: "مدرسة", correct: true, explanation: "Doğru!" }, { text: "قلم", correct: false, explanation: "Yanlış." }], secret: "🏫 Okul bulundu." },
+    { section: "Bölüm 5", story: "Sandık üstü yazı: ‘سيف’", question: "Anlamı?", options: [{ text: "Kılıç", correct: true, explanation: "Doğru!" }, { text: "Kitap", correct: false, explanation: "Yanlış." }], secret: "⚔️ Kılıç fermanı koruyor!" }
+  ];
 
-    let currentIndex = 0;
-    let score = 0;
+  const bgMusic = document.getElementById('bg-music');
+  const muteBtn = document.getElementById('mute-btn');
+  let isMuted = false;
 
-    function renderQuestion() {
-      nextBtn.disabled = true;
-      feedbackEl.textContent = '';
-      secretEl.style.display = 'none';
-      secretEl.textContent = '';
+  muteBtn.onclick = () => {
+    isMuted = !isMuted;
+    bgMusic.muted = isMuted;
+    muteBtn.textContent = isMuted ? "🔇 Müzik Aç" : "🔊 Müzik Kapat";
+  };
 
-      const current = quizData[currentIndex];
-      sectionEl.textContent = current.section;
-      storyEl.textContent = current.story;
-      questionEl.textContent = current.question;
-      optionsEl.innerHTML = '';
+  const sectionEl = document.getElementById('section');
+  const storyEl = document.getElementById('story');
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const feedbackEl = document.getElementById('feedback');
+  const nextBtn = document.getElementById('next-btn');
+  const secretEl = document.getElementById('secret');
+  const resultEl = document.getElementById('result');
 
-      current.options.forEach(opt => {
-        const li = document.createElement('li');
-        li.textContent = opt.text;
-        li.onclick = () => {
-          if (li.classList.contains('selected')) return;
-          li.classList.add('selected');
-          if (opt.correct) {
-            score++;
-            feedbackEl.textContent = `✅ ${opt.explanation}`;
-          } else {
-            feedbackEl.textContent = `❌ ${opt.explanation}`;
-          }
-          nextBtn.disabled = false;
-          [...optionsEl.children].forEach(el => el.style.pointerEvents = 'none');
-          secretEl.style.display = 'block';
-          secretEl.textContent = current.secret;
-        };
-        optionsEl.appendChild(li);
-      });
-    }
+  let currentIndex = 0, score = 0;
 
-    nextBtn.onclick = () => {
-      currentIndex++;
-      if (currentIndex < quizData.length) {
-        renderQuestion();
-      } else {
-        showResult();
-      }
-    };
+  function renderQuestion() {
+    nextBtn.disabled = true;
+    feedbackEl.textContent = '';
+    secretEl.style.display = 'none';
+    secretEl.textContent = '';
 
-    function showResult() {
-      sectionEl.style.display = 'none';
-      storyEl.style.display = 'none';
-      questionEl.style.display = 'none';
-      optionsEl.style.display = 'none';
-      feedbackEl.style.display = 'none';
-      nextBtn.style.display = 'none';
-      secretEl.style.display = 'none';
+    const current = quizData[currentIndex];
+    sectionEl.textContent = current.section;
+    storyEl.textContent = current.story;
+    questionEl.textContent = current.question;
+    optionsEl.innerHTML = '';
 
-      let message = `🎉 Tebrikler! Tüm bölümleri geçtin ve kaybolan fermanı koruyan kılıcı buldun!\n\nToplam puanın: ${score} / ${quizData.length}`;
-      resultEl.textContent = message;
-    }
+    current.options.forEach(opt => {
+      const li = document.createElement('li');
+      li.textContent = opt.text;
+      li.onclick = () => {
+        if (li.classList.contains('selected')) return;
+        li.classList.add('selected');
+        if (opt.correct) { score++; feedbackEl.textContent = `✅ ${opt.explanation}`; }
+        else { feedbackEl.textContent = `❌ ${opt.explanation}`; }
+        nextBtn.disabled = false;
+        [...optionsEl.children].forEach(el => el.style.pointerEvents = 'none');
+        secretEl.style.display = 'block'; secretEl.textContent = current.secret;
+      };
+      optionsEl.appendChild(li);
+    });
+  }
 
-    renderQuestion();
-  </script>
+  nextBtn.onclick = () => {
+    currentIndex++;
+    if (currentIndex < quizData.length) renderQuestion();
+    else { sectionEl.style.display = storyEl.style.display = questionEl.style.display = optionsEl.style.display = feedbackEl.style.display = nextBtn.style.display = secretEl.style.display = 'none'; resultEl.textContent = `🎉 Tebrikler! ${score}/5`; }
+  };
+
+  renderQuestion();
+</script>
 </body>
 </html>
