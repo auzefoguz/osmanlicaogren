@@ -165,11 +165,21 @@ async function loadWords() {
       console.log("default > entries:", words);
     }
 
-    // 4. default > liste
+    // 4. default > liste (collection)
     if (words.length === 0) {
       const listeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("liste").get();
       words = listeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-      console.log("default > liste:", words);
+      console.log("default > liste (collection):", words);
+    }
+
+    // 4-b. default > liste (array alanı)
+    if (words.length === 0) {
+      const defaultDoc = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").get();
+      const data = defaultDoc.data();
+      if (data && Array.isArray(data.liste)) {
+        words = data.liste.filter(w => w.word && w.meaning);
+        console.log("default > liste (array alanı):", words);
+      }
     }
 
     // 5. dictionaryHA > kelimeler
