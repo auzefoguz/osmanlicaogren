@@ -119,72 +119,56 @@
   </div>
 </nav>
 <!-- Mobil Offcanvas Menü -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
-  <div class="offcanvas-header">
-   <h5 class="offcanvas-title d-flex align-items-center gap-2 mb-0 text-osmanli-gold" style="font-family: 'Lateef', serif; font-size: 1.5rem;">
-  <i class="bi bi-list" style="color: #c9a343; font-size: 1.6rem;"></i>
-  <span style="text-shadow: 1px 1px 1px rgba(0,0,0,0.3);">Menü</span>
-</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+<div class="offcanvas-body d-flex flex-column gap-2">
+  <a href="hat-sanati.html" class="btn btn-outline-warning">Hat Sanatı</a>
+  <a href="https://www.osmanlicagazeteler.org/Sozluk.php" target="_blank" class="btn btn-outline-info">Sözlük</a>
+  <a href="https://www.osmanlicagazeteler.org/" target="_blank" class="btn btn-outline-info">Gazeteler</a>
+
+  <div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Testler</button>
+    <ul class="dropdown-menu w-100">
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/1-kur-sorulari/" target="_blank">1. Kur</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/ikinci-kur-osmanlica-testler/" target="_blank">2. Kur</a></li>
+    </ul>
   </div>
-  <div class="offcanvas-body d-flex flex-column gap-2">
-    <a href="hat-sanati.html" class="btn btn-outline-warning">Hat Sanatı</a>
-    <a href="https://www.osmanlicagazeteler.org/Sozluk.php" target="_blank" class="btn btn-outline-info">Sözlük</a>
-    <a href="https://www.osmanlicagazeteler.org/" target="_blank" class="btn btn-outline-info">Gazeteler</a>
 
-    <div class="dropdown">
-      <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Testler</button>
-      <ul class="dropdown-menu w-100">
-        <li><a class="dropdown-item" href="https://osmanlicaogren.com/1-kur-sorulari/" target="_blank">1. Kur</a></li>
-        <li><a class="dropdown-item" href="https://osmanlicaogren.com/ikinci-kur-osmanlica-testler/" target="_blank">2. Kur</a></li>
-      </ul>
-    </div>
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">Etkinlikler</a>
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
-    <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
-    <li><a class="dropdown-item" href="dedektiv-quiz.html"><i class="bi bi-search"></i> Dedektif Quiz</a></li> <!-- Yeni -->
-  </ul>
-</li>
-
-   <div class="dropdown">
-  <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Kaynaklar</button>
-  <ul class="dropdown-menu w-100">
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/matbu-hat/" target="_blank">Matbu Hat</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-hatti/" target="_blank">Rika Hattı</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-matbu-karsilastirmali/" target="_blank">Rika & Matbu</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/category/kitabeler/" target="_blank">Kitabeler</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/mezar-taslari/" target="_blank">Mezar Taşları</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/husnu-hat/" target="_blank">Hüsn-ü Hat</a></li>
-    <li><a class="dropdown-item" href="https://osmanlicaogren.com/osmanlica-cuma-mesajlari-ve-tebrik-mesajlari/" target="_blank">Mesajlar</a></li>
-  </ul>
-</div>
-<div class="dropdown">
-  <button class="btn btn-outline-info dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Etkinlikler</button>
-  <ul class="dropdown-menu w-100">
-    <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
-    <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
-  </ul>
-</div>
-
-    <a href="profile.html" class="btn btn-outline-success">Profil</a>
-    <a href="premium.html" class="btn btn-outline-warning">Premium</a>
-      
-
-
-    <div class="dropdown">
-      <button class="btn btn-outline-dark dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Bilgi</button>
-      <ul class="dropdown-menu w-100">
-        <li><a class="dropdown-item" href="hakkimizda.html">Hakkımızda</a></li>
-        <li><a class="dropdown-item" href="sss.html">SSS</a></li>
-        <li><a class="dropdown-item" href="gizlilik.html">Gizlilik</a></li>
-        <li><a class="dropdown-item" href="destek.html">Destek</a></li>
-      </ul>
-    </div>
-<a href="analytics.html" class="btn btn-outline-info">İstatistik</a>
+  <div class="dropdown">
+    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Etkinlikler</button>
+    <ul class="dropdown-menu w-100">
+      <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
+      <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
+      <li><a class="dropdown-item" href="dedektiv-quiz.html"><i class="bi bi-search"></i> Dedektif Quiz</a></li>
+    </ul>
   </div>
+
+  <div class="dropdown">
+    <button class="btn btn-outline-info dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Kaynaklar</button>
+    <ul class="dropdown-menu w-100">
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/matbu-hat/" target="_blank">Matbu Hat</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-hatti/" target="_blank">Rika Hattı</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-matbu-karsilastirmali/" target="_blank">Rika & Matbu</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/category/kitabeler/" target="_blank">Kitabeler</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/mezar-taslari/" target="_blank">Mezar Taşları</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/husnu-hat/" target="_blank">Hüsn-ü Hat</a></li>
+      <li><a class="dropdown-item" href="https://osmanlicaogren.com/osmanlica-cuma-mesajlari-ve-tebrik-mesajlari/" target="_blank">Mesajlar</a></li>
+    </ul>
+  </div>
+
+  <div class="dropdown">
+    <button class="btn btn-outline-dark dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Bilgi</button>
+    <ul class="dropdown-menu w-100">
+      <li><a class="dropdown-item" href="hakkimizda.html">Hakkımızda</a></li>
+      <li><a class="dropdown-item" href="sss.html">SSS</a></li>
+      <li><a class="dropdown-item" href="gizlilik.html">Gizlilik</a></li>
+      <li><a class="dropdown-item" href="destek.html">Destek</a></li>
+    </ul>
+  </div>
+
+  <a href="profile.html" class="btn btn-outline-success">Profil</a>
+  <a href="premium.html" class="btn btn-outline-warning">Premium</a>
+  <a href="analytics.html" class="btn btn-outline-info">İstatistik</a>
 </div>
+
 
 <!-- 🎨 Menü Stili -->
 <style>
