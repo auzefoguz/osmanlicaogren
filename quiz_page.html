@@ -101,13 +101,6 @@
     const chartCanvas = document.getElementById("dailyChart").getContext('2d');
     const endButtons = document.getElementById("endButtons");
 
-    const defaultWords = [
-      { word: "كِتَاب", transliteration: "Kitâb", meaning: "Kitap", additional_meanings: [] },
-      { word: "مَدْرَسَة", transliteration: "Medrese", meaning: "Okul", additional_meanings: [] },
-      { word: "قَلَم", transliteration: "Kalem", meaning: "Kalem", additional_meanings: [] },
-      { word: "وَرَقَة", transliteration: "Varaka", meaning: "Kağıt", additional_meanings: [] }
-    ];
-
     auth.onAuthStateChanged(user => {
       if (user) {
         userId = user.uid;
@@ -119,23 +112,35 @@
       }
     });
 
-    function loadWords() {
-      db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryelif").collection("entries").get()
-        .then(snapshot => {
-          words = snapshot.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-          if (words.length < 4) words = defaultWords;
-          questions = createQuestionsFromWords(words);
-          showQuestion();
-        }).catch(err => {
-          console.error("Kelime yüklenirken hata:", err);
-          questionText.textContent = "Kelime verisi alınamadı.";
-        });
+    async function loadWords() {
+      words = [];
+      try {
+        // 1. Yeni yapı: dictionaryelif > entries
+        const dictSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryelif").collection("entries").get();
+        words = dictSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+
+        // 2. Eski yapı: direkt entries
+        if (words.length === 0) {
+          const altSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("entries").collection("entries").get();
+          words = altSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+        }
+
+        if (words.length < 4) {
+          questionText.textContent = "Quiz için yeterli kelime yok.";
+          return;
+        }
+
+        questions = createQuestionsFromWords(words);
+        showQuestion();
+      } catch (err) {
+        console.error("Kelime yüklenirken hata:", err);
+        questionText.textContent = "Kelime verisi alınamadı.";
+      }
     }
 
     function createQuestionsFromWords(wordList) {
       const result = [];
       const allMeanings = wordList.flatMap(w => [w.meaning, ...(w.additional_meanings || [])]);
-
       wordList.forEach(entry => {
         const correct = entry.meaning;
         const wrongs = shuffle(allMeanings.filter(m => m !== correct)).slice(0, 3);
@@ -257,4 +262,3 @@
   </script>
 </body>
 </html>
-
