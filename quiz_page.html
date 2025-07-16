@@ -116,24 +116,32 @@
 
 // Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
 
+// Kodun 'loadWords' fonksiyonunu güncelliyoruz ki '/kelimeListeleri/default/entries', '/kelimeListeleri/default/liste', '/kelimeListeleri/dictionaryHA/kelimeler', '/kelimeListeleri/dictionaryayn/entries' ve '/kelimeListeleri/dictionaryayn/kelimeler' yolları da desteklensin:
+
 async function loadWords() {
   words = [];
   try {
     // 1. dictionaryelif > entries
     const dictSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryelif").collection("entries").get();
     words = dictSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
+console.log("Kelime kaynağından gelen veriler:", words);
 
     // 2. entries > entries
     if (words.length === 0) {
       const altSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("entries").collection("entries").get();
       words = altSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-    }
+   console.log("Kelime kaynağından gelen veriler:", words);
+
+}
+
 
     // 3. default > entries
     if (words.length === 0) {
       const defaultSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("default").collection("entries").get();
       words = defaultSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-    }
+    console.log("Kelime kaynağından gelen veriler:", words);
+
+}
 
     // 4. default > liste
     if (words.length === 0) {
@@ -145,7 +153,9 @@ async function loadWords() {
     if (words.length === 0) {
       const haSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryHA").collection("kelimeler").get();
       words = haSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-    }
+   
+}console.log("Kelime kaynağından gelen veriler:", words);
+
 
     // 6. dictionaryayn > entries
     if (words.length === 0) {
@@ -157,7 +167,9 @@ async function loadWords() {
     if (words.length === 0) {
       const aynKelimeSnap = await db.collection("users").doc(userId).collection("kelimeListeleri").doc("dictionaryayn").collection("kelimeler").get();
       words = aynKelimeSnap.docs.map(doc => doc.data()).filter(w => w.word && w.meaning);
-    }
+   console.log("Kelime kaynağından gelen veriler:", words);
+
+}
 
     if (words.length < 4) {
       questionText.textContent = "Quiz için yeterli kelime yok.";
