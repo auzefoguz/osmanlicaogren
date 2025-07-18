@@ -52,73 +52,20 @@
       font-weight: bold;
       color: #ffdf7e;
     }
-    #mapProgress {
-      margin-top: 30px;
-    }
-    .level-lock {
-      display: inline-block;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      margin: 10px;
-      line-height: 100px;
-      font-weight: bold;
-      color: white;
-      background-color: rgba(255,255,255,0.1);
-      border: 2px solid #ffc107;
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-    .level-unlock {
-      cursor: pointer;
-      opacity: 1;
-    }
-    #badgeBox {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.2rem;
-      background: #ffc107;
-      color: #000;
-      border-radius: 1rem;
-      padding: 5px 15px;
-    }
-    #istatistikBox {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.3);
-      padding: 10px;
-      border-radius: 1rem;
-      border: 1px solid #ffc107;
-    }
   </style>
 </head>
 <body>
+  <div id="scoreBox">Skor: <span id="score">0</span></div>
   <div class="story-box">
     <h1 id="titleWithCharacter">🕵️ Osmanlıca Dedektifi</h1>
-    <h5>Bölüm <span id="bolum">1</span></h5>
+    <p id="soruMetni" class="question">Yükleniyor...</p>
+    <div id="secenekler" class="mb-3"></div>
+    <div id="geribildirim" class="mt-3"></div>
+    <button id="sonrakiBtn" class="btn btn-warning d-none" onclick="siradaki()">Sonraki</button>
     <div class="progress my-3">
       <div id="progressBar" class="progress-bar" style="width: 0%"></div>
     </div>
     <div id="rankBox">🎓 Rütbe: Acemi Dedektif</div>
-    <p id="soruMetni" class="question">Yükleniyor...</p>
-    <div id="secenekler" class="mb-3"></div>
-    <div id="geribildirim" class="mt-3"></div>
-    <div class="mt-3">
-      <button id="sonrakiBtn" class="btn btn-warning d-none" onclick="siradaki()">Sonraki</button>
-    </div>
-  </div>
-  <div class="story-box" id="mapProgress">
-    <h4>🗺️ Görev Haritası</h4>
-    <div id="levelContainer"></div>
-  </div>
-  <div id="istatistikBox">
-    <strong>📊 İstatistikler:</strong><br>
-    Doğru: <span id="istatistikDogru">0</span><br>
-    Yanlış: <span id="istatistikYanlis">0</span><br>
-    Başarı: <span id="istatistikBasari">0%</span>
   </div>
 
   <script>
@@ -141,60 +88,58 @@
     let yanlisSayisi = 0;
 
     function siradaki() {
-      if (aktifSoru >= kelimeler.length) return;
+      if (aktifSoru >= kelimeler.length) {
+        bitir();
+        return;
+      }
+
       const soru = kelimeler[aktifSoru];
       document.getElementById("soruMetni").innerText = `"${soru.word}" ne demektir?`;
+
       const secenekler = [soru.meaning];
       while (secenekler.length < 4) {
-        let rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
-        if (!secenekler.includes(rast)) secenekler.push(rast);
+        const rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
+        if (!secenekler.includes(rast)) {
+          secenekler.push(rast);
+        }
       }
+
       secenekler.sort(() => Math.random() - 0.5);
-      document.getElementById("secenekler").innerHTML = secenekler.map(secenek => `<button class='btn btn-outline-light btn-answer' onclick='cevapla("${secenek}")'>${secenek}</button>`).join('');
-      document.getElementById("geribildirim").innerHTML = "";
+      document.getElementById("secenekler").innerHTML = secenekler.map(secenek =>
+        `<button class='btn btn-outline-light btn-answer' onclick='cevapla("${secenek}")'>${secenek}</button>`
+      ).join('');
+
+      document.getElementById("geribildirim").innerText = "";
       document.getElementById("sonrakiBtn").classList.add("d-none");
     }
 
     function cevapla(secim) {
       const dogru = kelimeler[aktifSoru].meaning;
       const sonuc = secim === dogru;
+
       if (sonuc) {
         skor += 10;
         dogruSayisi++;
         document.getElementById("geribildirim").innerHTML = "<span class='text-success'>✅ Doğru!</span>";
       } else {
         yanlisSayisi++;
-        document.getElementById("geribildirim").innerHTML = `<span class='text-danger'>❌ Yanlış. Doğru cevap: ${dogru}</span>`;
+        document.getElementById("geribildirim").innerHTML = `<span class='text-danger'>❌ Yanlış. Doğru: ${dogru}</span>`;
       }
+
       aktifSoru++;
+      document.getElementById("score").innerText = skor;
       document.getElementById("progressBar").style.width = `${(aktifSoru / kelimeler.length) * 100}%`;
       document.getElementById("sonrakiBtn").classList.remove("d-none");
-      document.getElementById("istatistikDogru").innerText = dogruSayisi;
-      document.getElementById("istatistikYanlis").innerText = yanlisSayisi;
-      const toplam = dogruSayisi + yanlisSayisi;
-      const basari = toplam > 0 ? Math.round((dogruSayisi / toplam) * 100) : 0;
-      document.getElementById("istatistikBasari").innerText = `${basari}%`;
     }
 
-    function bolumKilidiGuncelle() {
-      const levelContainer = document.getElementById("levelContainer");
-      levelContainer.innerHTML = "";
-      const toplamBolum = 5;
-      const acilanBolum = 1;
-      for (let i = 1; i <= toplamBolum; i++) {
-        const bolum = document.createElement("div");
-        bolum.className = "level-lock";
-        if (i <= acilanBolum) {
-          bolum.classList.add("level-unlock");
-          bolum.onclick = () => alert("Bölüm " + i + " açıldı!");
-        }
-        bolum.innerText = "Bölüm " + i;
-        levelContainer.appendChild(bolum);
-      }
+    function bitir() {
+      document.getElementById("soruMetni").innerText = "🎉 Tüm görevleri tamamladınız!";
+      document.getElementById("secenekler").innerHTML = "";
+      document.getElementById("geribildirim").innerHTML = `<strong>Toplam Skor: ${skor}</strong>`;
+      document.getElementById("rankBox").innerText = skor >= 80 ? "🎖️ Rütbe: Usta Dedektif" : "🎖️ Rütbe: Acemi Dedektif";
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      bolumKilidiGuncelle();
       siradaki();
     });
   </script>
