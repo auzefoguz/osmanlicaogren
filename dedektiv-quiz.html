@@ -1,394 +1,259 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>🕵️ Osmanlıca Dedektif Quiz</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Lateef&display=swap');
-
-  body {
-    font-family: 'Lateef', serif, Arial, sans-serif;
-    background: #fdf9f3;
-    color: #1a3b5d;
-    margin: 0; padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  main {
-    background: #fffdf9;
-    max-width: 720px;
-    border-radius: 15px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.12);
-    padding: 2rem 2.5rem 3rem;
-    position: relative;
-  }
-  header {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #a67c00;
-    text-align: center;
-    text-shadow: 0 0 3px #7a5c00;
-    margin-bottom: 1.5rem;
-    letter-spacing: 3px;
-  }
-  #story {
-    font-style: italic;
-    font-size: 1.2rem;
-    color: #444;
-    margin-bottom: 1.8rem;
-    min-height: 120px;
-    line-height: 1.5;
-    border-left: 4px solid #a67c00;
-    padding-left: 1rem;
-    background: #fff7cc88;
-    border-radius: 8px;
-  }
-  #question {
-    font-size: 2rem;
-    font-weight: 900;
-    margin-bottom: 1rem;
-    min-height: 80px;
-    color: #4b3200;
-    text-shadow: 0 1px 2px #f0e68c88;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-  #question svg {
-    width: 36px;
-    height: 36px;
-    fill: #a67c00;
-  }
-  ul.options {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 1.5rem;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-  ul.options::-webkit-scrollbar {
-    width: 8px;
-  }
-  ul.options::-webkit-scrollbar-thumb {
-    background-color: #a67c00cc;
-    border-radius: 4px;
-  }
-  ul.options li {
-    background: #fef8d8;
-    border: 2px solid transparent;
-    margin-bottom: 1rem;
-    padding: 1rem 1.3rem;
-    border-radius: 14px;
-    cursor: pointer;
-    font-size: 1.4rem;
-    font-weight: 600;
-    transition: background-color 0.3s, border-color 0.3s;
-    box-shadow: 1px 1px 4px #e2d48f88;
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-  }
-  ul.options li:hover {
-    background-color: #a67c00;
-    color: white;
-    border-color: #7a5c00;
-  }
-  ul.options li.selected {
-    background-color: #4b3200;
-    color: #f7e58d;
-    font-weight: 900;
-    border-color: #a67c00;
-    box-shadow: 0 0 10px #b39b00;
-  }
-  #feedback {
-    background: #fff4b7;
-    border-left: 6px solid #a67c00;
-    padding: 1rem 1.2rem;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #6b4f00;
-    border-radius: 8px;
-    min-height: 60px;
-    margin-bottom: 1.8rem;
-    box-shadow: 1px 1px 5px #a67c0033;
-  }
-  button#next-btn {
-    background-color: #a67c00;
-    color: #fffdf9;
-    border: none;
-    padding: 1rem 2.2rem;
-    font-size: 1.3rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 900;
-    letter-spacing: 1px;
-    transition: background-color 0.3s;
-    box-shadow: 0 3px 7px #7a5c0055;
-    user-select: none;
-    display: block;
-    margin: 0 auto 1rem;
-  }
-  button#next-btn:disabled {
-    background-color: #d4c57f88;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  button#next-btn:hover:not(:disabled) {
-    background-color: #7a5c00;
-  }
-  #result {
-    margin-top: 2rem;
-    font-size: 1.7rem;
-    font-weight: 800;
-    text-align: center;
-    color: #4b3200;
-    line-height: 1.4;
-    white-space: pre-line;
-  }
-  #controls {
-    position: fixed;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 20px;
-    z-index: 100;
-  }
-  #controls button {
-    background: #a67c00;
-    border: none;
-    color: white;
-    font-size: 1.8rem;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    cursor: pointer;
-    box-shadow: 0 3px 7px #7a5c0055;
-    transition: background-color 0.3s;
-    user-select: none;
-  }
-  #controls button:hover {
-    background-color: #7a5c00;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Osmanlıca Dedektifi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #1a3b5d, #3f5b82);
+      color: #fff;
+      font-family: 'Georgia', serif;
+      padding: 60px 15px;
+    }
+    .story-box {
+      background-color: rgba(0,0,0,0.3);
+      border: 2px solid #c9a343;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+    }
+    .btn-answer {
+      margin: 0.5rem;
+      min-width: 180px;
+    }
+    .question {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+    #scoreBox {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ffc107;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 1rem;
+      font-weight: bold;
+    }
+    .progress {
+      height: 20px;
+      background-color: #eee;
+    }
+    .progress-bar {
+      background-color: #ffc107;
+    }
+    #rankBox {
+      font-size: 1.1rem;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #ffdf7e;
+    }
+    #themeSelector, #characterSelector, #customWordLink, #langSelector {
+      position: absolute;
+      left: 20px;
+      z-index: 999;
+    }
+    #themeSelector { top: 20px; }
+    #characterSelector { top: 70px; }
+    #customWordLink { top: 120px; }
+    #langSelector { top: 170px; }
+    #mapProgress { margin-top: 30px; }
+    .level-lock {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 10px;
+      line-height: 100px;
+      font-weight: bold;
+      color: white;
+      background-color: rgba(255,255,255,0.1);
+      border: 2px solid #ffc107;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .level-unlock {
+      cursor: pointer;
+      opacity: 1;
+    }
+    #badgeBox {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      background: #ffc107;
+      color: #000;
+      border-radius: 1rem;
+      padding: 5px 15px;
+    }
+    #istatistikBox {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border-radius: 1rem;
+      border: 1px solid #ffc107;
+    }
+  </style>
 </head>
 <body>
-<main>
-  <header>🕵️ Osmanlıca Dedektif Gizemi</header>
-  <div id="story"></div>
-  <div id="question">
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 16a2 2 0 1 1 2-2 2 2 0 0 1-2 2Zm2-6h-4v-6h4Z"/>
-    </svg>
-    <span id="question-text"></span>
+  <div id="themeSelector">
+    <select class="form-select" onchange="degistirTema(this.value)">
+      <option value="default">🎨 Tema Seç</option>
+      <option value="blue">🔵 Mavi Dedektif</option>
+      <option value="green">🟢 Doğa Dedektif</option>
+      <option value="dark">⚫ Karanlık Dedektif</option>
+    </select>
   </div>
-  <ul class="options" id="options"></ul>
-  <div id="feedback"></div>
-  <button id="next-btn" disabled>Sonraki İpucu</button>
-  <div id="result"></div>
-</main>
+  <div id="characterSelector">
+    <select class="form-select" onchange="degistirKarakter(this.value)">
+      <option value="default">🧑 Karakter Seç</option>
+      <option value="male">🕵️ Erkek Dedektif</option>
+      <option value="female">🕵️‍♀️ Kadın Dedektif</option>
+      <option value="hat">🎩 Şapkalı Dedektif</option>
+    </select>
+  </div>
+  <div id="customWordLink">
+    <button class="btn btn-info btn-sm" onclick="window.location.href='custom_words.html'">🗃️ Kendi Kelime Havuzun</button>
+  </div>
+  <div id="langSelector">
+    <select class="form-select" onchange="degistirDil(this.value)">
+      <option value="tr">🇹🇷 Türkçe</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 Arabic</option>
+    </select>
+  </div>
+  <div id="badgeBox">🎖️ Rozet: Yok</div>
+  <div id="scoreBox">Skor: <span id="score">0</span></div>
+  <div class="story-box">
+    <h1 id="titleWithCharacter">🕵️ Osmanlıca Dedektifi</h1>
+    <h5>Bölüm <span id="bolum">1</span></h5>
+    <div class="progress my-3">
+      <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+    </div>
+    <div id="rankBox">🎓 Rütbe: Acemi Dedektif</div>
+    <p id="soruMetni" class="question">Yükleniyor...</p>
+    <div id="secenekler" class="mb-3"></div>
+    <div id="geribildirim" class="mt-3"></div>
+    <div class="mt-3">
+      <button id="sonrakiBtn" class="btn btn-warning d-none" onclick="siradaki()">Sonraki</button>
+    </div>
+  </div>
+  <div class="story-box" id="mapProgress">
+    <h4>🗺️ Görev Haritası</h4>
+    <div id="levelContainer"></div>
+  </div>
+  <div id="istatistikBox">
+    <strong>📊 İstatistikler:</strong><br>
+    Doğru: <span id="istatistikDogru">0</span><br>
+    Yanlış: <span id="istatistikYanlis">0</span><br>
+    Başarı: <span id="istatistikBasari">0%</span>
+  </div>
 
-<div id="controls">
-  <button id="home-btn" title="Ana Sayfa" aria-label="Ana Sayfa">🏠</button>
-  <button id="restart-btn" title="Yeniden Başlat" aria-label="Yeniden Başlat">🔄</button>
-  <button id="finish-btn" title="Bitir" aria-label="Bitir">⏹️</button>
-</div>
+  <script>
+    let aktifDil = 'tr';
+    let skor = 0;
+    let kelimeler = [];
+    let aktifSoru = 0;
+    let dogruSayisi = 0;
+    let yanlisSayisi = 0;
 
-<audio id="background-music" loop>
-  <source src="haunting-middle-eastern-piece-188714.mp3" type="audio/mpeg" />
-  Tarayıcınız audio elementini desteklemiyor.
-</audio>
-
-<script>
-  // Hikayeler 5 bölüm
-  const chapters = [
-    `📜 Eski Osmanlı arşivinde başlayan gizemli dava. Dedektifimiz ilk ipucuna ulaştı.`,
-    `🕰️ Tarih tozları arasında yeni ipuçları keşfediliyor. Dikkatli olmalı!`,
-    `✉️ Gizem derinleşiyor; mektuplar, yazmalar ve sırlar ortaya çıkıyor.`,
-    `📚 Arşiv odasında gece yarısı, kritik kelimeler dedektifi bekliyor.`,
-    `🏫 Son ipucu bulundu. Osmanlı sırları çözülmek üzere...`
-  ];
-
-  // HTML elementleri
-  const storyEl = document.getElementById("story");
-  const questionEl = document.getElementById("question-text");
-  const optionsEl = document.getElementById("options");
-  const feedbackEl = document.getElementById("feedback");
-  const nextBtn = document.getElementById("next-btn");
-  const resultEl = document.getElementById("result");
-  const homeBtn = document.getElementById("home-btn");
-  const restartBtn = document.getElementById("restart-btn");
-  const finishBtn = document.getElementById("finish-btn");
-
-  let allWords = [];
-  let currentIndex = 0;
-  let score = 0;
-  let answered = false;
-
-  // Müzik
-  const music = document.getElementById("background-music");
-  music.volume = 0.15;
-  music.play().catch(() => {
-    console.log("Müzik otomatik başlamadı.");
-  });
-
-  // Bölüm bulucu
-  function getChapterByIndex(idx) {
-    return chapters[Math.floor(idx / 5)] || "";
-  }
-
-  // Yanlış seçenekler anlam için
-  function getWrongMeanings(correctMeaning) {
-    const meanings = allWords.map(k => k.meaning);
-    return meanings.filter(m => m !== correctMeaning)
-      .sort(() => 0.5 - Math.random())
-      .slice(0,3);
-  }
-  // Yanlış kelimeler eksik kelime için
-  function getWrongWords(correctWord) {
-    const words = allWords.map(k => k.word);
-    return words.filter(w => w !== correctWord)
-      .sort(() => 0.5 - Math.random())
-      .slice(0,3);
-  }
-
-  // Yeni soru tipleri için (3 tip)
-  function generateQuestion(wordObj) {
-    const rnd = Math.random();
-    if (rnd < 0.33) {
-      // Anlam sorusu
-      return {
-        type: "meaning",
-        question: `Bu kelimenin anlamı nedir? (${wordObj.transliteration})`,
-        correctAnswer: wordObj.meaning,
-        explanation: wordObj.explanation
-      };
-    } else if (rnd < 0.66) {
-      // Eksik kelime cümlede
-      return {
-        type: "missing_word",
-        question: `Dedektifin notlarında şu cümle var: "Bugün ${wordObj.meaning} çok önemli." Hangi kelime eksiktir?`,
-        correctAnswer: wordObj.word,
-        explanation: `Doğru kelime: '${wordObj.word}' (${wordObj.transliteration})`
-      };
-    } else {
-      // Eşleştirme (kelime anlam eşleştir)
-      return {
-        type: "match",
-        question: `Bu kelimenin Osmanlıca karşılığı hangisidir? (${wordObj.meaning})`,
-        correctAnswer: wordObj.word,
-        explanation: `Doğru cevap: '${wordObj.word}' (${wordObj.transliteration})`
-      };
-    }
-  }
-
-  // Render soru ve seçenekler
-  function renderQuestion() {
-    answered = false;
-    feedbackEl.textContent = "";
-    nextBtn.disabled = true;
-    optionsEl.innerHTML = "";
-    resultEl.textContent = "";
-
-    const wordObj = allWords[currentIndex];
-    const chapter = getChapterByIndex(currentIndex);
-    storyEl.textContent = chapter;
-
-    const q = generateQuestion(wordObj);
-    questionEl.textContent = q.question;
-
-    let options = [];
-
-    if (q.type === "meaning") {
-      options = [q.correctAnswer, ...getWrongMeanings(q.correctAnswer)];
-    } else if (q.type === "missing_word") {
-      options = [q.correctAnswer, ...getWrongWords(q.correctAnswer)];
-    } else if (q.type === "match") {
-      options = [q.correctAnswer, ...getWrongMeanings(q.correctAnswer)];
+    async function kelimeleriYukle() {
+      try {
+        const response = await fetch('dedektif.json');
+        kelimeler = await response.json();
+        siradaki();
+      } catch (error) {
+        document.getElementById("soruMetni").innerText = "Kelime listesi yüklenemedi.";
+        console.error(error);
+      }
     }
 
-    options = options.sort(() => 0.5 - Math.random());
+    function degistirDil(lang) {
+      aktifDil = lang;
+    }
 
-    options.forEach(opt => {
-      const li = document.createElement("li");
-      li.textContent = opt;
-      li.addEventListener("click", () => {
-        if (answered) return;
-        answered = true;
-        li.classList.add("selected");
-        // Kilitle diğerleri
-        [...optionsEl.children].forEach(el => el.style.pointerEvents = "none");
+    function degistirKarakter(tip) {
+      const title = document.getElementById("titleWithCharacter");
+      if (tip === 'male') title.innerHTML = '🕵️ Osmanlıca Dedektifi';
+      else if (tip === 'female') title.innerHTML = '🕵️‍♀️ Osmanlıca Dedektifi';
+      else if (tip === 'hat') title.innerHTML = '🎩 Osmanlıca Dedektifi';
+      else title.innerHTML = '🕵️ Osmanlıca Dedektifi';
+    }
 
-        if (opt === q.correctAnswer) {
-          score++;
-          feedbackEl.textContent = `✅ Doğru! ${q.explanation}`;
-          feedbackEl.style.color = "#2a5d1a";
-        } else {
-          feedbackEl.textContent = `❌ Yanlış! ${q.explanation} Doğru cevap: "${q.correctAnswer}"`;
-          feedbackEl.style.color = "#a62a2a";
-        }
-        nextBtn.disabled = false;
-      });
-      optionsEl.appendChild(li);
+    function bolumKilidiGuncelle() {
+      const container = document.getElementById("levelContainer");
+      container.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const kilitliMi = skor < (i - 1) * 20;
+        const div = document.createElement("div");
+        div.className = kilitliMi ? 'level-lock' : 'level-lock level-unlock';
+        div.innerText = `Bölüm ${i}`;
+        if (!kilitliMi) div.onclick = () => alert(`Bölüm ${i} yüklenecek`);
+        container.appendChild(div);
+      }
+    }
+
+    function guncelleIstatistik() {
+      const toplam = dogruSayisi + yanlisSayisi;
+      const basari = toplam > 0 ? Math.round((dogruSayisi / toplam) * 100) : 0;
+      document.getElementById("istatistikDogru").innerText = dogruSayisi;
+      document.getElementById("istatistikYanlis").innerText = yanlisSayisi;
+      document.getElementById("istatistikBasari").innerText = `${basari}%`;
+    }
+
+    function siradaki() {
+      if (aktifSoru >= kelimeler.length) return bitir();
+      const soru = kelimeler[aktifSoru];
+      document.getElementById("soruMetni").innerText = `"${soru.word}" ne demektir?`;
+      const secenekler = [soru.meaning];
+      while (secenekler.length < 4) {
+        let rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
+        if (!secenekler.includes(rast)) secenekler.push(rast);
+      }
+      secenekler.sort(() => Math.random() - 0.5);
+      document.getElementById("secenekler").innerHTML = secenekler.map(secenek => `<button class='btn btn-outline-light btn-answer' onclick='cevapla("${secenek}")'>${secenek}</button>`).join('');
+      document.getElementById("geribildirim").innerHTML = "";
+      document.getElementById("sonrakiBtn").classList.add("d-none");
+    }
+
+    function cevapla(secim) {
+      const dogru = kelimeler[aktifSoru].meaning;
+      const sonuc = secim === dogru;
+      if (sonuc) {
+        skor += 10;
+        dogruSayisi++;
+        document.getElementById("geribildirim").innerHTML = "<span class='text-success'>✅ Doğru!</span>";
+      } else {
+        yanlisSayisi++;
+        document.getElementById("geribildirim").innerHTML = `<span class='text-danger'>❌ Yanlış. Doğru cevap: ${dogru}</span>`;
+      }
+      document.getElementById("score").innerText = skor;
+      aktifSoru++;
+      document.getElementById("progressBar").style.width = `${(aktifSoru / kelimeler.length) * 100}%`;
+      document.getElementById("sonrakiBtn").classList.remove("d-none");
+      guncelleIstatistik();
+      bolumKilidiGuncelle();
+    }
+
+    function bitir() {
+      document.getElementById("soruMetni").innerText = "Tebrikler! Tüm görevleri tamamladınız.";
+      document.getElementById("secenekler").innerHTML = "";
+      document.getElementById("geribildirim").innerHTML = `<strong>Toplam Skor: ${skor}</strong>`;
+      document.getElementById("rankBox").innerText = skor >= 80 ? "🎖️ Rütbe: Usta Dedektif" : "🎖️ Rütbe: Acemi Dedektif";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      degistirKarakter('default');
+      bolumKilidiGuncelle();
+      kelimeleriYukle();
     });
-  }
-
-  nextBtn.addEventListener("click", () => {
-    currentIndex++;
-    if(currentIndex < allWords.length){
-      renderQuestion();
-    } else {
-      showFinalResult();
-    }
-  });
-
-  // Buton olayları
-  homeBtn.addEventListener("click", () => {
-    window.location.href = "index.html";
-  });
-  restartBtn.addEventListener("click", () => {
-    currentIndex = 0;
-    score = 0;
-    renderQuestion();
-    feedbackEl.textContent = "";
-    resultEl.textContent = "";
-  });
-  finishBtn.addEventListener("click", () => {
-    showFinalResult();
-  });
-
-  function showFinalResult(){
-    storyEl.style.display = "none";
-    questionEl.parentElement.style.display = "none";
-    optionsEl.style.display = "none";
-    feedbackEl.style.display = "none";
-    nextBtn.style.display = "none";
-
-    let message = `🕵️ Osmanlıca Dedektif Gizemini çözdün!\n\nToplam ${allWords.length} ipucundan ${score} doğru cevap verdin.`;
-
-    if(score === allWords.length){
-      message += "\n\n🎉 Harika! Tüm sırları çözdün ve büyük bir Osmanlıca dedektifi oldun!";
-    } else if(score >= allWords.length / 2){
-      message += "\n\n👍 İyi iş çıkardın, bazı gizemler hala çözülmeyi bekliyor.";
-    } else {
-      message += "\n\n😕 Biraz daha çalışmalısın, Osmanlıca sırları zorlu olabilir.";
-    }
-
-    resultEl.textContent = message;
-  }
-
-  // JSON dosyasını yükle ve başlat
-  fetch("kelimeler.json")
-    .then(res => res.json())
-    .then(data => {
-      allWords = data.slice(0,25); // sadece 25 kelime
-      renderQuestion();
-    })
-    .catch(() => alert("Kelime verisi yüklenemedi."));
-
-</script>
+  </script>
 </body>
 </html>
