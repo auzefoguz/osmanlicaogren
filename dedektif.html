@@ -174,34 +174,49 @@
       }
     }
 
-    // Diğer JS fonksiyonlar aynı şekilde burada yer alır...
+    function degistirKarakter(secim) {
+      const baslik = document.getElementById("titleWithCharacter");
+      let karakterEmoji = "🕵️";
+
+      switch (secim) {
+        case "male":
+          karakterEmoji = "🕵️";
+          break;
+        case "female":
+          karakterEmoji = "🕵️‍♀️";
+          break;
+        case "hat":
+          karakterEmoji = "🎩";
+          break;
+        default:
+          karakterEmoji = "🕵️";
+      }
+
+      baslik.textContent = `${karakterEmoji} Osmanlıca Dedektifi`;
+    }
+
+    function bolumKilidiGuncelle() {
+      const levelContainer = document.getElementById("levelContainer");
+      levelContainer.innerHTML = "";
+      const toplamBolum = 5;
+      const acilanBolum = 1;
+      for (let i = 1; i <= toplamBolum; i++) {
+        const bolum = document.createElement("div");
+        bolum.className = "level-lock";
+        if (i <= acilanBolum) {
+          bolum.classList.add("level-unlock");
+          bolum.onclick = () => alert("Bölüm " + i + " açıldı!");
+        }
+        bolum.innerText = "Bölüm " + i;
+        levelContainer.appendChild(bolum);
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
       degistirKarakter('default');
       bolumKilidiGuncelle();
       kelimeleriYukle();
     });
-    function degistirKarakter(secim) {
-  const baslik = document.getElementById("titleWithCharacter");
-  let karakterEmoji = "🕵️";
-
-  switch (secim) {
-    case "male":
-      karakterEmoji = "🕵️";
-      break;
-    case "female":
-      karakterEmoji = "🕵️‍♀️";
-      break;
-    case "hat":
-      karakterEmoji = "🎩";
-      break;
-    default:
-      karakterEmoji = "🕵️";
-  }
-
-  baslik.textContent = `${karakterEmoji} Osmanlıca Dedektifi`;
-}
-
   </script>
 </body>
 </html>
