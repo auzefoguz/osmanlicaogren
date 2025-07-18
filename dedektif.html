@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Osmanlıca Dedektifi</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="kelime_data.js"></script>
   <style>
     body {
       background: linear-gradient(to right, #1a3b5d, #3f5b82);
@@ -123,21 +122,23 @@
   </div>
 
   <script>
-    let aktifDil = 'tr';
+    const kelimeler = [
+      { word: "اقلام", meaning: "Kalemler. Yazı gereçleri. Devlet daireleri." },
+      { word: "كتاب", meaning: "Kitap." },
+      { word: "مدرسه", meaning: "Okul." },
+      { word: "قلم", meaning: "Yazı aracı." },
+      { word: "علم", meaning: "Bilgi." },
+      { word: "معلم", meaning: "Öğretmen." },
+      { word: "درس", meaning: "Eğitim oturumu." },
+      { word: "مدينه", meaning: "Şehir." },
+      { word: "زمان", meaning: "Zaman." },
+      { word: "قلب", meaning: "Kalp." }
+    ];
+
     let skor = 0;
-    let kelimeler = [];
     let aktifSoru = 0;
     let dogruSayisi = 0;
     let yanlisSayisi = 0;
-
-    function kelimeleriYukle() {
-      kelimeler = (window.kelimeler || []).slice(0, 20);
-      if (kelimeler.length > 0) {
-        setTimeout(siradaki, 200);
-      } else {
-        document.getElementById("soruMetni").innerText = "Kelime listesi boş.";
-      }
-    }
 
     function siradaki() {
       if (aktifSoru >= kelimeler.length) return;
@@ -175,19 +176,6 @@
       document.getElementById("istatistikBasari").innerText = `${basari}%`;
     }
 
-    function degistirKarakter(secim) {
-      const baslik = document.getElementById("titleWithCharacter");
-      if (!baslik) return;
-      let karakterEmoji = "🕵️";
-      switch (secim) {
-        case "male": karakterEmoji = "🕵️"; break;
-        case "female": karakterEmoji = "🕵️‍♀️"; break;
-        case "hat": karakterEmoji = "🎩"; break;
-        default: karakterEmoji = "🕵️";
-      }
-      baslik.textContent = `${karakterEmoji} Osmanlıca Dedektifi`;
-    }
-
     function bolumKilidiGuncelle() {
       const levelContainer = document.getElementById("levelContainer");
       levelContainer.innerHTML = "";
@@ -206,9 +194,8 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      degistirKarakter('default');
       bolumKilidiGuncelle();
-      kelimeleriYukle();
+      siradaki();
     });
   </script>
 </body>
