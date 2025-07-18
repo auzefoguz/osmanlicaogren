@@ -12,136 +12,222 @@
       font-family: 'Georgia', serif;
       padding: 60px 15px;
     }
-    .story-box {
-      background-color: rgba(0,0,0,0.3);
-      border: 2px solid #c9a343;
-      border-radius: 1rem;
-      padding: 2rem;
-      max-width: 700px;
-      margin: auto;
-      text-align: center;
-    }
-    .btn-answer {
+    .btn-mode {
       margin: 0.5rem;
-      min-width: 180px;
     }
-    .question {
-      font-size: 1.2rem;
-      margin: 1rem 0;
+    .game-mode {
+      display: none;
     }
-    #scoreBox {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #ffc107;
-      color: #000;
-      padding: 10px 20px;
-      border-radius: 1rem;
+    .active-mode {
+      display: block;
+    }
+    #scoreBox, #badgeBox, #themeBox, #characterBox, #langBox {
+      position: fixed;
+      background: #ffc107;
+      color: black;
       font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 10px;
+      z-index: 1000;
     }
-    .progress {
-      height: 20px;
-      background-color: #eee;
-    }
-    .progress-bar {
-      background-color: #ffc107;
-    }
-    #rankBox {
-      font-size: 1.1rem;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #ffdf7e;
-    }
+    #scoreBox { top: 10px; right: 10px; }
+    #badgeBox { top: 10px; left: 10px; background: #17a2b8; color: white; }
+    #themeBox { top: 60px; left: 10px; }
+    #characterBox { top: 110px; left: 10px; }
+    #langBox { top: 160px; left: 10px; }
   </style>
 </head>
 <body>
   <div id="scoreBox">Skor: <span id="score">0</span></div>
-  <div class="story-box">
-    <h1 id="titleWithCharacter">🕵️ Osmanlıca Dedektifi</h1>
-    <p id="soruMetni" class="question">Yükleniyor...</p>
-    <div id="secenekler" class="mb-3"></div>
-    <div id="geribildirim" class="mt-3"></div>
-    <button id="sonrakiBtn" class="btn btn-warning d-none" onclick="siradaki()">Sonraki</button>
-    <div class="progress my-3">
-      <div id="progressBar" class="progress-bar" style="width: 0%"></div>
-    </div>
-    <div id="rankBox">🎓 Rütbe: Acemi Dedektif</div>
+  <div id="badgeBox">🎖️ Rozet: Acemi</div>
+  <div id="themeBox">
+    <select class="form-select" onchange="temaDegistir(this.value)">
+      <option value="blue">🔵 Mavi</option>
+      <option value="green">🟢 Yeşil</option>
+      <option value="dark">⚫ Karanlık</option>
+    </select>
+  </div>
+  <div id="characterBox">
+    <select class="form-select" onchange="karakterDegistir(this.value)">
+      <option value="default">🧑 Dedektif</option>
+      <option value="male">🕵️ Erkek</option>
+      <option value="female">🕵️‍♀️ Kadın</option>
+    </select>
+  </div>
+  <div id="langBox">
+    <select class="form-select" onchange="dilDegistir(this.value)">
+      <option value="tr">🇹🇷 Türkçe</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 Arabic</option>
+    </select>
   </div>
 
+  <div class="text-center mb-4">
+    <button class="btn btn-warning btn-mode" onclick="oyunModuSec('quiz')">🧪 Quiz</button>
+    <button class="btn btn-success btn-mode" onclick="oyunModuSec('eslestirme')">🧩 Eşleştirme</button>
+    <button class="btn btn-info btn-mode" onclick="oyunModuSec('hafiza')">🧠 Hafıza</button>
+    <button class="btn btn-secondary btn-mode" onclick="oyunModuSec('ipucu')">🔍 İpucu</button>
+  </div>
+
+  <div id="quiz" class="game-mode active-mode">
+    <div class="container text-center">
+      <h1 id="karakterBaslik">🧑 Osmanlıca Dedektifi</h1>
+      <p id="quizSoru">Soru yüklenecek...</p>
+      <div id="quizSecenekler"></div>
+      <div id="quizSonuc"></div>
+      <button class="btn btn-light mt-3" onclick="siradakiQuiz()">Sonraki</button>
+    </div>
+  </div>
+
+  <div id="eslestirme" class="game-mode">
+    <div class="container text-center">
+      <h1>🧩 Eşleştirme Modu</h1>
+      <div id="eslestirmeAlan" class="row"></div>
+    </div>
+  </div>
+
+  <div id="hafiza" class="game-mode">
+    <div class="container text-center">
+      <h1>🧠 Hafıza Oyunu</h1>
+      <div id="hafizaAlan" class="row row-cols-4 g-3"></div>
+    </div>
+  </div>
+
+  <div id="ipucu" class="game-mode">
+    <div class="container text-center">
+      <h1>🔍 İpucu ile Tahmin</h1>
+      <p id="ipucuSoru">İpucu hazırlanıyor...</p>
+      <input type="text" id="ipucuCevap" class="form-control w-50 mx-auto" placeholder="Tahmininiz">
+      <button class="btn btn-warning mt-2" onclick="kontrolIpucu()">Cevapla</button>
+      <div id="ipucuSonuc"></div>
+    </div>
+  </div>
+
+  <script src="kelime_data.js"></script>
   <script>
-    const kelimeler = [
-      { word: "اقلام", meaning: "Kalemler. Yazı gereçleri. Devlet daireleri." },
-      { word: "كتاب", meaning: "Kitap." },
-      { word: "مدرسه", meaning: "Okul." },
-      { word: "قلم", meaning: "Yazı aracı." },
-      { word: "علم", meaning: "Bilgi." },
-      { word: "معلم", meaning: "Öğretmen." },
-      { word: "درس", meaning: "Eğitim oturumu." },
-      { word: "مدينه", meaning: "Şehir." },
-      { word: "زمان", meaning: "Zaman." },
-      { word: "قلب", meaning: "Kalp." }
-    ];
-
     let skor = 0;
-    let aktifSoru = 0;
-    let dogruSayisi = 0;
-    let yanlisSayisi = 0;
+    const rozetler = ["Acemi", "Gözcü", "Usta", "Baş Dedektif"];
+    let aktifDil = 'tr';
 
-    function siradaki() {
-      if (aktifSoru >= kelimeler.length) {
-        bitir();
-        return;
-      }
-
-      const soru = kelimeler[aktifSoru];
-      document.getElementById("soruMetni").innerText = `"${soru.word}" ne demektir?`;
-
-      const secenekler = [soru.meaning];
-      while (secenekler.length < 4) {
-        const rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
-        if (!secenekler.includes(rast)) {
-          secenekler.push(rast);
-        }
-      }
-
-      secenekler.sort(() => Math.random() - 0.5);
-      document.getElementById("secenekler").innerHTML = secenekler.map(secenek =>
-        `<button class='btn btn-outline-light btn-answer' onclick='cevapla("${secenek}")'>${secenek}</button>`
-      ).join('');
-
-      document.getElementById("geribildirim").innerText = "";
-      document.getElementById("sonrakiBtn").classList.add("d-none");
+    function rozetGuncelle() {
+      let r = rozetler[0];
+      if (skor >= 80) r = rozetler[3];
+      else if (skor >= 50) r = rozetler[2];
+      else if (skor >= 20) r = rozetler[1];
+      document.getElementById("badgeBox").innerText = `🎖️ Rozet: ${r}`;
     }
-
-    function cevapla(secim) {
-      const dogru = kelimeler[aktifSoru].meaning;
-      const sonuc = secim === dogru;
-
-      if (sonuc) {
-        skor += 10;
-        dogruSayisi++;
-        document.getElementById("geribildirim").innerHTML = "<span class='text-success'>✅ Doğru!</span>";
-      } else {
-        yanlisSayisi++;
-        document.getElementById("geribildirim").innerHTML = `<span class='text-danger'>❌ Yanlış. Doğru: ${dogru}</span>`;
-      }
-
-      aktifSoru++;
+    function skorArttir(puan) {
+      skor += puan;
       document.getElementById("score").innerText = skor;
-      document.getElementById("progressBar").style.width = `${(aktifSoru / kelimeler.length) * 100}%`;
-      document.getElementById("sonrakiBtn").classList.remove("d-none");
+      rozetGuncelle();
+    }
+    function oyunModuSec(mod) {
+      document.querySelectorAll('.game-mode').forEach(div => div.classList.remove('active-mode'));
+      document.getElementById(mod).classList.add('active-mode');
+      if (mod === 'quiz') siradakiQuiz();
+      if (mod === 'eslestirme') eslestirmeOlustur();
+      if (mod === 'hafiza') hafizaOlustur();
+      if (mod === 'ipucu') ipucuHazirla();
+    }
+    function temaDegistir(t) {
+      if (t === 'blue') document.body.style.background = 'linear-gradient(to right, #1a3b5d, #3f5b82)';
+      if (t === 'green') document.body.style.background = 'linear-gradient(to right, #2e8b57, #3cb371)';
+      if (t === 'dark') document.body.style.background = '#121212';
+    }
+    function karakterDegistir(tip) {
+      let karakter = '🧑';
+      if (tip === 'male') karakter = '🕵️';
+      if (tip === 'female') karakter = '🕵️‍♀️';
+      document.getElementById("karakterBaslik").innerText = `${karakter} Osmanlıca Dedektifi`;
+    }
+    function dilDegistir(lang) {
+      aktifDil = lang;
+      alert("Dil değiştirildi: " + lang);
     }
 
-    function bitir() {
-      document.getElementById("soruMetni").innerText = "🎉 Tüm görevleri tamamladınız!";
-      document.getElementById("secenekler").innerHTML = "";
-      document.getElementById("geribildirim").innerHTML = `<strong>Toplam Skor: ${skor}</strong>`;
-      document.getElementById("rankBox").innerText = skor >= 80 ? "🎖️ Rütbe: Usta Dedektif" : "🎖️ Rütbe: Acemi Dedektif";
+    // Quiz
+    let quizIndex = 0;
+    function siradakiQuiz() {
+      if (quizIndex >= kelimeler.length) quizIndex = 0;
+      const s = kelimeler[quizIndex];
+      const secenekler = [s.meaning];
+      while (secenekler.length < 4) {
+        let rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
+        if (!secenekler.includes(rast)) secenekler.push(rast);
+      }
+      secenekler.sort(() => Math.random() - 0.5);
+      document.getElementById("quizSoru").innerText = `"${s.word}" ne demektir?`;
+      document.getElementById("quizSecenekler").innerHTML = secenekler.map(m => `<button class='btn btn-outline-light m-1' onclick='cevaplaQuiz("${m}")'>${m}</button>`).join('');
+      document.getElementById("quizSonuc").innerText = "";
+    }
+    function cevaplaQuiz(secim) {
+      const dogru = kelimeler[quizIndex].meaning;
+      if (secim === dogru) skorArttir(10);
+      document.getElementById("quizSonuc").innerText = (secim === dogru ? "✅ Doğru!" : `❌ Yanlış. Doğru cevap: ${dogru}`);
+      quizIndex++;
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      siradaki();
-    });
+    // Eşleştirme
+    function eslestirmeOlustur() {
+      const alan = document.getElementById("eslestirmeAlan");
+      alan.innerHTML = "";
+      const rastKelimeler = kelimeler.sort(() => Math.random() - 0.5).slice(0, 4);
+      rastKelimeler.forEach(k => {
+        alan.innerHTML += `<div class='col-md-6'><div class='p-2 bg-light text-dark border mb-2'>${k.word}</div></div>`;
+        alan.innerHTML += `<div class='col-md-6'><div class='p-2 bg-warning text-dark border mb-2'>${k.meaning}</div></div>`;
+      });
+    }
+
+    // Hafıza
+    function hafizaOlustur() {
+      const alan = document.getElementById("hafizaAlan");
+      let kartlar = [];
+      kelimeler.slice(0, 4).forEach(k => {
+        kartlar.push({ icerik: k.word, tip: "w" });
+        kartlar.push({ icerik: k.meaning, tip: "m" });
+      });
+      kartlar = kartlar.sort(() => Math.random() - 0.5);
+      alan.innerHTML = kartlar.map((k, i) => `<div class='col'><button class='btn btn-outline-light w-100' id='kart${i}' onclick='acKart(${i}, "${k.icerik}", "${k.tip}")'>❓</button></div>`).join('');
+    }
+    let acilanKart = null;
+    function acKart(i, icerik, tip) {
+      const btn = document.getElementById(`kart${i}`);
+      btn.innerText = icerik;
+      if (!acilanKart) {
+        acilanKart = { i, icerik, tip };
+      } else {
+        const eslesme = (acilanKart.tip !== tip) && (kelimeEslesme(acilanKart.icerik, icerik));
+        setTimeout(() => {
+          if (!eslesme) {
+            btn.innerText = '❓';
+            document.getElementById(`kart${acilanKart.i}`).innerText = '❓';
+          } else {
+            skorArttir(5);
+          }
+          acilanKart = null;
+        }, 1000);
+      }
+    }
+    function kelimeEslesme(a, b) {
+      return kelimeler.some(k => (k.word === a && k.meaning === b) || (k.word === b && k.meaning === a));
+    }
+
+    // İpucu
+    let ipucuIndex = 0;
+    function ipucuHazirla() {
+      const k = kelimeler[ipucuIndex % kelimeler.length];
+      const ipucu = k.meaning.slice(0, 5);
+      document.getElementById("ipucuSoru").innerText = `Kelime: ${k.word} - İpucu: ${ipucu}...`;
+      document.getElementById("ipucuSonuc").innerText = "";
+    }
+    function kontrolIpucu() {
+      const cevap = document.getElementById("ipucuCevap").value.trim();
+      const dogru = kelimeler[ipucuIndex % kelimeler.length].meaning;
+      if (cevap === dogru) skorArttir(10);
+      document.getElementById("ipucuSonuc").innerText = (cevap === dogru ? "✅ Doğru!" : `❌ Yanlış. Doğru: ${dogru}`);
+      ipucuIndex++;
+      ipucuHazirla();
+    }
   </script>
 </body>
 </html>
