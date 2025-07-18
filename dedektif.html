@@ -53,16 +53,9 @@
       font-weight: bold;
       color: #ffdf7e;
     }
-    #themeSelector, #characterSelector, #customWordLink, #langSelector {
-      position: absolute;
-      left: 20px;
-      z-index: 999;
+    #mapProgress {
+      margin-top: 30px;
     }
-    #themeSelector { top: 20px; }
-    #characterSelector { top: 70px; }
-    #customWordLink { top: 120px; }
-    #langSelector { top: 170px; }
-    #mapProgress { margin-top: 30px; }
     .level-lock {
       display: inline-block;
       width: 100px;
@@ -138,9 +131,9 @@
     let yanlisSayisi = 0;
 
     function kelimeleriYukle() {
-      kelimeler = window.kelimeler || [];
+      kelimeler = (window.kelimeler || []).slice(0, 20);
       if (kelimeler.length > 0) {
-        siradaki();
+        setTimeout(siradaki, 200);
       } else {
         document.getElementById("soruMetni").innerText = "Kelime listesi boş.";
       }
@@ -159,6 +152,27 @@
       document.getElementById("secenekler").innerHTML = secenekler.map(secenek => `<button class='btn btn-outline-light btn-answer' onclick='cevapla("${secenek}")'>${secenek}</button>`).join('');
       document.getElementById("geribildirim").innerHTML = "";
       document.getElementById("sonrakiBtn").classList.add("d-none");
+    }
+
+    function cevapla(secim) {
+      const dogru = kelimeler[aktifSoru].meaning;
+      const sonuc = secim === dogru;
+      if (sonuc) {
+        skor += 10;
+        dogruSayisi++;
+        document.getElementById("geribildirim").innerHTML = "<span class='text-success'>✅ Doğru!</span>";
+      } else {
+        yanlisSayisi++;
+        document.getElementById("geribildirim").innerHTML = `<span class='text-danger'>❌ Yanlış. Doğru cevap: ${dogru}</span>`;
+      }
+      aktifSoru++;
+      document.getElementById("progressBar").style.width = `${(aktifSoru / kelimeler.length) * 100}%`;
+      document.getElementById("sonrakiBtn").classList.remove("d-none");
+      document.getElementById("istatistikDogru").innerText = dogruSayisi;
+      document.getElementById("istatistikYanlis").innerText = yanlisSayisi;
+      const toplam = dogruSayisi + yanlisSayisi;
+      const basari = toplam > 0 ? Math.round((dogruSayisi / toplam) * 100) : 0;
+      document.getElementById("istatistikBasari").innerText = `${basari}%`;
     }
 
     function degistirKarakter(secim) {
