@@ -181,6 +181,27 @@
       bolumKilidiGuncelle();
       kelimeleriYukle();
     });
+    function degistirKarakter(secim) {
+  const baslik = document.getElementById("titleWithCharacter");
+  let karakterEmoji = "🕵️";
+
+  switch (secim) {
+    case "male":
+      karakterEmoji = "🕵️";
+      break;
+    case "female":
+      karakterEmoji = "🕵️‍♀️";
+      break;
+    case "hat":
+      karakterEmoji = "🎩";
+      break;
+    default:
+      karakterEmoji = "🕵️";
+  }
+
+  baslik.textContent = `${karakterEmoji} Osmanlıca Dedektifi`;
+}
+
   </script>
 </body>
 </html>
