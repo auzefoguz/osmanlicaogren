@@ -2,232 +2,229 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Osmanlıca Dedektifi</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🕵️ Osmanlıca Dedektifi: Macera Oyunu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
     body {
-      background: linear-gradient(to right, #1a3b5d, #3f5b82);
-      color: #fff;
+      background-color: #f6f0e8;
       font-family: 'Georgia', serif;
-      padding: 60px 15px;
     }
-    .btn-mode {
-      margin: 0.5rem;
+    .kutucuk {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #b3936c;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
     }
-    .game-mode {
-      display: none;
+    .btn-custom {
+      background-color: #704214;
+      color: white;
     }
-    .active-mode {
-      display: block;
+    .btn-custom:hover {
+      background-color: #5a3310;
     }
-    #scoreBox, #badgeBox, #themeBox, #characterBox, #langBox {
-      position: fixed;
-      background: #ffc107;
-      color: black;
-      font-weight: bold;
+    .choice-btn {
+      margin: 5px;
+    }
+    .senaryo-aciklama {
+      font-style: italic;
+      color: #444;
+      margin-bottom: 15px;
+    }
+    .soru-senaryo {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+    .harita {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .harita button {
+      font-size: 0.9rem;
       padding: 10px 15px;
-      border-radius: 10px;
-      z-index: 1000;
     }
-    #scoreBox { top: 10px; right: 10px; }
-    #badgeBox { top: 10px; left: 10px; background: #17a2b8; color: white; }
-    #themeBox { top: 60px; left: 10px; }
-    #characterBox { top: 110px; left: 10px; }
-    #langBox { top: 160px; left: 10px; }
   </style>
 </head>
 <body>
-  <div id="scoreBox">Skor: <span id="score">0</span></div>
-  <div id="badgeBox">🎖️ Rozet: Acemi</div>
-  <div id="themeBox">
-    <select class="form-select" onchange="temaDegistir(this.value)">
-      <option value="blue">🔵 Mavi</option>
-      <option value="green">🟢 Yeşil</option>
-      <option value="dark">⚫ Karanlık</option>
-    </select>
-  </div>
-  <div id="characterBox">
-    <select class="form-select" onchange="karakterDegistir(this.value)">
-      <option value="default">🧑 Dedektif</option>
-      <option value="male">🕵️ Erkek</option>
-      <option value="female">🕵️‍♀️ Kadın</option>
-    </select>
-  </div>
-  <div id="langBox">
-    <select class="form-select" onchange="dilDegistir(this.value)">
-      <option value="tr">🇹🇷 Türkçe</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="ar">🇸🇦 Arabic</option>
-    </select>
-  </div>
+<nav class="navbar navbar-light bg-light px-3">
+  <span class="navbar-brand mb-0 h5" id="navbarKarakter">🕵️ Osmanlıca Dedektifi</span>
+  <span class="ms-auto badge bg-success" id="skorGoster">Skor: 0</span>
+  <span class="ms-3 badge bg-primary" onclick="ilerlemeGoster()" style="cursor:pointer;">📌 İlerlemeni Göster</span>
+</nav>
+<div class="container my-5">
+  <div id="ilerlemeAlani"></div>
+  <div id="icerik" class="kutucuk text-center"></div>
+</div>
+<script>
+let skor = 0;
+let seciliKarakter = null;
+let bolum = 0;
+let bolumDogru = 0;
+let kelimeler = [];
+let toplamKelimeler = 0;
+const kullanilanKelimeler = new Set();
 
-  <div class="text-center mb-4">
-    <button class="btn btn-warning btn-mode" onclick="oyunModuSec('quiz')">🧪 Quiz</button>
-    <button class="btn btn-success btn-mode" onclick="oyunModuSec('eslestirme')">🧩 Eşleştirme</button>
-    <button class="btn btn-info btn-mode" onclick="oyunModuSec('hafiza')">🧠 Hafıza</button>
-    <button class="btn btn-secondary btn-mode" onclick="oyunModuSec('ipucu')">🔍 İpucu</button>
-  </div>
+const karakterler = [
+  { ad: "Hattat Ahmet", ikon: "👳", aciklama: "Eski belgeleri okuma uzmanı.", bonus: "+5 puan her doğru cevapta" },
+  { ad: "Müverrihe Zeynep", ikon: "🧕", aciklama: "Tarihçi ve arşiv dedektifi.", bonus: "%20 daha fazla ipucu gösterir" },
+  { ad: "Çömez Hasan", ikon: "👲", aciklama: "Yeni mezun ama çok meraklı.", bonus: "Yanlış cevapta -puan almaz" }
+];
 
-  <div id="quiz" class="game-mode active-mode">
-    <div class="container text-center">
-      <h1 id="karakterBaslik">🧑 Osmanlıca Dedektifi</h1>
-      <p id="quizSoru">Soru yüklenecek...</p>
-      <div id="quizSecenekler"></div>
-      <div id="quizSonuc"></div>
-      <button class="btn btn-light mt-3" onclick="siradakiQuiz()">Sonraki</button>
-    </div>
-  </div>
+const senaryolar = [
+  "1. İstanbul: Kayıp Fermanın Peşinde",
+  "2. Bursa: Kütüphanedeki Gizemli Kitap",
+  "3. Edirne: Vakanüvisin Sandığı",
+  "4. Şam: Zindandaki Esrar",
+  "5. Kahire: Sarayda Casus Var!"
+];
 
-  <div id="eslestirme" class="game-mode">
-    <div class="container text-center">
-      <h1>🧩 Eşleştirme Modu</h1>
-      <div id="eslestirmeAlan" class="row"></div>
-    </div>
-  </div>
+const aciklamalar = [
+  "Topkapı Sarayı'ndan padişahın mührünü taşıyan kadim bir ferman ortadan kayboldu. Onu bulan kişi, devlet sırrına erişebilir.",
+  "Bursa Ulu Kütüphane'de kaybolan kitap sıradan değil. İçinde gizli notlar saklı.",
+  "Edirne'de eski bir tarihçiye ait sandık bulundu. Ancak içerisindeki belgeler şifreli.",
+  "Şam zindanlarında bir tutsak Osmanlıca ipuçları bıraktı. Onu bulmak için kelimeleri çözmelisin.",
+  "Kahire Sarayı’nda bir casus dolaşıyor. Notlar Osmanlıca yazılmış. Çözebilir misin?"
+];
 
-  <div id="hafiza" class="game-mode">
-    <div class="container text-center">
-      <h1>🧠 Hafıza Oyunu</h1>
-      <div id="hafizaAlan" class="row row-cols-4 g-3"></div>
-    </div>
-  </div>
+const soruSenaryolari = [
+  "Şüpheli bir not buldun. Ne anlama geliyor olabilir?",
+  "Duvara kazınmış bu kelime sana neyi hatırlatıyor?",
+  "Eski bir mektupta bu kelime vurgulanmış. Anlamı nedir?",
+  "Bir sandığın üstünde bu Osmanlıca kelime yazıyor. Ne demek olabilir?",
+  "Gizli bir haritada bu kelime dikkatini çekti. Sence anlamı nedir?"
+];
 
-  <div id="ipucu" class="game-mode">
-    <div class="container text-center">
-      <h1>🔍 İpucu ile Tahmin</h1>
-      <p id="ipucuSoru">İpucu hazırlanıyor...</p>
-      <input type="text" id="ipucuCevap" class="form-control w-50 mx-auto" placeholder="Tahmininiz">
-      <button class="btn btn-warning mt-2" onclick="kontrolIpucu()">Cevapla</button>
-      <div id="ipucuSonuc"></div>
-    </div>
-  </div>
+function karakterSecimi() {
+  let html = `<h4>Dedektifini Seç</h4><p>Oynayacağın karakteri seç:</p>`;
+  karakterler.forEach((karakter, index) => {
+    html += `<button class='btn btn-outline-dark m-2' onclick='seciliKarakteriAyarla(${index})'>${karakter.ikon} ${karakter.ad}</button>`;
+  });
+  document.getElementById("icerik").innerHTML = html;
+}
 
-  <script src="kelime_data.js"></script>
-  <script>
-    let skor = 0;
-    const rozetler = ["Acemi", "Gözcü", "Usta", "Baş Dedektif"];
-    let aktifDil = 'tr';
+function seciliKarakteriAyarla(index) {
+  seciliKarakter = karakterler[index];
+  document.getElementById("navbarKarakter").innerHTML = `${seciliKarakter.ikon} Osmanlıca Dedektifi - ${seciliKarakter.ad}`;
+  document.getElementById("icerik").innerHTML = `
+    <p><strong>${seciliKarakter.ad}</strong>: ${seciliKarakter.aciklama}<br><em>${seciliKarakter.bonus}</em></p>
+    <input type="file" id="dosyaInput" accept="application/json" class="form-control mb-3">
+    <button class="btn btn-custom" onclick="jsonYukle()">📂 JSON'dan Yükle ve Haritaya Geç</button>`;
+}
 
-    function rozetGuncelle() {
-      let r = rozetler[0];
-      if (skor >= 80) r = rozetler[3];
-      else if (skor >= 50) r = rozetler[2];
-      else if (skor >= 20) r = rozetler[1];
-      document.getElementById("badgeBox").innerText = `🎖️ Rozet: ${r}`;
+function jsonYukle() {
+  const dosya = document.getElementById("dosyaInput").files[0];
+  if (!dosya) return alert("Lütfen bir JSON dosyası seçin.");
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const veri = JSON.parse(e.target.result);
+      kelimeler = (Array.isArray(veri) ? veri : Object.entries(veri).map(([key, val]) => ({
+        word: val.osmanlica || key,
+        transliteration: key,
+        meaning: val.anlam,
+        hint: val.ipucu || ""
+      }))).sort(() => 0.5 - Math.random()).slice(0, 100);
+      toplamKelimeler = kelimeler.length;
+      haritaGoster();
+    } catch {
+      alert("Geçerli bir JSON dosyası yükleyin.");
     }
-    function skorArttir(puan) {
-      skor += puan;
-      document.getElementById("score").innerText = skor;
-      rozetGuncelle();
-    }
-    function oyunModuSec(mod) {
-      document.querySelectorAll('.game-mode').forEach(div => div.classList.remove('active-mode'));
-      document.getElementById(mod).classList.add('active-mode');
-      if (mod === 'quiz') siradakiQuiz();
-      if (mod === 'eslestirme') eslestirmeOlustur();
-      if (mod === 'hafiza') hafizaOlustur();
-      if (mod === 'ipucu') ipucuHazirla();
-    }
-    function temaDegistir(t) {
-      if (t === 'blue') document.body.style.background = 'linear-gradient(to right, #1a3b5d, #3f5b82)';
-      if (t === 'green') document.body.style.background = 'linear-gradient(to right, #2e8b57, #3cb371)';
-      if (t === 'dark') document.body.style.background = '#121212';
-    }
-    function karakterDegistir(tip) {
-      let karakter = '🧑';
-      if (tip === 'male') karakter = '🕵️';
-      if (tip === 'female') karakter = '🕵️‍♀️';
-      document.getElementById("karakterBaslik").innerText = `${karakter} Osmanlıca Dedektifi`;
-    }
-    function dilDegistir(lang) {
-      aktifDil = lang;
-      alert("Dil değiştirildi: " + lang);
-    }
+  };
+  reader.readAsText(dosya);
+}
 
-    // Quiz
-    let quizIndex = 0;
-    function siradakiQuiz() {
-      if (quizIndex >= kelimeler.length) quizIndex = 0;
-      const s = kelimeler[quizIndex];
-      const secenekler = [s.meaning];
-      while (secenekler.length < 4) {
-        let rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
-        if (!secenekler.includes(rast)) secenekler.push(rast);
-      }
-      secenekler.sort(() => Math.random() - 0.5);
-      document.getElementById("quizSoru").innerText = `"${s.word}" ne demektir?`;
-      document.getElementById("quizSecenekler").innerHTML = secenekler.map(m => `<button class='btn btn-outline-light m-1' onclick='cevaplaQuiz("${m}")'>${m}</button>`).join('');
-      document.getElementById("quizSonuc").innerText = "";
-    }
-    function cevaplaQuiz(secim) {
-      const dogru = kelimeler[quizIndex].meaning;
-      if (secim === dogru) skorArttir(10);
-      document.getElementById("quizSonuc").innerText = (secim === dogru ? "✅ Doğru!" : `❌ Yanlış. Doğru cevap: ${dogru}`);
-      quizIndex++;
-    }
+function haritaGoster() {
+  let html = `<h4>Görev Haritası</h4><div class='harita'>`;
+  senaryolar.forEach((s, i) => {
+    html += `<button class='btn btn-outline-secondary' onclick='bolumSec(${i})'>${s.split(':')[0]}</button>`;
+  });
+  html += `</div>`;
+  document.getElementById("icerik").innerHTML = html;
+}
 
-    // Eşleştirme
-    function eslestirmeOlustur() {
-      const alan = document.getElementById("eslestirmeAlan");
-      alan.innerHTML = "";
-      const rastKelimeler = kelimeler.sort(() => Math.random() - 0.5).slice(0, 4);
-      rastKelimeler.forEach(k => {
-        alan.innerHTML += `<div class='col-md-6'><div class='p-2 bg-light text-dark border mb-2'>${k.word}</div></div>`;
-        alan.innerHTML += `<div class='col-md-6'><div class='p-2 bg-warning text-dark border mb-2'>${k.meaning}</div></div>`;
-      });
-    }
+function bolumSec(index) {
+  bolum = index;
+  oyunuBaslat();
+}
 
-    // Hafıza
-    function hafizaOlustur() {
-      const alan = document.getElementById("hafizaAlan");
-      let kartlar = [];
-      kelimeler.slice(0, 4).forEach(k => {
-        kartlar.push({ icerik: k.word, tip: "w" });
-        kartlar.push({ icerik: k.meaning, tip: "m" });
-      });
-      kartlar = kartlar.sort(() => Math.random() - 0.5);
-      alan.innerHTML = kartlar.map((k, i) => `<div class='col'><button class='btn btn-outline-light w-100' id='kart${i}' onclick='acKart(${i}, "${k.icerik}", "${k.tip}")'>❓</button></div>`).join('');
-    }
-    let acilanKart = null;
-    function acKart(i, icerik, tip) {
-      const btn = document.getElementById(`kart${i}`);
-      btn.innerText = icerik;
-      if (!acilanKart) {
-        acilanKart = { i, icerik, tip };
+function oyunuBaslat() {
+  bolumDogru = 0;
+  document.getElementById("icerik").innerHTML = `<h4>${senaryolar[bolum]}</h4>
+    <p class='senaryo-aciklama'>${aciklamalar[bolum]}</p>
+    <p><strong>Toplam Yüklenen Kelime:</strong> ${toplamKelimeler}</p>
+    <button class='btn btn-success mt-3' onclick='soruSor(0)'>Göreve Başla</button>`;
+}
+
+function ilerlemeGoster() {
+  alert(`Şu ana kadar ${skor} puan topladın.`);
+}
+
+function soruSor(sira) {
+  const kelime = kelimeler.find(k => !kullanilanKelimeler.has(k.word));
+  if (!kelime) {
+    document.getElementById("icerik").innerHTML = `<h4>Oyun Bitti</h4><p>Tüm kelimeleri kullandın. Tebrikler!</p>`;
+    return;
+  }
+  kullanilanKelimeler.add(kelime.word);
+  const secenekler = [kelime.meaning];
+  while (secenekler.length < 4) {
+    const rast = kelimeler[Math.floor(Math.random() * kelimeler.length)].meaning;
+    if (!secenekler.includes(rast)) secenekler.push(rast);
+  }
+  secenekler.sort(() => Math.random() - 0.5);
+  const soruSenaryosu = soruSenaryolari[Math.floor(Math.random() * soruSenaryolari.length)];
+  let html = `<div class='soru-senaryo'>${soruSenaryosu}</div><h2>${kelime.word.toUpperCase()}</h2>`;
+  if (kelime.hint && seciliKarakter?.ad === "Müverrihe Zeynep") {
+    html += `<p><em>İpucu: ${kelime.hint}</em></p>`;
+  }
+  secenekler.forEach(sec => {
+    html += `<button class='btn btn-outline-dark choice-btn' onclick='cevapKontrol("${sec}", "${kelime.meaning}", ${sira})'>${sec}</button>`;
+  });
+  document.getElementById("icerik").innerHTML = html;
+}
+
+function cevapKontrol(secilen, dogru, sira) {
+  const butonlar = document.querySelectorAll('.choice-btn');
+  butonlar.forEach(btn => {
+    if (btn.innerText === dogru) btn.classList.replace('btn-outline-dark', 'btn-success');
+    else if (btn.innerText === secilen) btn.classList.replace('btn-outline-dark', 'btn-danger');
+    btn.disabled = true;
+  });
+
+  if (secilen === dogru) {
+    skor += seciliKarakter?.ad === "Hattat Ahmet" ? 15 : 10;
+    bolumDogru++;
+  } else if (seciliKarakter?.ad !== "Çömez Hasan") {
+    skor -= 5;
+  }
+  document.getElementById("skorGoster").innerText = "Skor: " + skor;
+
+  setTimeout(() => {
+    if (sira + 1 >= 5) {
+      if (bolumDogru >= 3) {
+        bolum++;
+        if (bolum >= senaryolar.length) {
+          document.getElementById("icerik").innerHTML = `<h4>Final!</h4><p>Tüm görevleri başarıyla tamamladın.</p>`;
+          return;
+        }
+        oyunuBaslat();
       } else {
-        const eslesme = (acilanKart.tip !== tip) && (kelimeEslesme(acilanKart.icerik, icerik));
-        setTimeout(() => {
-          if (!eslesme) {
-            btn.innerText = '❓';
-            document.getElementById(`kart${acilanKart.i}`).innerText = '❓';
-          } else {
-            skorArttir(5);
-          }
-          acilanKart = null;
-        }, 1000);
+        document.getElementById("icerik").innerHTML = `<h4>Görev Başarısız</h4><p>En az 3 doğru cevap vermeliydin.</p><button class='btn btn-warning' onclick='oyunuBaslat()'>Tekrar Dene</button>`;
       }
+    } else {
+      soruSor(sira + 1);
     }
-    function kelimeEslesme(a, b) {
-      return kelimeler.some(k => (k.word === a && k.meaning === b) || (k.word === b && k.meaning === a));
-    }
+  }, 1500);
+}
 
-    // İpucu
-    let ipucuIndex = 0;
-    function ipucuHazirla() {
-      const k = kelimeler[ipucuIndex % kelimeler.length];
-      const ipucu = k.meaning.slice(0, 5);
-      document.getElementById("ipucuSoru").innerText = `Kelime: ${k.word} - İpucu: ${ipucu}...`;
-      document.getElementById("ipucuSonuc").innerText = "";
-    }
-    function kontrolIpucu() {
-      const cevap = document.getElementById("ipucuCevap").value.trim();
-      const dogru = kelimeler[ipucuIndex % kelimeler.length].meaning;
-      if (cevap === dogru) skorArttir(10);
-      document.getElementById("ipucuSonuc").innerText = (cevap === dogru ? "✅ Doğru!" : `❌ Yanlış. Doğru: ${dogru}`);
-      ipucuIndex++;
-      ipucuHazirla();
-    }
-  </script>
+window.onload = karakterSecimi;
+</script>
 </body>
 </html>
