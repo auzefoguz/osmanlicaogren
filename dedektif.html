@@ -58,10 +58,12 @@
   <span class="ms-auto badge bg-success" id="skorGoster">Skor: 0</span>
   <span class="ms-3 badge bg-primary" onclick="ilerlemeGoster()" style="cursor:pointer;">📌 İlerlemeni Göster</span>
 </nav>
+
 <div class="container my-5">
   <div id="ilerlemeAlani"></div>
   <div id="icerik" class="kutucuk text-center"></div>
 </div>
+
 <script>
 let skor = 0;
 let seciliKarakter = null;
@@ -70,6 +72,7 @@ let bolumDogru = 0;
 let kelimeler = [];
 let toplamKelimeler = 0;
 const kullanilanKelimeler = new Set();
+const soruSayisi = 5;
 
 const karakterler = [
   { ad: "Hattat Ahmet", ikon: "👳", aciklama: "Eski belgeleri okuma uzmanı.", bonus: "+5 puan her doğru cevapta" },
@@ -86,11 +89,11 @@ const senaryolar = [
 ];
 
 const aciklamalar = [
-  "Topkapı Sarayı'ndan padişahın mührünü taşıyan kadim bir ferman ortadan kayboldu. Onu bulan kişi, devlet sırrına erişebilir.",
-  "Bursa Ulu Kütüphane'de kaybolan kitap sıradan değil. İçinde gizli notlar saklı.",
-  "Edirne'de eski bir tarihçiye ait sandık bulundu. Ancak içerisindeki belgeler şifreli.",
-  "Şam zindanlarında bir tutsak Osmanlıca ipuçları bıraktı. Onu bulmak için kelimeleri çözmelisin.",
-  "Kahire Sarayı’nda bir casus dolaşıyor. Notlar Osmanlıca yazılmış. Çözebilir misin?"
+  "Topkapı Sarayı'ndan padişahın mührünü taşıyan kadim bir ferman ortadan kayboldu.",
+  "Bursa Ulu Kütüphane'de kaybolan kitap sıradan değil. İçinde gizli notlar var.",
+  "Edirne'de eski bir tarihçiye ait sandık bulundu. Belgeler şifreli.",
+  "Şam zindanlarında bir tutsak Osmanlıca ipuçları bıraktı. Çözmelisin.",
+  "Kahire Sarayı’nda bir casus dolaşıyor. Notlar Osmanlıca yazılmış."
 ];
 
 const soruSenaryolari = [
@@ -143,7 +146,8 @@ function jsonYukle() {
 function haritaGoster() {
   let html = `<h4>Görev Haritası</h4><div class='harita'>`;
   senaryolar.forEach((s, i) => {
-    html += `<button class='btn btn-outline-secondary' onclick='bolumSec(${i})'>${s.split(':')[0]}</button>`;
+    const aktifMi = bolum === i ? "btn-warning" : "btn-outline-secondary";
+    html += `<button class='btn ${aktifMi} btn-sm' onclick='bolumSec(${i})'>${s.split(':')[0]}</button>`;
   });
   html += `</div>`;
   document.getElementById("icerik").innerHTML = html;
@@ -187,6 +191,7 @@ function soruSor(sira) {
   secenekler.forEach(sec => {
     html += `<button class='btn btn-outline-dark choice-btn' onclick='cevapKontrol("${sec}", "${kelime.meaning}", ${sira})'>${sec}</button>`;
   });
+  html += `<p class="text-muted mt-2"><small>${seciliKarakter.bonus}</small></p>`;
   document.getElementById("icerik").innerHTML = html;
 }
 
@@ -207,11 +212,19 @@ function cevapKontrol(secilen, dogru, sira) {
   document.getElementById("skorGoster").innerText = "Skor: " + skor;
 
   setTimeout(() => {
-    if (sira + 1 >= 5) {
+    if (sira + 1 >= soruSayisi) {
       if (bolumDogru >= 3) {
         bolum++;
         if (bolum >= senaryolar.length) {
-          document.getElementById("icerik").innerHTML = `<h4>Final!</h4><p>Tüm görevleri başarıyla tamamladın.</p>`;
+          document.getElementById("icerik").innerHTML = `
+            <h4>Final!</h4>
+            <p>Tüm görevleri başarıyla tamamladın.</p>
+            <ul class="list-group text-start mt-3">
+              <li class="list-group-item">Toplam Puan: ${skor}</li>
+              <li class="list-group-item">Bilinen Kelime Sayısı: ${kullanilanKelimeler.size}</li>
+              <li class="list-group-item">Seçilen Karakter: ${seciliKarakter.ad}</li>
+              <li class="list-group-item">Toplam Bölüm: ${senaryolar.length}</li>
+            </ul>`;
           return;
         }
         oyunuBaslat();
