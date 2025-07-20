@@ -302,6 +302,9 @@
           <h1 class="osmanli-banner text-center">
   <i class="bi bi-journal-richtext me-2"></i> Osmanlıca’yı Keşfet
 </h1>
+             <audio id="arkaPlanMuzik" src="osmanlicaogren/haunting-middle-eastern-piece-188714.mp3" loop autoplay style="display:none"></audio>
+
+  <button onclick="muzikToggle()">🎵 Müziği Durdur / Başlat</button>
 <div id="gununSozuAlani" class="text-center mt-2">
   <p id="sloganText" class="osmanli-slogan mb-1">...</p>
   <small id="yazarText" class="text-muted fst-italic">...</small>
@@ -542,6 +545,19 @@
   document.getElementById("sloganText").textContent = `"${gunlukSoz.metin}"`;
   document.getElementById("yazarText").textContent = `– ${gunlukSoz.yazar}`;
 </script>
+ <script>
+    const muzik = document.getElementById("arkaPlanMuzik");
+    let muzikCaliyor = true;
 
+    function muzikToggle() {
+      if(muzikCaliyor) {
+        muzik.pause();
+        muzikCaliyor = false;
+      } else {
+        muzik.play();
+        muzikCaliyor = true;
+      }
+    }
+  </script>
 </body>
 </html>
