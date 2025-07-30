@@ -2,11 +2,14 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Osmanlıca Görselden Metin Tanıma</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
   <style>
     body {
       font-family: 'Lateef', serif;
@@ -29,6 +32,8 @@
       padding: 0.75rem;
       border-radius: 0.5rem;
       font-size: 0.9rem;
+      white-space: pre-wrap; /* uzun metinlerde satır kaydırma */
+      word-break: break-word;
     }
   </style>
 </head>
@@ -42,7 +47,7 @@
     <div class="card mt-4">
       <div class="card-body">
         <h5 class="card-title"><i class="bi bi-image"></i> Görsel Seç</h5>
-        <input type="file" id="ocrImageInput" accept="image/*" class="form-control mb-3">
+        <input type="file" id="ocrImageInput" accept="image/*" class="form-control mb-3" />
         <button class="btn btn-primary" onclick="resimdenMetinTara()">Metni Tara</button>
         <div id="ocrSonuc" class="mt-4"></div>
       </div>
@@ -57,7 +62,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
 
-  <!-- Örnek kelime listesi (Gerçek uygulamada JSON'dan yüklenebilir) -->
+  <!-- Örnek kelime listesi -->
   <script>
     const kelimeListesi = [
       { word: "اقلا", transliteration: "Aklen", meaning: "Akılca." },
@@ -81,30 +86,40 @@
         return;
       }
 
-      const { createWorker } = Tesseract;
-      const worker = await createWorker('osd+tur');
-
-      await worker.load();
-      await worker.loadLanguage('osd');
-      await worker.initialize('osd');
-
-      const { data: { text } } = await worker.recognize(fileInput.files[0]);
-      await worker.terminate();
-
-      const taninanMetin = text.trim();
-      const kelimeler = window.kelimeListesi || [];
-
-      const eslesenler = kelimeler.filter(k => taninanMetin.includes(k.word));
-      if (eslesenler.length === 0) {
-        sonucDiv.innerHTML = `<div class="alert alert-warning">Hiçbir eşleşen kelime bulunamadı.<br><strong>OCR Metni:</strong><pre>${taninanMetin}</pre></div>`;
-      } else {
-        let html = `<h6 class="text-success"><i class="bi bi-check-circle"></i> Eşleşen Kelimeler:</h6><ul class="list-group mb-3">`;
-        eslesenler.forEach(k => {
-          html += `<li class="list-group-item"><strong>${k.word}</strong> — ${k.meaning}</li>`;
+      try {
+        const { createWorker } = Tesseract;
+        const worker = createWorker({
+          logger: m => {
+            // İstersen burada işlem durumunu konsola yazdırabilirsin
+            // console.log(m);
+          }
         });
-        html += '</ul>';
-        html += `<div class="small text-muted"><strong>OCR ile tanınan metin:</strong><pre>${taninanMetin}</pre></div>`;
-        sonucDiv.innerHTML = html;
+
+        await worker.load();
+        await worker.loadLanguage('ara');  // Osmanlıca için Arap harfi modeli: Arapça dili
+        await worker.initialize('ara');
+
+        const { data: { text } } = await worker.recognize(fileInput.files[0]);
+        await worker.terminate();
+
+        const taninanMetin = text.trim();
+        const kelimeler = window.kelimeListesi || [];
+
+        const eslesenler = kelimeler.filter(k => taninanMetin.includes(k.word));
+
+        if (eslesenler.length === 0) {
+          sonucDiv.innerHTML = `<div class="alert alert-warning">Hiçbir eşleşen kelime bulunamadı.<br><strong>OCR Metni:</strong><pre>${taninanMetin}</pre></div>`;
+        } else {
+          let html = `<h6 class="text-success"><i class="bi bi-check-circle"></i> Eşleşen Kelimeler:</h6><ul class="list-group mb-3">`;
+          eslesenler.forEach(k => {
+            html += `<li class="list-group-item"><strong>${k.word}</strong> — ${k.meaning}</li>`;
+          });
+          html += '</ul>';
+          html += `<div class="small text-muted"><strong>OCR ile tanınan metin:</strong><pre>${taninanMetin}</pre></div>`;
+          sonucDiv.innerHTML = html;
+        }
+      } catch (error) {
+        sonucDiv.innerHTML = `<div class="text-danger">Bir hata oluştu: ${error.message}</div>`;
       }
     }
   </script>
