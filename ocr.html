@@ -1,127 +1,165 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Osmanlıca Görselden Metin Tanıma</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-  />
-  <style>
-    body {
-      font-family: 'Lateef', serif;
-      background-color: #f9f9f9;
-    }
-    .banner {
-      background: linear-gradient(to right, #1a3b5d, #3f5b82);
-      color: #c9a343;
-      padding: 1rem;
-      text-align: center;
-      border-radius: 1rem;
-      margin-top: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-    .card-title i {
-      margin-right: 8px;
-    }
-    pre {
-      background-color: #f8f9fa;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      font-size: 0.9rem;
-      white-space: pre-wrap; /* uzun metinlerde satır kaydırma */
-      word-break: break-word;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mezar Taşı Okuyucu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .camera-container {
+            width: 100%;
+            height: 300px;
+            background-color: #000;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .result-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background-color: #f9f9f9;
+        }
+        .osmanlica-font {
+            font-family: 'Lateef', serif;
+            font-size: 1.5rem;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-  <div class="container py-4">
-    <div class="banner">
-      <h1><i class="bi bi-eye"></i> Görselden Osmanlıca Metin Tanıma</h1>
-      <p class="lead fs-6">Bir Osmanlıca görsel yükleyin, metni tanıyalım ve anlamını gösterelim.</p>
+    <div class="container">
+        <h1 class="text-center my-4">Mezar Taşı Okuyucu 📜</h1>
+        
+        <div class="camera-container">
+            <img id="camera-feed" src="https://via.placeholder.com/800x300/333333/FFFFFF?text=Kamerayı+Mezar+Taşına+Tutun" alt="Kamera Önizleme">
+        </div>
+        
+        <button id="scan-btn" class="btn btn-primary w-100 py-2">Tara</button>
+        
+        <div class="result-card">
+            <h3>Sonuç:</h3>
+            <div id="ocr-result" class="osmanlica-font">---</div>
+            <div id="translation" class="mt-2">---</div>
+            <div id="explanation" class="text-muted mt-2 small">---</div>
+        </div>
+        
+        <h4 class="mt-4">Geçmiş Kayıtlar</h4>
+        <div id="history" class="result-card">
+            <div class="history-item" onclick="showHistory('Hüve\'l-bâkî / Mehmet Efendi / 1892-1954', 'Sonsuz olan Allah\'tır', 'Osmanlıca mezar taşı yazısı')">
+                Mehmet Efendi - 1892
+            </div>
+            <div class="history-item" onclick="showHistory('Ruhuna Fatiha / Ayşe Hanım / 1920-2001', 'Ruhuna Fatiha okunması rica olunur', 'Modern Türkçe mezar taşı')">
+                Ayşe Hanım - 1920
+            </div>
+        </div>
     </div>
 
-    <div class="card mt-4">
-      <div class="card-body">
-        <h5 class="card-title"><i class="bi bi-image"></i> Görsel Seç</h5>
-        <input type="file" id="ocrImageInput" accept="image/*" class="form-control mb-3" />
-        <button class="btn btn-primary" onclick="resimdenMetinTara()">Metni Tara</button>
-        <div id="ocrSonuc" class="mt-4"></div>
-      </div>
-    </div>
-  </div>
+    <script>
+        // Simüle edilmiş OCR fonksiyonu
+        function simulateOCR() {
+            const sampleTexts = [
+                { 
+                    text: "هو الباقي / محمد أفندي / ١٣١٠-١٣٧٣", 
+                    latin: "Hüve'l-bâkî / Mehmet Efendi / 1310-1373",
+                    translation: "Sonsuz olan Allah'tır",
+                    explanation: "Osmanlıca mezar taşı. 1310 Hicri (1892 Miladi) - 1373 Hicri (1954 Miladi)"
+                },
+                { 
+                    text: "روحنه فاتحه / عائشه خانم / ١٣٣٨-١٣٨١", 
+                    latin: "Ruhuna Fatiha / Ayşe Hanım / 1338-1381",
+                    translation: "Ruhuna Fatiha okunması rica olunur",
+                    explanation: "Modern dönem mezar taşı. 1338 Hicri (1920 Miladi) - 1381 Hicri (1962 Miladi)"
+                },
+                { 
+                    text: "فاطمه خاتون / بنت عبد الله / ١٢٥٠-١٣٠٠", 
+                    latin: "Fatma Hatun / bint Abdullah / 1250-1300",
+                    translation: "Fatma Hatun / Abdullah'ın kızı",
+                    explanation: "Klasik dönem mezar taşı. 1250 Hicri (1834 Miladi) - 1300 Hicri (1883 Miladi)"
+                }
+            ];
+            
+            return sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+        }
 
-  <footer class="text-center text-muted small py-3 border-top mt-4">
-    &copy; 2025 Osmanlıca Öğren – OCR Modülü
-  </footer>
-
-  <!-- Gerekli JS kütüphaneleri -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
-
-  <!-- Örnek kelime listesi -->
-  <script>
-    const kelimeListesi = [
-      { word: "اقلا", transliteration: "Aklen", meaning: "Akılca." },
-      { word: "علم", transliteration: "İlim", meaning: "Bilgi, bilim." },
-      { word: "حقیقت", transliteration: "Hakikat", meaning: "Gerçek." },
-      { word: "قلم", transliteration: "Kalem", meaning: "Yazma aracı." },
-      { word: "مدرسه", transliteration: "Medrese", meaning: "Okul." }
-    ];
-    window.kelimeListesi = kelimeListesi;
-  </script>
-
-  <!-- OCR fonksiyonu -->
-  <script>
-    async function resimdenMetinTara() {
-      const fileInput = document.getElementById('ocrImageInput');
-      const sonucDiv = document.getElementById('ocrSonuc');
-      sonucDiv.innerHTML = '<div class="text-info">Görsel işleniyor, lütfen bekleyin...</div>';
-
-      if (!fileInput.files[0]) {
-        sonucDiv.innerHTML = '<div class="text-danger">Lütfen bir görsel seçin.</div>';
-        return;
-      }
-
-      try {
-        const { createWorker } = Tesseract;
-        const worker = createWorker({
-          logger: m => {
-            // İstersen burada işlem durumunu konsola yazdırabilirsin
-            // console.log(m);
-          }
+        // Tara butonu işlevi
+        document.getElementById('scan-btn').addEventListener('click', function() {
+            // Gerçek uygulamada burada kamera görüntüsü işlenecek
+            const result = simulateOCR();
+            
+            document.getElementById('ocr-result').textContent = result.text;
+            document.getElementById('translation').textContent = "Çeviri: " + result.translation;
+            document.getElementById('explanation').textContent = "Açıklama: " + result.explanation;
+            
+            // Geçmişe ekle
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.textContent = result.latin.split('/')[1].trim() + " - " + result.latin.split('/')[2].trim().substring(0,4);
+            historyItem.onclick = () => showHistory(result.text, result.translation, result.explanation);
+            document.getElementById('history').prepend(historyItem);
+            
+            // Kamerayı yenile (simülasyon)
+            document.getElementById('camera-feed').src = "https://via.placeholder.com/800x300/333333/FFFFFF?text=Tarama+Başarılı";
+            setTimeout(() => {
+                document.getElementById('camera-feed').src = "https://via.placeholder.com/800x300/333333/FFFFFF?text=Yeni+Mezar+Taşını+Tutun";
+            }, 2000);
         });
 
-        await worker.load();
-        await worker.loadLanguage('ara');  // Osmanlıca için Arap harfi modeli: Arapça dili
-        await worker.initialize('ara');
-
-        const { data: { text } } = await worker.recognize(fileInput.files[0]);
-        await worker.terminate();
-
-        const taninanMetin = text.trim();
-        const kelimeler = window.kelimeListesi || [];
-
-        const eslesenler = kelimeler.filter(k => taninanMetin.includes(k.word));
-
-        if (eslesenler.length === 0) {
-          sonucDiv.innerHTML = `<div class="alert alert-warning">Hiçbir eşleşen kelime bulunamadı.<br><strong>OCR Metni:</strong><pre>${taninanMetin}</pre></div>`;
-        } else {
-          let html = `<h6 class="text-success"><i class="bi bi-check-circle"></i> Eşleşen Kelimeler:</h6><ul class="list-group mb-3">`;
-          eslesenler.forEach(k => {
-            html += `<li class="list-group-item"><strong>${k.word}</strong> — ${k.meaning}</li>`;
-          });
-          html += '</ul>';
-          html += `<div class="small text-muted"><strong>OCR ile tanınan metin:</strong><pre>${taninanMetin}</pre></div>`;
-          sonucDiv.innerHTML = html;
+        function showHistory(text, translation, explanation) {
+            document.getElementById('ocr-result').textContent = text;
+            document.getElementById('translation').textContent = "Çeviri: " + translation;
+            document.getElementById('explanation').textContent = "Açıklama: " + explanation;
         }
-      } catch (error) {
-        sonucDiv.innerHTML = `<div class="text-danger">Bir hata oluştu: ${error.message}</div>`;
-      }
-    }
-  </script>
+
+        // Gerçek kamera erişimi için izin iste
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    document.getElementById('camera-feed').srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error("Kamera erişimi hatası:", error);
+                });
+        }
+    </script>
+    
+    <!-- Tesseract.js için gerekli kütüphaneler (gerçek OCR için) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script>
+        // Gerçek OCR için (isteğe bağlı)
+        async function performRealOCR(image) {
+            const worker = await Tesseract.createWorker({
+                logger: m => console.log(m)
+            });
+            
+            await worker.loadLanguage('ota'); // Osmanlıca için özel eğitim gerekir
+            await worker.initialize('ota');
+            
+            const { data: { text } } = await worker.recognize(image);
+            console.log("Tanınan metin:", text);
+            await worker.terminate();
+            return text;
+        }
+    </script>
 </body>
 </html>
