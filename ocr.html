@@ -1,165 +1,128 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mezar Taşı Okuyucu</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        .camera-container {
-            width: 100%;
-            height: 300px;
-            background-color: #000;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-        #camera-feed {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .result-card {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .history-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .history-item:hover {
-            background-color: #f1f1f1;
-        }
-        .osmanlica-font {
-            font-family: 'Lateef', serif;
-            font-size: 1.5rem;
-            text-align: right;
-        }
-        .footer-info {
-            font-size: 0.9rem;
-            text-align: center;
-            margin-top: 30px;
-            color: #777;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Osmanlıca OCR Tanıma</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 2rem; background-color: #f9f9f9; }
+    video, canvas, img { max-width: 100%; margin-top: 1rem; }
+    #result { white-space: pre-wrap; background: #fff; padding: 1rem; border-radius: 5px; margin-top: 1rem; }
+    .highlight { background-color: yellow; font-weight: bold; }
+    button { margin: 0.3rem; padding: 0.6rem 1rem; font-size: 1rem; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center my-4">Mezar Taşı Okuyucu <span aria-hidden="true">📜</span></h1>
 
-        <div class="camera-container">
-            <video id="camera-feed" autoplay muted playsinline></video>
-        </div>
+<h2>📸 Osmanlıca Görüntüden Metin Tanıma</h2>
 
-        <canvas id="capture-canvas" width="800" height="300" style="display: none;"></canvas>
+<button id="start-camera">Kamerayı Aç</button>
+<button id="capture">📷 Fotoğraf Çek</button>
+<button id="stop-camera">Kamerayı Kapat</button>
+<button id="upload">🖼️ Galeriden Seç</button>
+<input type="file" id="file-input" accept="image/*" style="display:none" />
 
-        <div class="d-grid gap-2 mb-3">
-            <button id="scan-btn" class="btn btn-success">📸 Fotoğraf Çek ve Tara</button>
-        </div>
+<video id="video" autoplay playsinline width="300" style="display:none;"></video>
+<canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+<img id="preview" />
 
-        <div class="result-card">
-            <h3>Sonuç:</h3>
-            <div id="ocr-result" class="osmanlica-font">---</div>
-            <div id="translation" class="mt-2">---</div>
-            <div id="explanation" class="text-muted mt-2 small">---</div>
-        </div>
+<button id="recognize">📝 OCR Başlat</button>
 
-        <h4 class="mt-4">Geçmiş Kayıtlar</h4>
-        <div id="history" class="result-card"></div>
+<div id="result" style="display:none;"></div>
 
-        <div class="footer-info">
-            <p><strong>Not:</strong> Bu uygulama deneyseldir ve doğruluk garantisi vermez. <br>Sonuçlar tarihî belgelerin yorumlanmasında yardımcı bir araç olarak düşünülmelidir.</p>
-        </div>
-    </div>
+<div id="controls" style="display:none;">
+  <button id="copy-btn">📋 Kopyala</button>
+  <button id="speak-btn">📢 Oku</button>
+  <button id="download-btn">📥 İndir</button>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script>
-        const HISTORY_KEY = 'ocrHistory';
+<script>
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  const preview = document.getElementById("preview");
+  const fileInput = document.getElementById("file-input");
 
-        function hicriToMiladi(hicriYil) {
-            return 622 + Math.floor(hicriYil * 0.97);
-        }
+  document.getElementById("start-camera").onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    video.style.display = "block";
+  };
 
-        async function taraVeIsle() {
-            const video = document.getElementById('camera-feed');
-            const canvas = document.getElementById('capture-canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/png');
+  document.getElementById("stop-camera").onclick = () => {
+    const stream = video.srcObject;
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    video.style.display = "none";
+  };
 
-            document.getElementById('ocr-result').textContent = "Taranıyor...";
-            document.getElementById('translation').textContent = "---";
-            document.getElementById('explanation').textContent = "---";
+  document.getElementById("capture").onclick = () => {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataURL = canvas.toDataURL("image/png");
+    preview.src = dataURL;
+    preview.style.display = "block";
+  };
 
-            try {
-                const worker = await Tesseract.createWorker({ logger: m => console.log(m) });
-                await worker.loadLanguage('osd');
-                await worker.initialize('osd');
-                const { data: { text } } = await worker.recognize(imageData);
-                await worker.terminate();
+  document.getElementById("upload").onclick = () => fileInput.click();
+  fileInput.onchange = e => {
+    const file = e.target.files[0];
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  };
 
-                const hicriYil = (text.match(/[١-٩]{3,4}/g) || [])[0];
-                const miladiTahmin = hicriYil ? hicriToMiladi(parseInt(hicriYil.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)))) : null;
-                const explanation = miladiTahmin ? `Taranan yıl: Hicri ${hicriYil} ≈ Miladi ${miladiTahmin}` : "Taranan yazıdan tarih çıkarılamadı.";
+  function highlightSpecial(text) {
+    const names = /(efendi|paşa|hanım|şeyh|hazret|bey|sultan)/gi;
+    const dates = /[0-9]{3,4}[^0-9]?[\u0627-\u06FF]*?/g; // Osmanlıca tarih gibi
+    return text
+      .replace(names, match => `<span class="highlight">${match}</span>`)
+      .replace(dates, match => `<span class="highlight">${match}</span>`);
+  }
 
-                document.getElementById('ocr-result').textContent = text;
-                document.getElementById('translation').textContent = "Not: Bu bir OCR çıktısıdır.";
-                document.getElementById('explanation').textContent = explanation;
+  document.getElementById("recognize").onclick = () => {
+    const image = preview.src;
+    document.getElementById("result").innerText = "OCR çalışıyor...";
+    document.getElementById("result").style.display = "block";
 
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.textContent = "📌 Tarama - " + new Date().toLocaleTimeString();
-                item.onclick = () => showHistory(text, "OCR Çıktısı", explanation);
-                document.getElementById('history').prepend(item);
+    Tesseract.recognize(
+      image,
+      'ara+tur',
+      { logger: m => console.log(m) }
+    ).then(({ data: { text } }) => {
+      const highlighted = highlightSpecial(text);
+      document.getElementById("result").innerHTML = highlighted;
+      document.getElementById("controls").style.display = "block";
 
-                const existing = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                existing.unshift({ text, explanation, time: new Date().toISOString() });
-                localStorage.setItem(HISTORY_KEY, JSON.stringify(existing));
-            } catch (err) {
-                console.error(err);
-                document.getElementById('ocr-result').textContent = "Hata oluştu.";
-            }
-        }
+      localStorage.setItem("ocr_result", text); // geçmişe kaydet
+    });
+  };
 
-        document.getElementById('scan-btn').addEventListener('click', taraVeIsle);
+  // 📋 Panoya kopyala
+  document.getElementById("copy-btn").onclick = () => {
+    const text = document.getElementById("result").innerText;
+    navigator.clipboard.writeText(text);
+    alert("Metin panoya kopyalandı.");
+  };
 
-        function showHistory(text, translation, explanation) {
-            document.getElementById('ocr-result').textContent = text;
-            document.getElementById('translation').textContent = "Çeviri: " + translation;
-            document.getElementById('explanation').textContent = "Açıklama: " + explanation;
-        }
+  // 📢 Sesli okuma
+  document.getElementById("speak-btn").onclick = () => {
+    const text = document.getElementById("result").innerText;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "tr-TR";
+    speechSynthesis.speak(utterance);
+  };
 
-        window.addEventListener('load', () => {
-            const past = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            for (const item of past) {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.textContent = "📌 Önceki - " + new Date(item.time).toLocaleTimeString();
-                div.onclick = () => showHistory(item.text, "OCR Çıktısı", item.explanation);
-                document.getElementById('history').appendChild(div);
-            }
+  // 📥 TXT olarak indir
+  document.getElementById("download-btn").onclick = () => {
+    const text = document.getElementById("result").innerText;
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ocr_sonucu.txt";
+    a.click();
+  };
+</script>
 
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        const video = document.getElementById('camera-feed');
-                        video.srcObject = stream;
-                    })
-                    .catch(err => console.error("Kamera hatası:", err));
-            }
-        });
-    </script>
 </body>
 </html>
-
