@@ -56,6 +56,8 @@
             <video id="camera-feed" autoplay muted playsinline></video>
         </div>
 
+        <canvas id="capture-canvas" width="800" height="300" style="display: none;"></canvas>
+
         <button id="scan-btn" class="btn btn-primary w-100 py-2">Tara</button>
 
         <div class="result-card">
@@ -69,39 +71,41 @@
         <div id="history" class="result-card"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
-        const sampleTexts = [
-            {
-                text: "هو الباقي / محمد أفندي / ١٣١٠-١٣٧٣",
-                latin: "Hüve'l-bâkî / Mehmet Efendi / 1310-1373",
-                translation: "Sonsuz olan Allah'tır",
-                explanation: "Osmanlıca mezar taşı. 1310 Hicri (1892 Miladi) - 1373 Hicri (1954 Miladi)"
-            },
-            {
-                text: "روحنه فاتحه / عائشه خانم / ١٣٣٨-١٣٨١",
-                latin: "Ruhuna Fatiha / Ayşe Hanım / 1338-1381",
-                translation: "Ruhuna Fatiha okunması rica olunur",
-                explanation: "Modern dönem mezar taşı. 1338 Hicri (1920 Miladi) - 1381 Hicri (1962 Miladi)"
-            },
-            {
-                text: "فاطمه خاتون / بنت عبد الله / ١٢٥٠-١٣٠٠",
-                latin: "Fatma Hatun / bint Abdullah / 1250-1300",
-                translation: "Fatma Hatun / Abdullah'ın kızı",
-                explanation: "Klasik dönem mezar taşı. 1250 Hicri (1834 Miladi) - 1300 Hicri (1883 Miladi)"
+        document.getElementById('scan-btn').addEventListener('click', async () => {
+            const video = document.getElementById('camera-feed');
+            const canvas = document.getElementById('capture-canvas');
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/png');
+
+            document.getElementById('ocr-result').textContent = "Taranıyor...";
+            document.getElementById('translation').textContent = "---";
+            document.getElementById('explanation').textContent = "---";
+
+            try {
+                const worker = await Tesseract.createWorker({ logger: m => console.log(m) });
+                await worker.loadLanguage('osd');
+                await worker.initialize('osd');
+
+                const { data: { text } } = await worker.recognize(imageData);
+                await worker.terminate();
+
+                document.getElementById('ocr-result').textContent = text;
+                document.getElementById('translation').textContent = "Not: Bu bir OCR çıktısıdır.";
+                document.getElementById('explanation').textContent = "Tesseract.js ile otomatik tarama yapıldı.";
+
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.textContent = "Son Tarama - " + new Date().toLocaleTimeString();
+                item.onclick = () => showHistory(text, "Otomatik OCR", "Canvas'tan alındı.");
+                document.getElementById('history').prepend(item);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('ocr-result').textContent = "Hata oluştu.";
             }
-        ];
-
-        document.getElementById('scan-btn').addEventListener('click', () => {
-            const result = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-            document.getElementById('ocr-result').textContent = result.text;
-            document.getElementById('translation').textContent = "Çeviri: " + result.translation;
-            document.getElementById('explanation').textContent = "Açıklama: " + result.explanation;
-
-            const item = document.createElement('div');
-            item.className = 'history-item';
-            item.textContent = result.latin.split('/')[1].trim() + " - " + result.latin.split('/')[2].trim().substring(0, 4);
-            item.onclick = () => showHistory(result.text, result.translation, result.explanation);
-            document.getElementById('history').prepend(item);
         });
 
         function showHistory(text, translation, explanation) {
@@ -110,7 +114,6 @@
             document.getElementById('explanation').textContent = "Açıklama: " + explanation;
         }
 
-        // Gerçek kamera yayını
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
@@ -118,22 +121,6 @@
                     video.srcObject = stream;
                 })
                 .catch(err => console.error("Kamera hatası:", err));
-        }
-    </script>
-
-    <!-- Gerçek OCR için Tesseract.js -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script>
-        async function performRealOCR(image) {
-            const worker = await Tesseract.createWorker({
-                logger: m => console.log(m)
-            });
-            await worker.loadLanguage('ota');
-            await worker.initialize('ota');
-            const { data: { text } } = await worker.recognize(image);
-            console.log("Tınanan metin:", text);
-            await worker.terminate();
-            return text;
         }
     </script>
 </body>
