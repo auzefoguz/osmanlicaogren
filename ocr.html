@@ -10,6 +10,10 @@
       font-family: Arial, sans-serif;
       background: #f8f9fa;
       padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .camera-container {
       width: 100%;
@@ -40,12 +44,31 @@
       min-height: 150px;
       white-space: pre-wrap;
       word-break: break-word;
+      margin-top: 10px;
+      user-select: text;
     }
     mark {
       background-color: #fffa8b;
       cursor: help;
       border-radius: 2px;
       padding: 0 2px;
+      position: relative;
+    }
+    mark:hover::after {
+      content: attr(title);
+      position: absolute;
+      white-space: nowrap;
+      background: #333;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0.9;
     }
     #history {
       margin-top: 20px;
@@ -55,48 +78,72 @@
       max-height: 200px;
       overflow-y: auto;
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      width: 100%;
+      max-width: 800px;
     }
     .history-item {
       cursor: pointer;
       padding: 8px;
       border-bottom: 1px solid #eee;
       transition: background-color 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .history-item:hover {
       background-color: #f1f1f1;
     }
     button {
-      margin: 5px 2px;
+      margin: 5px 4px;
+    }
+    #controls {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #accuracy {
+      margin-top: 8px;
+      font-weight: 600;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="mb-4 text-center">Mezar Taşı OCR & Kelime Vurgulama <span>📜</span></h1>
+  <h1 class="mb-4 text-center">Mezar Taşı OCR & Kelime Vurgulama <span>📜</span></h1>
 
-    <div class="camera-container">
-      <video id="camera-feed" autoplay muted playsinline></video>
-    </div>
-
-    <canvas id="capture-canvas" width="800" height="300"></canvas>
-
-    <div class="mb-3 d-flex flex-wrap justify-content-center">
-      <button id="start-camera-btn" class="btn btn-primary">📷 Kamera Aç</button>
-      <button id="switch-camera-btn" class="btn btn-secondary" disabled>🔄 Kamera Değiştir</button>
-      <button id="capture-btn" class="btn btn-success" disabled>📸 Fotoğraf Çek ve Tara</button>
-      <button id="upload-btn" class="btn btn-info">🖼️ Galeriden Seç</button>
-      <input type="file" id="file-input" accept="image/*" style="display:none" />
-    </div>
-
-    <div id="ocr-result" class="osmanlica-font">OCR sonucu burada görünecek...</div>
-
-    <h4 class="mt-4">Geçmiş Kayıtlar</h4>
-    <div id="history"></div>
+  <div class="camera-container">
+    <video id="camera-feed" autoplay muted playsinline></video>
   </div>
+
+  <canvas id="capture-canvas" width="800" height="300"></canvas>
+
+  <div class="mb-3 d-flex flex-wrap justify-content-center">
+    <button id="start-camera-btn" class="btn btn-primary">📷 Kamera Aç</button>
+    <button id="switch-camera-btn" class="btn btn-secondary" disabled>🔄 Kamera Değiştir</button>
+    <button id="capture-btn" class="btn btn-success" disabled>📸 Fotoğraf Çek ve Tara</button>
+    <button id="upload-btn" class="btn btn-info">🖼️ Galeriden Seç</button>
+    <input type="file" id="file-input" accept="image/*" style="display:none" />
+  </div>
+
+  <div id="ocr-result" class="osmanlica-font" tabindex="0" aria-label="OCR sonucu">OCR sonucu burada görünecek...</div>
+
+  <div id="accuracy"></div>
+
+  <div id="controls" class="justify-content-center">
+    <button id="copy-btn" class="btn btn-outline-secondary" title="Metni kopyala">📋 Kopyala</button>
+    <button id="speak-btn" class="btn btn-outline-secondary" title="Metni sesli oku">📢 Oku</button>
+    <button id="google-search-btn" class="btn btn-outline-primary" title="Metni Google'da ara" disabled>🔍 Google’da Ara</button>
+  </div>
+
+  <h4 class="mt-4 w-100 text-center">Geçmiş Kayıtlar</h4>
+  <div id="history"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
   <script>
+    // Sık kullanılan kelimeler + anlamları
     const sozluk = {
       "مرحوم": "Merhum, vefat etmiş kişi",
       "رحمة الله عليه": "Allah’ın rahmeti üzerine olsun",
@@ -131,9 +178,11 @@
       "الشهيد": "Şehit"
     };
 
+    // Değişkenler
     let currentStream = null;
     let useFrontCamera = false;
 
+    // DOM elementleri
     const video = document.getElementById('camera-feed');
     const canvas = document.getElementById('capture-canvas');
     const ctx = canvas.getContext('2d');
@@ -145,11 +194,18 @@
     const fileInput = document.getElementById('file-input');
 
     const ocrResult = document.getElementById('ocr-result');
+    const accuracyDiv = document.getElementById('accuracy');
     const historyDiv = document.getElementById('history');
+
+    const copyBtn = document.getElementById('copy-btn');
+    const speakBtn = document.getElementById('speak-btn');
+    const googleSearchBtn = document.getElementById('google-search-btn');
 
     const HISTORY_KEY = 'ocrHistoryMezarTasi';
 
+    // Metni işleyip sık kullanılan kelimeleri vurgula
     function highlightWords(text) {
+      // HTML güvenliği için escape et
       let escaped = text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -162,6 +218,7 @@
       return escaped;
     }
 
+    // Kamera açma
     async function startCamera() {
       if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
@@ -181,6 +238,7 @@
       }
     }
 
+    // Kamera kapatma
     function stopCamera() {
       if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
@@ -205,6 +263,7 @@
       startCamera();
     };
 
+    // Fotoğraf çek ve OCR işle
     captureBtn.onclick = async () => {
       if (!currentStream) {
         alert("Önce kamerayı açın.");
@@ -215,6 +274,7 @@
       await ocrProcess(dataURL);
     };
 
+    // Galeriden dosya seçimi
     uploadBtn.onclick = () => fileInput.click();
 
     fileInput.onchange = async (e) => {
@@ -228,28 +288,50 @@
       reader.readAsDataURL(file);
     };
 
+    // OCR işlemi
     async function ocrProcess(imageDataURL) {
       ocrResult.innerHTML = "Taranıyor...";
+      accuracyDiv.textContent = "";
+      googleSearchBtn.disabled = true;
+
       try {
         const worker = await Tesseract.createWorker({
-          logger: m => console.log(m)
+          logger: m => {
+            // İstersen console'a yazdırabiliriz
+            // console.log(m);
+            if (m.status === 'recognizing text' && m.progress) {
+              accuracyDiv.textContent = `OCR doğruluk: ${(m.progress * 100).toFixed(1)}%`;
+            }
+          }
         });
         await worker.loadLanguage('ara');
         await worker.initialize('ara');
 
-        const { data: { text } } = await worker.recognize(imageDataURL);
+        const { data: { text, confidence } } = await worker.recognize(imageDataURL);
 
         await worker.terminate();
+
+        if (!text.trim()) {
+          ocrResult.textContent = "Metin algılanamadı.";
+          accuracyDiv.textContent = "";
+          return;
+        }
 
         const highlighted = highlightWords(text);
         ocrResult.innerHTML = highlighted;
 
+        accuracyDiv.textContent = `OCR Doğruluk Tahmini: %${confidence.toFixed(2)}`;
+        googleSearchBtn.disabled = false;
+
         saveToHistory(text);
+
       } catch (e) {
         ocrResult.textContent = "OCR hatası: " + e.message;
+        accuracyDiv.textContent = "";
       }
     }
 
+    // Geçmişe kaydet
     function saveToHistory(text) {
       let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
       history.unshift({ text, date: new Date().toISOString() });
@@ -258,6 +340,7 @@
       renderHistory();
     }
 
+    // Geçmişi göster
     function renderHistory() {
       let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
       historyDiv.innerHTML = "";
@@ -269,14 +352,55 @@
         const div = document.createElement('div');
         div.className = 'history-item';
         div.textContent = `📌 ${new Date(item.date).toLocaleString()}`;
+        div.title = item.text;
         div.onclick = () => {
           const highlighted = highlightWords(item.text);
           ocrResult.innerHTML = highlighted;
+          accuracyDiv.textContent = "";
+          googleSearchBtn.disabled = false;
         };
         historyDiv.appendChild(div);
       });
     }
 
+    // Metni panoya kopyala
+    copyBtn.onclick = () => {
+      const text = ocrResult.textContent;
+      if (!text.trim()) {
+        alert("Kopyalanacak metin yok.");
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Metin panoya kopyalandı.");
+      }).catch(() => {
+        alert("Panoya kopyalama başarısız.");
+      });
+    };
+
+    // Metni sesli okuma
+    speakBtn.onclick = () => {
+      const text = ocrResult.textContent.trim();
+      if (!text) {
+        alert("Okunacak metin yok.");
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "ar-SA"; // Arapça için
+      speechSynthesis.speak(utterance);
+    };
+
+    // Google'da arama aç
+    googleSearchBtn.onclick = () => {
+      const text = ocrResult.textContent.trim();
+      if (!text) {
+        alert("Aranacak metin yok.");
+        return;
+      }
+      const query = encodeURIComponent(text);
+      window.open(`https://www.google.com/search?q=${query}`, '_blank');
+    };
+
+    // Sayfa yüklenince geçmişi getir
     window.onload = () => {
       renderHistory();
     };
