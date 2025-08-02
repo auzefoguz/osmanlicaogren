@@ -1,218 +1,285 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mezar Taşı Okuyucu - Arapça-Türkçe Çeviri & Kamera</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-<style>
-  body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }
-  .camera-container { width: 100%; height: 300px; background-color: #000; margin-bottom: 20px; border-radius: 8px; overflow: hidden; position: relative; }
-  #camera-feed { width: 100%; height: 100%; object-fit: cover; }
-  .result-card { background-color: #fff; border-radius: 8px; padding: 15px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-  .history-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background-color 0.2s; }
-  .history-item:hover { background-color: #f1f1f1; }
-  .osmanlica-font { font-family: 'Lateef', serif; font-size: 1.5rem; text-align: right; }
-  .btn-group { margin-bottom: 15px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mezar Taşı OCR & Kelime Vurgulama</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      padding: 20px;
+    }
+    .camera-container {
+      width: 100%;
+      max-width: 800px;
+      height: 300px;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    #camera-feed {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #capture-canvas {
+      display: none;
+    }
+    .osmanlica-font {
+      font-family: 'Lateef', serif;
+      font-size: 1.5rem;
+      text-align: right;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+      min-height: 150px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    mark {
+      background-color: #fffa8b;
+      cursor: help;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    #history {
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    .history-item {
+      cursor: pointer;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s;
+    }
+    .history-item:hover {
+      background-color: #f1f1f1;
+    }
+    button {
+      margin: 5px 2px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1 class="mb-4 text-center">Mezar Taşı OCR & Kelime Vurgulama <span>📜</span></h1>
 
-<div class="container">
-  <h1 class="text-center my-4">Mezar Taşı Okuyucu <span aria-hidden="true">📜</span></h1>
+    <div class="camera-container">
+      <video id="camera-feed" autoplay muted playsinline></video>
+    </div>
 
-  <div class="btn-group d-flex justify-content-between" role="group">
-    <button id="start-camera-btn" class="btn btn-primary flex-grow-1 me-1">📷 Kamera Aç</button>
-    <button id="switch-camera-btn" class="btn btn-secondary flex-grow-1 ms-1" disabled>🔄 Kamera Değiştir</button>
+    <canvas id="capture-canvas" width="800" height="300"></canvas>
+
+    <div class="mb-3 d-flex flex-wrap justify-content-center">
+      <button id="start-camera-btn" class="btn btn-primary">📷 Kamera Aç</button>
+      <button id="switch-camera-btn" class="btn btn-secondary" disabled>🔄 Kamera Değiştir</button>
+      <button id="capture-btn" class="btn btn-success" disabled>📸 Fotoğraf Çek ve Tara</button>
+      <button id="upload-btn" class="btn btn-info">🖼️ Galeriden Seç</button>
+      <input type="file" id="file-input" accept="image/*" style="display:none" />
+    </div>
+
+    <div id="ocr-result" class="osmanlica-font">OCR sonucu burada görünecek...</div>
+
+    <h4 class="mt-4">Geçmiş Kayıtlar</h4>
+    <div id="history"></div>
   </div>
 
-  <div class="camera-container">
-    <video id="camera-feed" autoplay muted playsinline></video>
-  </div>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
-  <canvas id="capture-canvas" width="800" height="300" style="display:none;"></canvas>
+  <script>
+    const sozluk = {
+      "مرحوم": "Merhum, vefat etmiş kişi",
+      "رحمة الله عليه": "Allah’ın rahmeti üzerine olsun",
+      "بسم الله الرحمن الرحيم": "Rahman ve Rahim olan Allah’ın adıyla",
+      "المرحومة": "Merhumun dişi, vefat etmiş kadın",
+      "الفقيد": "Vefat eden, kayıp kişi",
+      "توفي": "Vefat etti",
+      "توفى": "Vefat etti (diğer yazım)",
+      "عليه السلام": "Üzerine selam olsun",
+      "عليها السلام": "Üzerine selam olsun (dişi için)",
+      "شيخ": "Dinî lider, mürşid",
+      "سلطان": "Hükümdar, kral",
+      "جنة": "Cennet",
+      "السلام": "Selam, barış",
+      "خير": "İyi, hayır, hayırlı",
+      "هادي": "Rehber",
+      "حبيب": "Sevgili",
+      "الملك": "Kral",
+      "المغفور له": "Bağışlanan kişi",
+      "رحمه الله": "Allah rahmet eylesin",
+      "الله": "Allah",
+      "صلى الله عليه وسلم": "Allah onun üzerine salat etsin",
+      "إنا لله وإنا إليه راجعون": "Biz Allah’a aidiz ve O’na döneceğiz",
+      "الحمد لله": "Hamd Allah’a mahsustur",
+      "قبر": "Mezar",
+      "وفاة": "Vefat",
+      "ذكرى": "Anı",
+      "مغفرة": "Af, bağışlama",
+      "دعا": "Dua",
+      "جنة الفردوس": "Cennet’in en yüksek katı",
+      "النار": "Cehennem",
+      "الشهيد": "Şehit"
+    };
 
-  <div class="d-grid gap-2 mb-3">
-    <button id="scan-btn" class="btn btn-success" disabled>📸 Fotoğraf Çek ve Tara</button>
-    <button id="upload-btn" class="btn btn-info">🖼️ Galeriden Seç</button>
-    <input type="file" id="file-input" accept="image/*" style="display:none" />
-  </div>
+    let currentStream = null;
+    let useFrontCamera = false;
 
-  <div class="result-card">
-    <h3>OCR Sonucu (Arapça):</h3>
-    <div id="ocr-result" class="osmanlica-font">---</div>
-    <h3 class="mt-3">Türkçe Çeviri:</h3>
-    <div id="translation" style="white-space: pre-wrap;">---</div>
-    <button id="google-search-btn" class="btn btn-warning mt-3" style="display:none;">🔎 Google’da Ara</button>
-  </div>
-
-  <h4 class="mt-4">Geçmiş Kayıtlar</h4>
-  <div id="history" class="result-card"></div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-<script>
-  const HISTORY_KEY = 'ocrHistory';
-  let currentStream = null;
-  let useFrontCamera = false;
-
-  const ceviriSozlugu = {
-    "شيخ": "Şeyh",
-    "أفندي": "Efendi",
-    "باشا": "Paşa",
-    "بيك": "Bey",
-    "خانم": "Hanım",
-    "مولانا": "Mevlana",
-    "سلطان": "Sultan",
-    // Daha fazlası eklenebilir
-  };
-
-  function arapcaToTurkce(text) {
-    let cevrilen = text;
-    for (const [arapca, turkce] of Object.entries(ceviriSozlugu)) {
-      const regex = new RegExp(arapca, 'g');
-      cevrilen = cevrilen.replace(regex, turkce);
-    }
-    return cevrilen;
-  }
-
-  async function startCamera() {
-    if (currentStream) {
-      currentStream.getTracks().forEach(t => t.stop());
-      currentStream = null;
-    }
-    try {
-      const constraints = { video: { facingMode: useFrontCamera ? "user" : "environment" } };
-      currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-      const video = document.getElementById('camera-feed');
-      video.srcObject = currentStream;
-      document.getElementById('scan-btn').disabled = false;
-      document.getElementById('switch-camera-btn').disabled = false;
-      document.getElementById('start-camera-btn').textContent = "📷 Kamera Kapat";
-    } catch (e) {
-      alert("Kamera açılamadı: " + e.message);
-    }
-  }
-
-  function stopCamera() {
-    if (currentStream) {
-      currentStream.getTracks().forEach(t => t.stop());
-      currentStream = null;
-    }
-    const video = document.getElementById('camera-feed');
-    video.srcObject = null;
-    document.getElementById('scan-btn').disabled = true;
-    document.getElementById('switch-camera-btn').disabled = true;
-    document.getElementById('start-camera-btn').textContent = "📷 Kamera Aç";
-  }
-
-  document.getElementById('start-camera-btn').addEventListener('click', () => {
-    if (currentStream) stopCamera();
-    else startCamera();
-  });
-
-  document.getElementById('switch-camera-btn').addEventListener('click', () => {
-    useFrontCamera = !useFrontCamera;
-    startCamera();
-  });
-
-  async function scanAndRecognize(imageDataURL) {
-    document.getElementById('ocr-result').textContent = "Taranıyor...";
-    document.getElementById('translation').textContent = "---";
-    document.getElementById('google-search-btn').style.display = "none";
-
-    try {
-      const worker = await Tesseract.createWorker({ logger: m => console.log(m) });
-      await worker.loadLanguage('ara+tur');
-      await worker.initialize('ara+tur');
-      const { data: { text } } = await worker.recognize(imageDataURL);
-      await worker.terminate();
-
-      document.getElementById('ocr-result').textContent = text;
-
-      const turkceMetin = arapcaToTurkce(text);
-      document.getElementById('translation').textContent = turkceMetin;
-
-      saveHistory(text, turkceMetin);
-
-      if(text.trim().length > 0) {
-        document.getElementById('google-search-btn').style.display = "inline-block";
-      }
-    } catch (err) {
-      console.error(err);
-      document.getElementById('ocr-result').textContent = "Hata oluştu.";
-      document.getElementById('translation').textContent = "---";
-    }
-  }
-
-  document.getElementById('scan-btn').addEventListener('click', () => {
-    if (!currentStream) {
-      alert("Lütfen önce kamerayı açın.");
-      return;
-    }
     const video = document.getElementById('camera-feed');
     const canvas = document.getElementById('capture-canvas');
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageDataURL = canvas.toDataURL('image/png');
-    scanAndRecognize(imageDataURL);
-  });
 
-  // Galeriden seçme
-  document.getElementById('upload-btn').addEventListener('click', () => {
-    document.getElementById('file-input').click();
-  });
+    const startCameraBtn = document.getElementById('start-camera-btn');
+    const switchCameraBtn = document.getElementById('switch-camera-btn');
+    const captureBtn = document.getElementById('capture-btn');
+    const uploadBtn = document.getElementById('upload-btn');
+    const fileInput = document.getElementById('file-input');
 
-  document.getElementById('file-input').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const ocrResult = document.getElementById('ocr-result');
+    const historyDiv = document.getElementById('history');
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const imageDataURL = event.target.result;
-      scanAndRecognize(imageDataURL);
-    };
-    reader.readAsDataURL(file);
-  });
+    const HISTORY_KEY = 'ocrHistoryMezarTasi';
 
-  // Google'da ara butonu
-  document.getElementById('google-search-btn').addEventListener('click', () => {
-    const text = document.getElementById('ocr-result').textContent;
-    if (text.trim().length === 0) return;
-    const query = encodeURIComponent(text.trim());
-    const url = `https://www.google.com/search?q=${query}`;
-    window.open(url, '_blank');
-  });
+    function highlightWords(text) {
+      let escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 
-  function saveHistory(ocrText, turkceText) {
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    const item = { time: new Date().toISOString(), ocrText, turkceText };
-    history.unshift(item);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    renderHistory();
-  }
+      for (const word in sozluk) {
+        const regex = new RegExp(word, 'gi');
+        escaped = escaped.replace(regex, (match) => `<mark title="${sozluk[word]}">${match}</mark>`);
+      }
+      return escaped;
+    }
 
-  function renderHistory() {
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    const container = document.getElementById('history');
-    container.innerHTML = '';
-    history.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'history-item';
-      div.textContent = `📌 ${new Date(item.time).toLocaleString()}`;
-      div.onclick = () => {
-        document.getElementById('ocr-result').textContent = item.ocrText;
-        document.getElementById('translation').textContent = item.turkceText;
-        document.getElementById('google-search-btn').style.display = item.ocrText.trim().length > 0 ? 'inline-block' : 'none';
+    async function startCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+      }
+      const constraints = {
+        video: { facingMode: useFrontCamera ? 'user' : 'environment' }
       };
-      container.appendChild(div);
-    });
-  }
+      try {
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = currentStream;
+        switchCameraBtn.disabled = false;
+        captureBtn.disabled = false;
+        startCameraBtn.textContent = "📷 Kamera Kapat";
+      } catch (e) {
+        alert("Kamera açılamadı: " + e.message);
+      }
+    }
 
-  window.addEventListener('load', () => {
-    renderHistory();
-  });
-</script>
+    function stopCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+      }
+      video.srcObject = null;
+      switchCameraBtn.disabled = true;
+      captureBtn.disabled = true;
+      startCameraBtn.textContent = "📷 Kamera Aç";
+    }
 
+    startCameraBtn.onclick = () => {
+      if (currentStream) {
+        stopCamera();
+      } else {
+        startCamera();
+      }
+    };
+
+    switchCameraBtn.onclick = () => {
+      useFrontCamera = !useFrontCamera;
+      startCamera();
+    };
+
+    captureBtn.onclick = async () => {
+      if (!currentStream) {
+        alert("Önce kamerayı açın.");
+        return;
+      }
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/png');
+      await ocrProcess(dataURL);
+    };
+
+    uploadBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const dataURL = event.target.result;
+        await ocrProcess(dataURL);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    async function ocrProcess(imageDataURL) {
+      ocrResult.innerHTML = "Taranıyor...";
+      try {
+        const worker = await Tesseract.createWorker({
+          logger: m => console.log(m)
+        });
+        await worker.loadLanguage('ara');
+        await worker.initialize('ara');
+
+        const { data: { text } } = await worker.recognize(imageDataURL);
+
+        await worker.terminate();
+
+        const highlighted = highlightWords(text);
+        ocrResult.innerHTML = highlighted;
+
+        saveToHistory(text);
+      } catch (e) {
+        ocrResult.textContent = "OCR hatası: " + e.message;
+      }
+    }
+
+    function saveToHistory(text) {
+      let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      history.unshift({ text, date: new Date().toISOString() });
+      if (history.length > 20) history.pop();
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      historyDiv.innerHTML = "";
+      if(history.length === 0) {
+        historyDiv.textContent = "Geçmiş kayıt yok.";
+        return;
+      }
+      history.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.textContent = `📌 ${new Date(item.date).toLocaleString()}`;
+        div.onclick = () => {
+          const highlighted = highlightWords(item.text);
+          ocrResult.innerHTML = highlighted;
+        };
+        historyDiv.appendChild(div);
+      });
+    }
+
+    window.onload = () => {
+      renderHistory();
+    };
+  </script>
 </body>
 </html>
