@@ -34,6 +34,8 @@
 
   <div class="d-grid gap-2 mb-3">
     <button id="scan-btn" class="btn btn-success" disabled>📸 Fotoğraf Çek ve Tara</button>
+    <button id="upload-btn" class="btn btn-info">🖼️ Galeriden Seç</button>
+    <input type="file" id="file-input" accept="image/*" style="display:none" />
   </div>
 
   <div class="result-card">
@@ -41,6 +43,7 @@
     <div id="ocr-result" class="osmanlica-font">---</div>
     <h3 class="mt-3">Türkçe Çeviri:</h3>
     <div id="translation" style="white-space: pre-wrap;">---</div>
+    <button id="google-search-btn" class="btn btn-warning mt-3" style="display:none;">🔎 Google’da Ara</button>
   </div>
 
   <h4 class="mt-4">Geçmiş Kayıtlar</h4>
@@ -53,7 +56,6 @@
   let currentStream = null;
   let useFrontCamera = false;
 
-  // Basit Arapça -> Türkçe sözlük
   const ceviriSozlugu = {
     "شيخ": "Şeyh",
     "أفندي": "Efendi",
@@ -65,7 +67,6 @@
     // Daha fazlası eklenebilir
   };
 
-  // Arapça metni Türkçeye çevir
   function arapcaToTurkce(text) {
     let cevrilen = text;
     for (const [arapca, turkce] of Object.entries(ceviriSozlugu)) {
@@ -115,19 +116,10 @@
     startCamera();
   });
 
-  async function scanAndRecognize() {
-    if (!currentStream) {
-      alert("Lütfen önce kamerayı açın.");
-      return;
-    }
-    const video = document.getElementById('camera-feed');
-    const canvas = document.getElementById('capture-canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageDataURL = canvas.toDataURL('image/png');
-
+  async function scanAndRecognize(imageDataURL) {
     document.getElementById('ocr-result').textContent = "Taranıyor...";
     document.getElementById('translation').textContent = "---";
+    document.getElementById('google-search-btn').style.display = "none";
 
     try {
       const worker = await Tesseract.createWorker({ logger: m => console.log(m) });
@@ -142,12 +134,55 @@
       document.getElementById('translation').textContent = turkceMetin;
 
       saveHistory(text, turkceMetin);
+
+      if(text.trim().length > 0) {
+        document.getElementById('google-search-btn').style.display = "inline-block";
+      }
     } catch (err) {
       console.error(err);
       document.getElementById('ocr-result').textContent = "Hata oluştu.";
       document.getElementById('translation').textContent = "---";
     }
   }
+
+  document.getElementById('scan-btn').addEventListener('click', () => {
+    if (!currentStream) {
+      alert("Lütfen önce kamerayı açın.");
+      return;
+    }
+    const video = document.getElementById('camera-feed');
+    const canvas = document.getElementById('capture-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageDataURL = canvas.toDataURL('image/png');
+    scanAndRecognize(imageDataURL);
+  });
+
+  // Galeriden seçme
+  document.getElementById('upload-btn').addEventListener('click', () => {
+    document.getElementById('file-input').click();
+  });
+
+  document.getElementById('file-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const imageDataURL = event.target.result;
+      scanAndRecognize(imageDataURL);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Google'da ara butonu
+  document.getElementById('google-search-btn').addEventListener('click', () => {
+    const text = document.getElementById('ocr-result').textContent;
+    if (text.trim().length === 0) return;
+    const query = encodeURIComponent(text.trim());
+    const url = `https://www.google.com/search?q=${query}`;
+    window.open(url, '_blank');
+  });
 
   function saveHistory(ocrText, turkceText) {
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -168,12 +203,11 @@
       div.onclick = () => {
         document.getElementById('ocr-result').textContent = item.ocrText;
         document.getElementById('translation').textContent = item.turkceText;
+        document.getElementById('google-search-btn').style.display = item.ocrText.trim().length > 0 ? 'inline-block' : 'none';
       };
       container.appendChild(div);
     });
   }
-
-  document.getElementById('scan-btn').addEventListener('click', scanAndRecognize);
 
   window.addEventListener('load', () => {
     renderHistory();
