@@ -6,63 +6,37 @@
   <title>Osmanlıca OCR Tanıma</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 2rem;
-      background-color: #f4f4f4;
-      color: #222;
-    }
-    button {
-      margin: 0.4rem;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      background-color: #274472;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover { background-color: #1b2c47; }
-    video, canvas, img {
-      max-width: 100%;
-      margin-top: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    #result {
-      background: white;
-      padding: 1rem;
-      border-radius: 5px;
-      margin-top: 1rem;
-      white-space: pre-wrap;
-    }
+    body { font-family: 'Segoe UI', sans-serif; margin: 2rem; background-color: #f9f9f9; }
+    video, canvas, img { max-width: 100%; margin-top: 1rem; }
+    #result { white-space: pre-wrap; background: #fff; padding: 1rem; border-radius: 5px; margin-top: 1rem; }
     .highlight { background-color: yellow; font-weight: bold; }
-    #controls { margin-top: 1rem; }
+    button { margin: 0.3rem; padding: 0.6rem 1rem; font-size: 1rem; }
+    #ocr-info { margin-top: 1rem; }
   </style>
 </head>
 <body>
 
 <h2>📸 Osmanlıca Görüntüden Metin Tanıma</h2>
 
-<!-- Kamera ve Dosya Yükleme Butonları -->
 <button id="start-camera">Kamerayı Aç</button>
 <button id="capture">📷 Fotoğraf Çek</button>
-<button id="stop-camera">Kapat</button>
+<button id="stop-camera">Kamerayı Kapat</button>
 <button id="upload">🖼️ Galeriden Seç</button>
 <input type="file" id="file-input" accept="image/*" style="display:none" />
 
-<!-- Görsel Elemanlar -->
 <video id="video" autoplay playsinline width="300" style="display:none;"></video>
 <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
 <img id="preview" />
 
-<!-- OCR Butonu -->
 <button id="recognize">📝 OCR Başlat</button>
 
-<!-- Sonuç Alanı -->
+<div id="ocr-info" style="display:none;">
+  <p><strong>🔍 Doğruluk:</strong> <span id="accuracy">%</span></p>
+  <p><strong>🌐 Arama:</strong> <a id="search-link" href="#" target="_blank">Google’da ara</a></p>
+</div>
+
 <div id="result" style="display:none;"></div>
 
-<!-- Kontrol Butonları -->
 <div id="controls" style="display:none;">
   <button id="copy-btn">📋 Kopyala</button>
   <button id="speak-btn">📢 Oku</button>
@@ -76,27 +50,19 @@
   const preview = document.getElementById("preview");
   const fileInput = document.getElementById("file-input");
 
-  // Kamera aç
   document.getElementById("start-camera").onclick = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-      video.style.display = "block";
-    } catch (err) {
-      alert("Kamera açılırken bir hata oluştu: " + err.message);
-    }
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    video.style.display = "block";
   };
 
-  // Kamera durdur
   document.getElementById("stop-camera").onclick = () => {
     const stream = video.srcObject;
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      video.style.display = "none";
-    }
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    video.style.display = "none";
   };
 
-  // Fotoğraf çek
   document.getElementById("capture").onclick = () => {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataURL = canvas.toDataURL("image/png");
@@ -104,33 +70,23 @@
     preview.style.display = "block";
   };
 
-  // Galeriden seç
   document.getElementById("upload").onclick = () => fileInput.click();
   fileInput.onchange = e => {
     const file = e.target.files[0];
-    if (file) {
-      preview.src = URL.createObjectURL(file);
-      preview.style.display = "block";
-    }
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
   };
 
-  // Özel kelimeleri ve tarihleri vurgula
   function highlightSpecial(text) {
     const names = /(efendi|paşa|hanım|şeyh|hazret|bey|sultan)/gi;
-    const dates = /\b[1-2][0-9]{3}\b/g; // Yıllar (ör: 1299, 2024)
-    const sections = /(isim[:：]?\s?.+|tarih[:：]?\s?.+|dua[:：]?\s?.+)/gi;
-
+    const dates = /[0-9]{3,4}[^0-9]?[\u0627-\u06FF]*?/g;
     return text
       .replace(names, match => `<span class="highlight">${match}</span>`)
-      .replace(dates, match => `<span class="highlight">${match}</span>`)
-      .replace(sections, match => `<br/><strong>${match}</strong>`);
+      .replace(dates, match => `<span class="highlight">${match}</span>`);
   }
 
-  // OCR Başlat
   document.getElementById("recognize").onclick = () => {
     const image = preview.src;
-    if (!image) return alert("Önce bir görüntü yükleyin veya çekin.");
-
     document.getElementById("result").innerText = "OCR çalışıyor...";
     document.getElementById("result").style.display = "block";
 
@@ -138,24 +94,32 @@
       image,
       'ara+tur',
       { logger: m => console.log(m) }
-    ).then(({ data: { text } }) => {
+    ).then(({ data: { text, confidence } }) => {
       const highlighted = highlightSpecial(text);
       document.getElementById("result").innerHTML = highlighted;
       document.getElementById("controls").style.display = "block";
+
+      // 🔍 Doğruluk oranını göster
+      document.getElementById("ocr-info").style.display = "block";
+      document.getElementById("accuracy").innerText = `${confidence.toFixed(2)}%`;
+
+      // 🌐 Google araması bağlantısı
+      const searchLink = document.getElementById("search-link");
+      const query = encodeURIComponent(text.slice(0, 100)); // ilk 100 karakter
+      searchLink.href = `https://www.google.com/search?q=${query}`;
+
       localStorage.setItem("ocr_result", text);
-    }).catch(err => {
-      document.getElementById("result").innerText = "OCR sırasında hata oluştu: " + err.message;
     });
   };
 
-  // Panoya kopyala
+  // 📋 Panoya kopyala
   document.getElementById("copy-btn").onclick = () => {
     const text = document.getElementById("result").innerText;
     navigator.clipboard.writeText(text);
     alert("Metin panoya kopyalandı.");
   };
 
-  // Sesli okuma
+  // 📢 Sesli okuma
   document.getElementById("speak-btn").onclick = () => {
     const text = document.getElementById("result").innerText;
     const utterance = new SpeechSynthesisUtterance(text);
@@ -163,7 +127,7 @@
     speechSynthesis.speak(utterance);
   };
 
-  // TXT indir
+  // 📥 TXT olarak indir
   document.getElementById("download-btn").onclick = () => {
     const text = document.getElementById("result").innerText;
     const blob = new Blob([text], { type: "text/plain" });
