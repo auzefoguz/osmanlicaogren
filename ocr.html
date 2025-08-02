@@ -109,7 +109,6 @@
   let currentStream = null;
   let useFrontCamera = false; // Ön kamera (true) / arka kamera (false)
 
-  // Basit Osmanlıca-Türkçe sözlük örneği (geliştirilebilir)
   const sozluk = {
     "ŞEYH": "Dinî lider, mürşid",
     "EFENDİ": "Saygı ifadesi, bey",
@@ -120,7 +119,6 @@
     "SULTAN": "Hükümdar, kraliyet unvanı"
   };
 
-  // Kamera başlatma fonksiyonu
   async function startCamera() {
     if (currentStream) {
       currentStream.getTracks().forEach(track => track.stop());
@@ -145,7 +143,6 @@
     }
   }
 
-  // Kamera durdurma fonksiyonu
   function stopCamera() {
     if (currentStream) {
       currentStream.getTracks().forEach(track => track.stop());
@@ -158,7 +155,6 @@
     document.getElementById('start-camera-btn').textContent = "📷 Kamera Aç";
   }
 
-  // Kamera aç/kapat butonu
   document.getElementById('start-camera-btn').addEventListener('click', () => {
     if (currentStream) {
       stopCamera();
@@ -167,23 +163,18 @@
     }
   });
 
-  // Kamera değiştirme butonu
   document.getElementById('switch-camera-btn').addEventListener('click', () => {
     useFrontCamera = !useFrontCamera;
     startCamera();
   });
 
-  // Hicri yılı miladiye çeviren basit fonksiyon (tahmini)
   function hicriToMiladi(hicriYil) {
     return 622 + Math.floor(hicriYil * 0.97);
   }
 
-  // Kelime bazlı vurgulama, tooltip ile
   function highlightWords(text) {
-    // Büyük harf olarak normalize et (basitçe)
     const words = Object.keys(sozluk);
     let escapedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
     for (const word of words) {
       const regex = new RegExp(`\\b${word}\\b`, 'gi');
       escapedText = escapedText.replace(regex, (match) => {
@@ -193,12 +184,9 @@
     return escapedText;
   }
 
-  // Çok satırlı metni bölme: isim, tarih, dua/metin
   function parseTextSections(text) {
-    // Satırlara böl
     const lines = text.trim().split(/\r?\n/).filter(l => l.trim() !== '');
 
-    // Basit ayrım: ilk satır isim/unvan, içinde tarih geçen satır tarih, kalanlar dua/metin
     let isimSatiri = '';
     let tarihSatiri = '';
     let duaSatirlari = [];
@@ -216,7 +204,6 @@
     };
   }
 
-  // OCR işlemi
   async function performOCR(imageDataURL) {
     document.getElementById('ocr-result').textContent = "Taranıyor...";
     document.getElementById('translation').textContent = "---";
@@ -225,41 +212,38 @@
 
     try {
       const worker = await Tesseract.createWorker({ logger: m => console.log(m) });
-      await worker.loadLanguage('osd');
-      await worker.initialize('osd');
+      await worker.loadLanguage('ara+tur');
+      await worker.initialize('ara+tur');
 
       const { data: { text } } = await worker.recognize(imageDataURL);
 
       await worker.terminate();
 
-      // Tarih algılama
-      const hicriYil = (text.match(/[١-٩]{3,4}/g) || [])[0];
+      // İstenmeyen karakterleri temizle
+      let filteredText = text.replace(/[^\u0600-\u06FF\u0750-\u077F\u0590-\u05FF0-9a-zA-Z\s\/\-\n]/g, '');
+      // \n ekledim ki satır bölme etkilenmesin
+
+      const hicriYil = (filteredText.match(/[١-٩]{3,4}/g) || [])[0];
       const miladiTahmin = hicriYil ? hicriToMiladi(parseInt(hicriYil.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)))) : null;
       const explanation = miladiTahmin ? `Taranan yıl: Hicri ${hicriYil} ≈ Miladi ${miladiTahmin}` : "Taranan yazıdan tarih çıkarılamadı.";
 
-      // Kelimeleri vurgula
-      const highlightedText = highlightWords(text.toUpperCase());
+      const highlightedText = highlightWords(filteredText.toUpperCase());
 
-      // Çok satırlı bölümlere ayır
-      const sections = parseTextSections(text);
+      const sections = parseTextSections(filteredText);
 
-      // Sonuçları güncelle
       document.getElementById('ocr-result').innerHTML = highlightedText;
       document.getElementById('translation').textContent = "Not: Bu bir OCR çıktısıdır.";
       document.getElementById('explanation').textContent = explanation;
+      document.getElementById('text-sections').innerHTML = `<b>İsim / Ünvan:</b> ${sections.isim || '---'}<br><b>Tarih:</b> ${sections.tarih || '---'}<br><b>Dua / Metin:</b><br>${sections.dua || '---'}`;
 
-      document.getElementById('text-sections').innerHTML = `<b>İsim / Ünvan:</b> ${sections.isim || '---'}\n<b>Tarih:</b> ${sections.tarih || '---'}\n<b>Dua / Metin:</b>\n${sections.dua || '---'}`;
-
-      // Geçmişe ekle
       const item = document.createElement('div');
       item.className = 'history-item';
       item.textContent = "📌 Tarama - " + new Date().toLocaleTimeString();
-      item.onclick = () => showHistory(text, "OCR Çıktısı", explanation, sections, highlightedText);
+      item.onclick = () => showHistory(filteredText, "OCR Çıktısı", explanation, sections, highlightedText);
       document.getElementById('history').prepend(item);
 
-      // Yerel depolama kaydı
       const existing = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-      existing.unshift({ text, explanation, time: new Date().toISOString(), sections, highlightedText });
+      existing.unshift({ text: filteredText, explanation, time: new Date().toISOString(), sections, highlightedText });
       localStorage.setItem(HISTORY_KEY, JSON.stringify(existing));
 
     } catch (err) {
@@ -268,7 +252,6 @@
     }
   }
 
-  // Geçmişten seçim yapılınca göster
   function showHistory(text, translation, explanation, sections, highlightedText) {
     document.getElementById('ocr-result').innerHTML = highlightedText || text;
     document.getElementById('translation').textContent = "Çeviri: " + translation;
@@ -281,7 +264,6 @@
     }
   }
 
-  // Kamera fotoğraf çekip OCR yap
   async function captureAndScan() {
     if (!currentStream) {
       alert("Lütfen önce kamerayı açın.");
@@ -295,7 +277,6 @@
     await performOCR(imageData);
   }
 
-  // Galeriden resim seçimi yapınca
   document.getElementById('file-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -308,10 +289,8 @@
     reader.readAsDataURL(file);
   });
 
-  // Scan butonuna tıkla
   document.getElementById('scan-btn').addEventListener('click', captureAndScan);
 
-  // Sayfa yüklendiğinde geçmişi göster
   window.addEventListener('load', () => {
     const past = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
     for (const item of past) {
