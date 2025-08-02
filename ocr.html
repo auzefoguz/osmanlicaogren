@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Osmanlıca OCR Tanıma</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <title>Osmanlıca OCR Tanıma - Arapça Harflerle</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', sans-serif; margin: 2rem; background-color: #f9f9f9; }
     video, canvas, img { max-width: 100%; margin-top: 1rem; }
@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<h2>📸 Osmanlıca Görüntüden Metin Tanıma</h2>
+<h2>📸 Osmanlıca (Arap Harfleri) Görüntüden Metin Tanıma</h2>
 
 <button id="start-camera">Kamerayı Aç</button>
 <button id="capture">📷 Fotoğraf Çek</button>
@@ -51,15 +51,21 @@
   const fileInput = document.getElementById("file-input");
 
   document.getElementById("start-camera").onclick = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-    video.style.display = "block";
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      video.style.display = "block";
+    } catch(e) {
+      alert("Kamera açılamadı: " + e.message);
+    }
   };
 
   document.getElementById("stop-camera").onclick = () => {
     const stream = video.srcObject;
-    const tracks = stream.getTracks();
-    tracks.forEach(track => track.stop());
+    if(stream){
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+    }
     video.style.display = "none";
   };
 
@@ -85,49 +91,59 @@
       .replace(dates, match => `<span class="highlight">${match}</span>`);
   }
 
-  document.getElementById("recognize").onclick = () => {
-    const image = preview.src;
+  async function recognize() {
+    if (!preview.src) {
+      alert("Lütfen önce bir fotoğraf seçin veya çekin.");
+      return;
+    }
     document.getElementById("result").innerText = "OCR çalışıyor...";
     document.getElementById("result").style.display = "block";
 
-    Tesseract.recognize(
-      image,
-      'ara+tur',
-      { logger: m => console.log(m) }
-    ).then(({ data: { text, confidence } }) => {
-      const highlighted = highlightSpecial(text);
-      document.getElementById("result").innerHTML = highlighted;
-      document.getElementById("controls").style.display = "block";
-
-      // 🔍 Doğruluk oranını göster
-      document.getElementById("ocr-info").style.display = "block";
-      document.getElementById("accuracy").innerText = `${confidence.toFixed(2)}%`;
-
-      // 🌐 Google araması bağlantısı
-      const searchLink = document.getElementById("search-link");
-      const query = encodeURIComponent(text.slice(0, 100)); // ilk 100 karakter
-      searchLink.href = `https://www.google.com/search?q=${query}`;
-
-      localStorage.setItem("ocr_result", text);
+    const worker = Tesseract.createWorker({
+      logger: m => console.log(m)
     });
-  };
 
-  // 📋 Panoya kopyala
+    await worker.load();
+    await worker.loadLanguage('ara');
+    await worker.initialize('ara');
+
+    const { data } = await worker.recognize(preview.src);
+
+    await worker.terminate();
+
+    const highlighted = highlightSpecial(data.text);
+
+    document.getElementById("result").innerHTML = highlighted;
+    document.getElementById("controls").style.display = "block";
+
+    document.getElementById("ocr-info").style.display = "block";
+    document.getElementById("accuracy").innerText = data.confidence.toFixed(2) + "%";
+
+    // Google'da arama linki (ilk 100 karakterle)
+    const query = encodeURIComponent(data.text.slice(0, 100));
+    document.getElementById("search-link").href = `https://www.google.com/search?q=${query}`;
+
+    // İstersen localStorage kaydı yapılabilir
+  }
+
+  document.getElementById("recognize").onclick = recognize;
+
+  // Kopyala
   document.getElementById("copy-btn").onclick = () => {
     const text = document.getElementById("result").innerText;
     navigator.clipboard.writeText(text);
     alert("Metin panoya kopyalandı.");
   };
 
-  // 📢 Sesli okuma
+  // Sesli oku
   document.getElementById("speak-btn").onclick = () => {
     const text = document.getElementById("result").innerText;
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "tr-TR";
+    utterance.lang = "ar-SA"; // Arapça için
     speechSynthesis.speak(utterance);
   };
 
-  // 📥 TXT olarak indir
+  // İndir
   document.getElementById("download-btn").onclick = () => {
     const text = document.getElementById("result").innerText;
     const blob = new Blob([text], { type: "text/plain" });
