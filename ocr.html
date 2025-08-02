@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
             padding: 20px;
         }
         .camera-container {
@@ -30,15 +30,16 @@
             border-radius: 8px;
             padding: 15px;
             margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .history-item {
             padding: 10px;
             border-bottom: 1px solid #eee;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         .history-item:hover {
-            background-color: #f9f9f9;
+            background-color: #f1f1f1;
         }
         .osmanlica-font {
             font-family: 'Lateef', serif;
@@ -49,80 +50,58 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center my-4">Mezar Taşı Okuyucu 📜</h1>
-        
+        <h1 class="text-center my-4">Mezar Taşı Okuyucu <span aria-hidden="true">📜</span></h1>
+
         <div class="camera-container">
-            <img id="camera-feed" src="https://via.placeholder.com/800x300/333333/FFFFFF?text=Kamerayı+Mezar+Taşına+Tutun" alt="Kamera Önizleme">
+            <video id="camera-feed" autoplay muted playsinline></video>
         </div>
-        
+
         <button id="scan-btn" class="btn btn-primary w-100 py-2">Tara</button>
-        
+
         <div class="result-card">
             <h3>Sonuç:</h3>
             <div id="ocr-result" class="osmanlica-font">---</div>
             <div id="translation" class="mt-2">---</div>
             <div id="explanation" class="text-muted mt-2 small">---</div>
         </div>
-        
+
         <h4 class="mt-4">Geçmiş Kayıtlar</h4>
-        <div id="history" class="result-card">
-            <div class="history-item" onclick="showHistory('Hüve\'l-bâkî / Mehmet Efendi / 1892-1954', 'Sonsuz olan Allah\'tır', 'Osmanlıca mezar taşı yazısı')">
-                Mehmet Efendi - 1892
-            </div>
-            <div class="history-item" onclick="showHistory('Ruhuna Fatiha / Ayşe Hanım / 1920-2001', 'Ruhuna Fatiha okunması rica olunur', 'Modern Türkçe mezar taşı')">
-                Ayşe Hanım - 1920
-            </div>
-        </div>
+        <div id="history" class="result-card"></div>
     </div>
 
     <script>
-        // Simüle edilmiş OCR fonksiyonu
-        function simulateOCR() {
-            const sampleTexts = [
-                { 
-                    text: "هو الباقي / محمد أفندي / ١٣١٠-١٣٧٣", 
-                    latin: "Hüve'l-bâkî / Mehmet Efendi / 1310-1373",
-                    translation: "Sonsuz olan Allah'tır",
-                    explanation: "Osmanlıca mezar taşı. 1310 Hicri (1892 Miladi) - 1373 Hicri (1954 Miladi)"
-                },
-                { 
-                    text: "روحنه فاتحه / عائشه خانم / ١٣٣٨-١٣٨١", 
-                    latin: "Ruhuna Fatiha / Ayşe Hanım / 1338-1381",
-                    translation: "Ruhuna Fatiha okunması rica olunur",
-                    explanation: "Modern dönem mezar taşı. 1338 Hicri (1920 Miladi) - 1381 Hicri (1962 Miladi)"
-                },
-                { 
-                    text: "فاطمه خاتون / بنت عبد الله / ١٢٥٠-١٣٠٠", 
-                    latin: "Fatma Hatun / bint Abdullah / 1250-1300",
-                    translation: "Fatma Hatun / Abdullah'ın kızı",
-                    explanation: "Klasik dönem mezar taşı. 1250 Hicri (1834 Miladi) - 1300 Hicri (1883 Miladi)"
-                }
-            ];
-            
-            return sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-        }
+        const sampleTexts = [
+            {
+                text: "هو الباقي / محمد أفندي / ١٣١٠-١٣٧٣",
+                latin: "Hüve'l-bâkî / Mehmet Efendi / 1310-1373",
+                translation: "Sonsuz olan Allah'tır",
+                explanation: "Osmanlıca mezar taşı. 1310 Hicri (1892 Miladi) - 1373 Hicri (1954 Miladi)"
+            },
+            {
+                text: "روحنه فاتحه / عائشه خانم / ١٣٣٨-١٣٨١",
+                latin: "Ruhuna Fatiha / Ayşe Hanım / 1338-1381",
+                translation: "Ruhuna Fatiha okunması rica olunur",
+                explanation: "Modern dönem mezar taşı. 1338 Hicri (1920 Miladi) - 1381 Hicri (1962 Miladi)"
+            },
+            {
+                text: "فاطمه خاتون / بنت عبد الله / ١٢٥٠-١٣٠٠",
+                latin: "Fatma Hatun / bint Abdullah / 1250-1300",
+                translation: "Fatma Hatun / Abdullah'ın kızı",
+                explanation: "Klasik dönem mezar taşı. 1250 Hicri (1834 Miladi) - 1300 Hicri (1883 Miladi)"
+            }
+        ];
 
-        // Tara butonu işlevi
-        document.getElementById('scan-btn').addEventListener('click', function() {
-            // Gerçek uygulamada burada kamera görüntüsü işlenecek
-            const result = simulateOCR();
-            
+        document.getElementById('scan-btn').addEventListener('click', () => {
+            const result = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
             document.getElementById('ocr-result').textContent = result.text;
             document.getElementById('translation').textContent = "Çeviri: " + result.translation;
             document.getElementById('explanation').textContent = "Açıklama: " + result.explanation;
-            
-            // Geçmişe ekle
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.textContent = result.latin.split('/')[1].trim() + " - " + result.latin.split('/')[2].trim().substring(0,4);
-            historyItem.onclick = () => showHistory(result.text, result.translation, result.explanation);
-            document.getElementById('history').prepend(historyItem);
-            
-            // Kamerayı yenile (simülasyon)
-            document.getElementById('camera-feed').src = "https://via.placeholder.com/800x300/333333/FFFFFF?text=Tarama+Başarılı";
-            setTimeout(() => {
-                document.getElementById('camera-feed').src = "https://via.placeholder.com/800x300/333333/FFFFFF?text=Yeni+Mezar+Taşını+Tutun";
-            }, 2000);
+
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.textContent = result.latin.split('/')[1].trim() + " - " + result.latin.split('/')[2].trim().substring(0, 4);
+            item.onclick = () => showHistory(result.text, result.translation, result.explanation);
+            document.getElementById('history').prepend(item);
         });
 
         function showHistory(text, translation, explanation) {
@@ -131,32 +110,28 @@
             document.getElementById('explanation').textContent = "Açıklama: " + explanation;
         }
 
-        // Gerçek kamera erişimi için izin iste
+        // Gerçek kamera yayını
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    document.getElementById('camera-feed').srcObject = stream;
+                .then(stream => {
+                    const video = document.getElementById('camera-feed');
+                    video.srcObject = stream;
                 })
-                .catch(function(error) {
-                    console.error("Kamera erişimi hatası:", error);
-                });
+                .catch(err => console.error("Kamera hatası:", err));
         }
     </script>
-    
-    <!-- Tesseract.js için gerekli kütüphaneler (gerçek OCR için) -->
+
+    <!-- Gerçek OCR için Tesseract.js -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
-        // Gerçek OCR için (isteğe bağlı)
         async function performRealOCR(image) {
             const worker = await Tesseract.createWorker({
                 logger: m => console.log(m)
             });
-            
-            await worker.loadLanguage('ota'); // Osmanlıca için özel eğitim gerekir
+            await worker.loadLanguage('ota');
             await worker.initialize('ota');
-            
             const { data: { text } } = await worker.recognize(image);
-            console.log("Tanınan metin:", text);
+            console.log("Tınanan metin:", text);
             await worker.terminate();
             return text;
         }
