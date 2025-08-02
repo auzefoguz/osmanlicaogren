@@ -212,16 +212,16 @@
 
     try {
       const worker = await Tesseract.createWorker({ logger: m => console.log(m) });
-      await worker.loadLanguage('ara+tur');
-      await worker.initialize('ara+tur');
+      await worker.loadLanguage('ara');  // Osmanlıca için öncelikli Arapça dil paketi
+      await worker.initialize('ara');
 
       const { data: { text } } = await worker.recognize(imageDataURL);
 
       await worker.terminate();
 
-      // İstenmeyen karakterleri temizle
-      let filteredText = text.replace(/[^\u0600-\u06FF\u0750-\u077F\u0590-\u05FF0-9a-zA-Z\s\/\-\n]/g, '');
-      // \n ekledim ki satır bölme etkilenmesin
+      // Normalize boşluklar ve satır sonları
+      let filteredText = text.replace(/[^\u0600-\u06FF\u0750-\u077F0-9a-zA-Z\s\/\-\n]/g, '');
+      filteredText = filteredText.replace(/\u00A0/g, ' ').replace(/\r/g, '');
 
       const hicriYil = (filteredText.match(/[١-٩]{3,4}/g) || [])[0];
       const miladiTahmin = hicriYil ? hicriToMiladi(parseInt(hicriYil.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)))) : null;
@@ -304,3 +304,4 @@
 </script>
 </body>
 </html>
+
