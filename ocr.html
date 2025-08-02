@@ -77,13 +77,11 @@
     <script>
         const HISTORY_KEY = 'ocrHistory';
 
-        // Hicri yılı miladiye çeviren basit fonksiyon (tahmini)
         function hicriToMiladi(hicriYil) {
             return 622 + Math.floor(hicriYil * 0.97);
         }
 
-        // OCR ve kayıt alma
-        document.getElementById('scan-btn').addEventListener('click', async () => {
+        async function taraVeIsle() {
             const video = document.getElementById('camera-feed');
             const canvas = document.getElementById('capture-canvas');
             const ctx = canvas.getContext('2d');
@@ -101,7 +99,6 @@
                 const { data: { text } } = await worker.recognize(imageData);
                 await worker.terminate();
 
-                // Tarih varsa Miladi tahmini
                 const hicriYil = (text.match(/[١-٩]{3,4}/g) || [])[0];
                 const miladiTahmin = hicriYil ? hicriToMiladi(parseInt(hicriYil.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)))) : null;
                 const explanation = miladiTahmin ? `Taranan yıl: Hicri ${hicriYil} ≈ Miladi ${miladiTahmin}` : "Taranan yazıdan tarih çıkarılamadı.";
@@ -116,7 +113,6 @@
                 item.onclick = () => showHistory(text, "OCR Çıktısı", explanation);
                 document.getElementById('history').prepend(item);
 
-                // Yerel depolamaya kaydet
                 const existing = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
                 existing.unshift({ text, explanation, time: new Date().toISOString() });
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(existing));
@@ -124,16 +120,16 @@
                 console.error(err);
                 document.getElementById('ocr-result').textContent = "Hata oluştu.";
             }
-        });
+        }
 
-        // Geçmiş gösterme fonksiyonu
+        document.getElementById('scan-btn').addEventListener('click', taraVeIsle);
+
         function showHistory(text, translation, explanation) {
             document.getElementById('ocr-result').textContent = text;
             document.getElementById('translation').textContent = "Çeviri: " + translation;
             document.getElementById('explanation').textContent = "Açıklama: " + explanation;
         }
 
-        // Uygulama yüklenirken geçmişi getir
         window.addEventListener('load', () => {
             const past = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
             for (const item of past) {
@@ -143,18 +139,16 @@
                 div.onclick = () => showHistory(item.text, "OCR Çıktısı", item.explanation);
                 document.getElementById('history').appendChild(div);
             }
-        });
 
-        // Kamera erişimi
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    const video = document.getElementById('camera-feed');
-                    video.srcObject = stream;
-                })
-                .catch(err => console.error("Kamera hatası:", err));
-        }
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        const video = document.getElementById('camera-feed');
+                        video.srcObject = stream;
+                    })
+                    .catch(err => console.error("Kamera hatası:", err));
+            }
+        });
     </script>
 </body>
 </html>
-
