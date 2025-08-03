@@ -2,46 +2,131 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Osmanlıca Klavye</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>Osmanlıca Klavye + El Yazısı + Bağlı Yazım + Düzen Seçimi + Tarihî Metinler</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
   <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  
+  <style>
+    body {
+      font-family: 'Lateef', serif;
+      background: linear-gradient(to right, #1a3b5d, #3f5b82);
+      color: white;
+      padding: 1rem;
+    }
+    #outputArea {
+      direction: rtl;
+      font-size: 2rem;
+      min-height: 100px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    #harfBilgiKutusu {
+      direction: rtl;
+      margin-bottom: 1rem;
+    }
+    .back-home-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      font-size: 1.6rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      background-color: #c9a343;
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .back-home-btn:hover {
+      transform: scale(1.1);
+      background-color: #e5c06d;
+      color: #000;
+    }
+    #klavye button {
+      min-width: 3.5rem;
+      min-height: 3.5rem;
+      font-size: 1.8rem;
+      user-select: none;
+    }
+    #canvasContainer {
+      background: #2c4a72;
+      border-radius: 8px;
+      margin-top: 1rem;
+      padding: 10px;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid #e5c06d;
+      border-radius: 8px;
+      touch-action: none;
+      background: white;
+      border-radius: 8px;
+    }
+    .btn-clear, .btn-recognize {
+      min-width: 100px;
+    }
+    /* Tarihî metinler listesinde hover efekti */
+    #metinListesi li:hover {
+      background: rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body style="font-family:'Lateef', serif; background:linear-gradient(to right, #1a3b5d, #3f5b82); color:white; padding:1rem;">
+<body>
 
 <div class="container">
-  <h2 class="text-center text-warning mb-3">📱 Osmanlıca Dokunmatik Klavye</h2>
 
+  <h2 class="text-center text-warning mb-3">📱 Osmanlıca Dokunmatik Klavye + El Yazısı + Bağlı Yazım + Düzen Seçimi + Tarihî Metinler</h2>
+  
+  <!-- Klavye Düzeni Seçimi -->
+  <div class="mb-3 text-center">
+    <label for="klavyeSecim" class="form-label">Klavye Düzeni Seç:</label>
+    <select id="klavyeSecim" class="form-select w-auto d-inline-block">
+      <option value="standart" selected>Standart</option>
+      <option value="alternatif">Alternatif</option>
+    </select>
+  </div>
+  
   <!-- Output -->
-  <div id="outputArea" contenteditable="true" class="form-control mb-3" style="direction:rtl; font-size:2rem; min-height:100px;"></div>
-
+  <div id="outputArea" contenteditable="true" class="form-control mb-3" aria-label="Osmanlıca yazı alanı"></div>
+  
   <!-- Harf Bilgisi Kutusu -->
-  <div id="harfBilgiKutusu" class="alert alert-info d-none" style="direction:rtl;"></div>
-
+  <div id="harfBilgiKutusu" class="alert alert-info d-none" role="alert"></div>
+  
   <!-- Tuşlar -->
   <div id="klavye" class="text-center mb-4">
-    <div class="d-flex flex-wrap justify-content-center gap-2">
-      <!-- Harfler buraya otomatik eklenecek -->
+    <div class="d-flex flex-wrap justify-content-center gap-2"></div>
+  </div>
+  
+  <!-- El Yazısı Çizim Alanı -->
+  <div id="canvasContainer">
+    <h5 class="text-warning">✍️ El Yazısı ile Harf Çizimi</h5>
+    <canvas id="canvas" width="300" height="150" aria-label="El yazısı çizim alanı"></canvas>
+    <div class="mt-2">
+      <button class="btn btn-outline-warning btn-clear me-2" aria-label="Çizim alanını temizle"><i class="bi bi-x-circle"></i> Temizle</button>
+      <button class="btn btn-warning btn-recognize" disabled aria-label="Çizimi tanıma (deneme)"><i class="bi bi-check-circle"></i> Tanıma (Deneme)</button>
+      <span class="text-muted small">* Otomatik tanıma yok, çizim kontrolü yapılabilir.</span>
     </div>
   </div>
 
-  <!-- Alıştırma -->
-  <div class="card text-dark bg-light mb-3">
-    <div class="card-body">
-      <h5>📝 Yazım Alıştırması:</h5>
-      <p>Bu kelimeyi yaz: <strong id="hedefKelime" style="font-size:1.5rem;">---</strong></p>
-      <button onclick="kontrolEt()" class="btn btn-success btn-sm">Kontrol Et</button>
-      <span id="sonucMesaji" class="ms-2"></span>
-      <button onclick="yeniKelime()" class="btn btn-outline-secondary btn-sm float-end">Yeni Kelime</button>
+  <!-- Tarihî Metin Örnekleri -->
+  <div class="card bg-light text-dark mt-4 mb-4">
+    <div class="card-body" style="max-height:200px; overflow-y:auto; font-size:1.3rem; direction:rtl;">
+      <h5 class="card-title text-center">📜 Tarihî Metin Örnekleri</h5>
+      <ul id="metinListesi" class="list-unstyled" style="user-select:none; padding-left:0;">
+        <!-- Örnekler JS ile yüklenecek -->
+      </ul>
     </div>
   </div>
 
-  <!-- PDF İndir Butonu -->
-  <div class="text-center mb-4">
-    <button onclick="indirPDF()" class="btn btn-warning"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
-  </div>
 </div>
 
 <!-- Ana Sayfa Butonu -->
@@ -49,10 +134,8 @@
   <i class="bi bi-house-door-fill"></i>
 </a>
 
-<!-- JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-  // 1. Harf Bilgileri
+  // 1. Harf Bilgileri (Standart Düzen için)
   const harfBilgileri = {
     "ا": "Elif – Genellikle başta kullanılır.",
     "ب": "Be – Dudak sesi. Başta: بـ Ortada: ـبـ Sonda: ـب",
@@ -88,88 +171,309 @@
     "◀": "Silme tuşu"
   };
 
-  const harfler = Object.keys(harfBilgileri);
+  // Alternatif Düzen (örnek)
+  const harfBilgileriAlternatif = {
+    "ا": "Elif – Genellikle başta kullanılır.",
+    "ب": "Be – Dudak sesi.",
+    "ت": "Te – Diş sesi.",
+    "ث": "Se – İnce diş sesi.",
+    "د": "Dal – D sesi.",
+    "ر": "Re – R sesi.",
+    "ز": "Ze – Sert Z.",
+    "س": "Sin – S sesi.",
+    "ش": "Şin – Ş sesi.",
+    "ص": "Sad – Kalın S.",
+    "ض": "Dad – Kalın D.",
+    "ط": "Tı – Kalın T.",
+    "ظ": "Zı – Kalın Z.",
+    "ع": "Ayn – Boğazdan gelen ses.",
+    "ف": "Fe – F sesi.",
+    "ق": "Kaf – Kalın K.",
+    "ك": "Kef – İnce K.",
+    "ل": "Lam – L sesi.",
+    "م": "Mim – M sesi.",
+    "ن": "Nun – N sesi.",
+    "ه": "He – H sesi.",
+    "و": "Vav – V veya U/O sesi.",
+    "ي": "Ye – Y sesi.",
+    "ء": "Hemze – Durak sesi.",
+    "،": "Virgül",
+    ".": "Nokta",
+    "◀": "Silme tuşu"
+  };
+
+  // 2. Harflerin Bağlantılı Yazımı - Unicode sunum formları (örnek, basitleştirilmiş)
+  const harfFormlari = {
+    "ا": {isolated: "\u0627", initial: "\uFE8D", medial: "\uFE8D", final: "\uFE8E", connects: false}, 
+    "ب": {isolated: "\u0628", initial: "\uFE91", medial: "\uFE92", final: "\uFE90", connects: true}, 
+    "ت": {isolated: "\u062A", initial: "\uFE97", medial: "\uFE98", final: "\uFE96", connects: true}, 
+    "ث": {isolated: "\u062B", initial: "\uFE9B", medial: "\uFE9C", final: "\uFE9A", connects: true},
+    "ج": {isolated: "\u062C", initial: "\uFE9F", medial: "\uFEA0", final: "\uFE9E", connects: true},
+    "ح": {isolated: "\u062D", initial: "\uFEA3", medial: "\uFEA4", final: "\uFEA2", connects: true},
+    "خ": {isolated: "\u062E", initial: "\uFEA7", medial: "\uFEA8", final: "\uFEA6", connects: true},
+    "د": {isolated: "\u062F", initial: "\uFEA9", medial: "\uFEAA", final: "\uFEA8", connects: false},
+    "ذ": {isolated: "\u0630", initial: "\uFEAB", medial: "\uFEAC", final: "\uFEAA", connects: false},
+    "ر": {isolated: "\u0631", initial: "\uFEAD", medial: "\uFEAE", final: "\uFEAC", connects: false},
+    "ز": {isolated: "\u0632", initial: "\uFEAF", medial: "\uFEB0", final: "\uFEAE", connects: false},
+    "س": {isolated: "\u0633", initial: "\uFEB3", medial: "\uFEB4", final: "\uFEB2", connects: true},
+    "ش": {isolated: "\u0634", initial: "\uFEB7", medial: "\uFEB8", final: "\uFEB6", connects: true},
+    "ص": {isolated: "\u0635", initial: "\uFEBB", medial: "\uFEBC", final: "\uFEBA", connects: true},
+    "ض": {isolated: "\u0636", initial: "\uFEBF", medial: "\uFEC0", final: "\uFEBE", connects: true},
+    "ط": {isolated: "\u0637", initial: "\uFEC3", medial: "\uFEC4", final: "\uFEC2", connects: true},
+    "ظ": {isolated: "\u0638", initial: "\uFEC7", medial: "\uFEC8", final: "\uFEC6", connects: true},
+    "ع": {isolated: "\u0639", initial: "\uFECB", medial: "\uFECC", final: "\uFECA", connects: true},
+    "غ": {isolated: "\u063A", initial: "\uFECF", medial: "\uFED0", final: "\uFECE", connects: true},
+    "ف": {isolated: "\u0641", initial: "\uFED3", medial: "\uFED4", final: "\uFED2", connects: true},
+    "ق": {isolated: "\u0642", initial: "\uFED7", medial: "\uFED8", final: "\uFED6", connects: true},
+    "ك": {isolated: "\u0643", initial: "\uFEDB", medial: "\uFEDC", final: "\uFEDA", connects: true},
+    "ل": {isolated: "\u0644", initial: "\uFEDF", medial: "\uFEE0", final: "\uFEDE", connects: true},
+    "م": {isolated: "\u0645", initial: "\uFEE3", medial: "\uFEE4", final: "\uFEE2", connects: true},
+    "ن": {isolated: "\u0646", initial: "\uFEE7", medial: "\uFEE8", final: "\uFEE6", connects: true},
+    "ه": {isolated: "\u0647", initial: "\uFEEB", medial: "\uFEEC", final: "\uFEEA", connects: true},
+    "و": {isolated: "\u0648", initial: "\uFEED", medial: "\uFEEE", final: "\uFEEC", connects: false},
+    "ي": {isolated: "\u064A", initial: "\uFEF3", medial: "\uFEF4", final: "\uFEF2", connects: true},
+    "ء": {isolated: "\u0621", initial: "\uFE80", medial: "\uFE80", final: "\uFE80", connects: false},
+    "،": {isolated: "،", initial: "،", medial: "،", final: "،", connects: false},
+    ".": {isolated: ".", initial: ".", medial: ".", final: ".", connects: false},
+    "◀": {isolated: "◀", initial: "◀", medial: "◀", final: "◀", connects: false}
+  };
+
+  // Bağlı yazım için fonksiyon
+  function biyeBagla(metin) {
+    let chars = metin.split('');
+    let sonucDizisi = [];
+
+    for (let i = 0; i < chars.length; i++) {
+      const simdiki = chars[i];
+      const onceki = chars[i - 1];
+      const sonraki = chars[i + 1];
+
+      const simdikiFormlar = harfFormlari[simdiki];
+      if (!simdikiFormlar) {
+        // Harf bulunmazsa direkt ekle
+        sonucDizisi.push(simdiki);
+        continue;
+      }
+
+      const oncekiBaglanir = onceki && harfFormlari[onceki] && harfFormlari[onceki].connects;
+      const sonrakiBaglanir = sonraki && harfFormlari[sonraki] && harfFormlari[sonraki].connects;
+
+      let form = simdikiFormlar.isolated;
+
+      if (oncekiBaglanir && sonrakiBaglanir && simdikiFormlar.medial) {
+        form = simdikiFormlar.medial;
+      } else if (oncekiBaglanir && simdikiFormlar.final) {
+        form = simdikiFormlar.final;
+      } else if (sonrakiBaglanir && simdikiFormlar.initial) {
+        form = simdikiFormlar.initial;
+      }
+
+      sonucDizisi.push(form);
+    }
+
+    return sonucDizisi.join('');
+  }
+
+  // 3. Klavye Düzenleri (tuş dizileri)
+  const klavyeDüzenleri = {
+    standart: ["ا","ب","ت","ث","ج","ح","خ","د","ذ","ر","ز","س","ش","ص","ض","ط","ظ","ع","غ","ف","ق","ك","ل","م","ن","ه","و","ي","ء","،",".","◀"],
+    alternatif: ["ا","ب","ت","ث","د","ر","ز","س","ش","ص","ض","ط","ظ","ع","ف","ق","ك","ل","م","ن","ه","و","ي","ء","،",".","◀"]
+  };
 
   const klavyeDiv = document.querySelector("#klavye .d-flex");
-
   const harfBilgiKutusu = document.getElementById("harfBilgiKutusu");
   const output = document.getElementById("outputArea");
+  const klavyeSecim = document.getElementById("klavyeSecim");
+  const sonuc = document.createElement("div"); // boş, kontrol mesajlarını burada gösteriyoruz
 
-  harfler.forEach(harf => {
-    const btn = document.createElement("button");
-    btn.className = "btn btn-outline-light fs-3";
-    btn.textContent = harf;
-    btn.onclick = () => {
-      if (harf === "◀") {
-        output.innerText = output.innerText.slice(0, -1);
-      } else {
-        output.innerText += harf;
-      }
-      harfBilgiKutusu.classList.remove("d-none");
-      harfBilgiKutusu.textContent = harfBilgileri[harf] || "";
-    };
-    klavyeDiv.appendChild(btn);
+  // Klavyeyi çiz
+  function klavyeOlustur(düzen) {
+    klavyeDiv.innerHTML = "";
+    const harfBilgiKaynak = düzen === klavyeDüzenleri.standart ? harfBilgileri : harfBilgileriAlternatif;
+    düzen.forEach(harf => {
+      const btn = document.createElement("button");
+      btn.className = "btn btn-outline-light";
+      btn.textContent = harf;
+      btn.setAttribute("aria-label", harfBilgiKaynak[harf] || "Harfi yaz");
+      btn.onclick = () => {
+        if (harf === "◀") {
+          let metin = output.innerText;
+          metin = metin.slice(0, -1);
+          output.innerText = biyeBagla(metin);
+        } else {
+          let metin = output.innerText + harf;
+          output.innerText = biyeBagla(metin);
+        }
+        harfBilgiKutusu.classList.remove("d-none");
+        harfBilgiKutusu.textContent = harfBilgiKaynak[harf] || "";
+        sonuc.textContent = "";
+        output.focus();
+      };
+      klavyeDiv.appendChild(btn);
+    });
+  }
+
+  klavyeOlustur(klavyeDüzenleri.standart);
+
+  klavyeSecim.addEventListener("change", () => {
+    const secim = klavyeSecim.value;
+    if (secim === "standart") {
+      klavyeOlustur(klavyeDüzenleri.standart);
+    } else {
+      klavyeOlustur(klavyeDüzenleri.alternatif);
+    }
+    harfBilgiKutusu.classList.add("d-none");
+    output.innerText = "";
+    sonuc.textContent = "";
   });
 
-  // 2. Alıştırma Sistemi
-  const kelimeler = ["كتاب", "مدرسة", "قلم", "مكتبة", "تاريخ", "لغة", "مسجد", "سؤال"];
-  const hedef = document.getElementById("hedefKelime");
-  const sonuc = document.getElementById("sonucMesaji");
+  // Output alanı manuel değişince (ör: yapıştırma) bağlı yazımı uygula
+  output.addEventListener("input", () => {
+    const val = output.innerText;
+    output.innerText = biyeBagla(val);
+    placeCaretAtEnd(output);
+  });
 
-  function yeniKelime() {
-    const kelime = kelimeler[Math.floor(Math.random() * kelimeler.length)];
-    hedef.textContent = kelime;
-    sonuc.textContent = "";
-    output.innerText = "";
-  }
-  yeniKelime();
-
-  function kontrolEt() {
-    const giris = output.innerText.trim();
-    if (giris === hedef.textContent.trim()) {
-      sonuc.textContent = "✅ Doğru yazdınız!";
-      sonuc.className = "text-success fw-bold";
-    } else {
-      sonuc.textContent = "❌ Yanlış! Tekrar deneyin.";
-      sonuc.className = "text-danger fw-bold";
+  // Caret (imleç) sonuna konumlandırma
+  function placeCaretAtEnd(el) {
+    el.focus();
+    if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
   }
 
-  // 4. PDF Kaydetme
-  async function indirPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFont("times", "normal");
-    doc.text(output.innerText, 20, 30, { align: "right" });
-    doc.save("osmanlica-yazim.pdf");
-  }
-</script>
+  // -----------------------------------
+  // 1. El Yazısı Çizim Alanı (Canvas)
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-<style>
-  .back-home-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    font-size: 1.6rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    background-color: #c9a343;
-    color: #000;
-    border: none;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
+  let çizimAktif = false;
+  let çizimYol = [];
+
+  function canvasTemizle() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    çizimYol = [];
+    btnRecognize.disabled = true;
   }
-  .back-home-btn:hover {
-    transform: scale(1.1);
-    background-color: #e5c06d;
-    color: #000;
+
+  canvasTemizle();
+
+  function getPointerPos(e) {
+    let rect = canvas.getBoundingClientRect();
+    let x, y;
+    if (e.touches) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+    return {x, y};
   }
-</style>
+
+  function basla(e) {
+    e.preventDefault();
+    çizimAktif = true;
+    çizimYol.push([]);
+    let pos = getPointerPos(e);
+    çizimYol[çizimYol.length - 1].push(pos);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    btnRecognize.disabled = false;
+  }
+
+  function çizim(e) {
+    if (!çizimAktif) return;
+    e.preventDefault();
+    let pos = getPointerPos(e);
+    çizimYol[çizimYol.length - 1].push(pos);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+
+  function bitir(e) {
+    if (!çizimAktif) return;
+    e.preventDefault();
+    çizimAktif = false;
+    ctx.closePath();
+  }
+
+  // Event listenerlar
+  canvas.addEventListener("mousedown", basla);
+  canvas.addEventListener("mousemove", çizim);
+  canvas.addEventListener("mouseup", bitir);
+  canvas.addEventListener("mouseout", bitir);
+  canvas.addEventListener("touchstart", basla);
+  canvas.addEventListener("touchmove", çizim);
+  canvas.addEventListener("touchend", bitir);
+  canvas.addEventListener("touchcancel", bitir);
+
+  const btnClear = document.querySelector(".btn-clear");
+  const btnRecognize = document.querySelector(".btn-recognize");
+
+  btnClear.addEventListener("click", () => {
+    canvasTemizle();
+  });
+
+  btnRecognize.addEventListener("click", () => {
+    alert("Şu anda otomatik el yazısı tanıma yok.\n\nÇizdiğiniz harfi gözlemleyin ve klavyeden yazabilirsiniz.");
+  });
+
+  // -----------------------------------
+  // 4. Tarihî Metin Örnekleri
+  const tarihMetinleri = [
+    {
+      osmanlica: "الحمد لله رب العالمين",
+      turkce: "Alemlerin Rabbi Allah’a hamdolsun."
+    },
+    {
+      osmanlica: "هذا كتاب المدرسة",
+      turkce: "Bu okulun kitabıdır."
+    },
+    {
+      osmanlica: "مسجد السلطان الجديد",
+      turkce: "Yeni Sultan Camii."
+    },
+    {
+      osmanlica: "كتب المؤرخ في التاريخ",
+      turkce: "Tarihçi tarih üzerine yazdı."
+    },
+    {
+      osmanlica: "اللغة العربية لغة القرآن",
+      turkce: "Arapça, Kuran’ın dilidir."
+    }
+  ];
+
+  const metinListesi = document.getElementById("metinListesi");
+
+  function metinleriYukle() {
+    tarihMetinleri.forEach((metin, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong style="font-size:1.4rem;">${metin.osmanlica}</strong><br><small>${metin.turkce}</small>`;
+      li.classList.add("p-2", "border-bottom");
+      li.style.userSelect = "none";
+      li.addEventListener("click", () => {
+        output.innerText = metin.osmanlica;
+        output.innerText = biyeBagla(output.innerText); // Bağlı yazımı uygula
+        harfBilgiKutusu.classList.add("d-none");
+        sonuc.textContent = "";
+        output.focus();
+      });
+      metinListesi.appendChild(li);
+    });
+  }
+  metinleriYukle();
+
+</script>
 
 </body>
 </html>
