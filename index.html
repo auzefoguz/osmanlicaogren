@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -9,56 +10,327 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="themes.css">
-</head>
-<body class="light-theme">
-    <!-- Navbar (Body'nin içinde, başta) -->
-    <nav class="navbar navbar-expand-md bg-osmanli-blue navbar-dark shadow-sm">
-      <div class="container-fluid">
-        <a class="navbar-brand osmanli-logo" href="index.html">Osmanlıca öğreniyorum</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Menüyü aç">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end">
-          <ul class="navbar-nav gap-2" id="mainMenu"></ul>
-        </div>
-      </div>
-    </nav>
+    <style>
+       .social-media-bar {
+        margin-top: 20px;
+        padding: 15px 0;
+    }
+ .offcanvas-body .btn {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+  }
+  .dropdown-menu a:hover {
+    background-color: #f8f9fa;
+  }
+ 
+    .social-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    }
+    .support-btn {
+        background-color: #6f42c1;
+        color: white;
+    }
+    #quizModal .modal-content { min-width: 320px;}
+    #quizModal .quiz-option { min-width: 200px; }
+      @media (min-width: 768px) {
+  .navbar .navbar-brand.position-absolute {
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 0 auto !important;
+    display: block;
+  }
+}
 
-    <!-- Mobil Offcanvas Menü -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="mobileMenuLabel">Menü</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
-      </div>
-      <div class="offcanvas-body d-flex flex-column gap-2" id="mobileMenuList"></div>
+    </style>
+</head>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md bg-osmanli-blue navbar-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand osmanli-logo" href="index.html">Osmanlıca öğreniyorum</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false" aria-label="Menüyü aç">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav gap-2">
+        <li class="nav-item"><a href="hat-sanati.html" class="nav-link text-osmanli-gold">Hat Sanatı</a></li>
+        <li class="nav-item"><a href="https://www.osmanlicagazeteler.org/Sozluk.php" target="_blank" class="nav-link text-white">Sözlük</a></li>
+        <li class="nav-item"><a href="https://www.osmanlicagazeteler.org/" target="_blank" class="nav-link text-white">Gazeteler</a></li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Testler</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/1-kur-sorulari/" target="_blank">1. Kur</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/ikinci-kur-osmanlica-testler/" target="_blank">2. Kur</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Etkinlikler</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
+            <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
+            <li><a class="dropdown-item" href="dedektif.html"><i class="bi bi-search"></i> Dedektif</a></li>
+<li><a class="dropdown-item" href="ocr.html"><i class="bi bi-search"></i> ocr tanıma</a></li>
+<li><a class="dropdown-item" href="klavye.html"><i class="bi bi-keyboard"></i> Osmanlıca Klavye</a></li>
+
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Kaynaklar</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/matbu-hat/" target="_blank">Matbu Hat</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-hatti/" target="_blank">Rika Hattı</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-matbu-karsilastirmali/" target="_blank">Rika & Matbu</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/category/kitabeler/" target="_blank">Kitabeler</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/mezar-taslari/" target="_blank">Mezar Taşları</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/husnu-hat/" target="_blank">Hüsn-ü Hat</a></li>
+            <li><a class="dropdown-item" href="https://osmanlicaogren.com/osmanlica-cuma-mesajlari-ve-tebrik-mesajlari/" target="_blank">Mesajlar</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Bilgi</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="hakkimizda.html">Hakkımızda</a></li>
+            <li><a class="dropdown-item" href="sss.html">SSS</a></li>
+            <li><a class="dropdown-item" href="gizlilik.html">Gizlilik</a></li>
+            <li><a class="dropdown-item" href="destek.html">Destek</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a href="profile.html" class="nav-link text-osmanli-gold">Profil</a></li>
+        <li class="nav-item"><a href="premium.html" class="nav-link text-osmanli-gold">Premium</a></li>
+        <li class="nav-item"><a href="analytics.html" class="nav-link text-white">İstatistik</a></li>
+      </ul>
     </div>
-    
+  </div>
+</nav>
+
+<!-- Mobil Offcanvas Menü -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileMenuLabel">Menü</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column gap-2">
+    <a href="hat-sanati.html" class="btn btn-outline-warning">Hat Sanatı</a>
+    <a href="https://www.osmanlicagazeteler.org/Sozluk.php" target="_blank" class="btn btn-outline-info">Sözlük</a>
+    <a href="https://www.osmanlicagazeteler.org/" target="_blank" class="btn btn-outline-info">Gazeteler</a>
+
+    <div class="dropdown">
+      <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Testler</button>
+      <ul class="dropdown-menu w-100">
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/1-kur-sorulari/" target="_blank">1. Kur</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/ikinci-kur-osmanlica-testler/" target="_blank">2. Kur</a></li>
+      </ul>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Etkinlikler</button>
+      <ul class="dropdown-menu w-100">
+        <li><a class="dropdown-item" href="game_page.html"><i class="bi bi-controller"></i> Oyun</a></li>
+        <li><a class="dropdown-item" href="quiz_page.html"><i class="bi bi-patch-question"></i> Quiz</a></li>
+        <li><a class="dropdown-item" href="dedektif.html"><i class="bi bi-search"></i> Dedektif</a></li>
+<li><a class="dropdown-item" href="ocr.html"><i class="bi bi-search"></i> ocr tanıma</a></li>
+<li><a class="dropdown-item" href="klavye.html"><i class="bi bi-keyboard"></i> Osmanlıca Klavye</a></li>
+
+      </ul>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn btn-outline-info dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Kaynaklar</button>
+      <ul class="dropdown-menu w-100">
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/matbu-hat/" target="_blank">Matbu Hat</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-hatti/" target="_blank">Rika Hattı</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/rika-matbu-karsilastirmali/" target="_blank">Rika & Matbu</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/category/kitabeler/" target="_blank">Kitabeler</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/mezar-taslari/" target="_blank">Mezar Taşları</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/husnu-hat/" target="_blank">Hüsn-ü Hat</a></li>
+        <li><a class="dropdown-item" href="https://osmanlicaogren.com/osmanlica-cuma-mesajlari-ve-tebrik-mesajlari/" target="_blank">Mesajlar</a></li>
+
+      </ul>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn btn-outline-dark dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">Bilgi</button>
+      <ul class="dropdown-menu w-100">
+        <li><a class="dropdown-item" href="hakkimizda.html">Hakkımızda</a></li>
+        <li><a class="dropdown-item" href="sss.html">SSS</a></li>
+        <li><a class="dropdown-item" href="gizlilik.html">Gizlilik</a></li>
+        <li><a class="dropdown-item" href="destek.html">Destek</a></li>
+      </ul>
+    </div>
+
+    <a href="profile.html" class="btn btn-outline-success">Profil</a>
+    <a href="premium.html" class="btn btn-outline-warning">Premium</a>
+    <a href="analytics.html" class="btn btn-outline-info">İstatistik</a>
+  </div>
+</div>
+
+
+
+<!-- 🎨 Menü Stili -->
+<style>
+  .menu-btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.4rem;
+    height: 2.2rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+.bg-osmanli-blue {
+  background-color: #1a3b5d !important;  /* Lacivert zemin */
+  border-bottom: 2px solid #c9a343;      /* Altın çizgi */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.navbar .nav-link {
+  color: #f8f9fa !important;
+}
+.navbar .nav-link:hover {
+  color: #c9a343 !important;
+}
+.navbar-brand {
+  color: #c9a343 !important;
+  font-family: 'Lateef', serif;
+  font-size: 1.6rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+  .text-osmanli-gold {
+    color: #c9a343 !important;
+  }
+
+  .text-osmanli-gold:hover {
+    color: #e5c06d !important;
+  }
+
+  .navbar-nav .nav-link {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .dropdown-menu {
+    font-size: 0.85rem;
+  }
+  .menu-btn i {
+    font-size: 1rem;
+  }
+.offcanvas-header .btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.offcanvas-header .btn:hover {
+  background-color: #f1f1f1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.offcanvas-title {
+  font-family: 'Lateef', serif;
+  font-size: 1.5rem;
+  color: #c9a343;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+}
+.osmanli-logo {
+    font-family: 'Lateef', serif;
+    font-size: 1.7rem;
+    color: #c9a343 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  }
+.osmanli-banner {
+  font-family: 'Lateef', serif;
+  font-size: 2.2rem;
+  color: #c9a343;
+  background: linear-gradient(to right, #1a3b5d, #3f5b82);
+  padding: 0.6em 1em;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  animation: fadeInSlide 1.5s ease forwards;
+  display: inline-block;
+}
+
+/* Animasyon */
+@keyframes fadeInSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.osmanli-slogan {
+    font-family: 'Lateef', serif;
+    font-size: 1.2rem;
+    color: #c9a343;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
+  }
+.navbar-toggler {
+  z-index: 1031;
+}
+</style>
+
+<body class="light-theme">
     <div class="ottoman-frame">
         <div class="container py-4">
         <header class="text-center mb-4">
           <h1 class="osmanli-banner text-center">
-            <i class="bi bi-journal-richtext me-2"></i> Osmanlıca’yı Keşfet
-          </h1>
-          <div id="gununSozuAlani" class="text-center mt-2">
-            <p id="sloganText" class="osmanli-slogan mb-1">...</p>
-            <small id="yazarText" class="text-muted fst-italic">...</small>
-          </div>
-          <div class="d-flex justify-content-center align-items-center gap-3">
-            <div class="theme-switcher btn-group mt-2">
-                <button class="btn btn-sm btn-light theme-btn active" data-theme="light" title="Açık tema">
-                    <i class="bi bi-sun-fill"></i>
-                </button>
-                <button class="btn btn-sm btn-dark theme-btn" data-theme="dark" title="Koyu tema">
-                    <i class="bi bi-moon-fill"></i>
-                </button>
-                <button class="btn btn-sm btn-warning theme-btn" data-theme="ottoman" title="Osmanlı teması">
-                    <i class="bi bi-palette-fill"></i>
-                </button>
+  <i class="bi bi-journal-richtext me-2"></i> Osmanlıca’yı Keşfet
+</h1>
+    
+<div id="gununSozuAlani" class="text-center mt-2">
+  <p id="sloganText" class="osmanli-slogan mb-1">...</p>
+  <small id="yazarText" class="text-muted fst-italic">...</small>
+</div>
+            <div class="d-flex justify-content-center align-items-center gap-3">
+                <div class="theme-switcher btn-group mt-2">
+                    <button class="btn btn-sm btn-light theme-btn active" data-theme="light" title="Açık tema">
+                        <i class="bi bi-sun-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-dark theme-btn" data-theme="dark" title="Koyu tema">
+                        <i class="bi bi-moon-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning theme-btn" data-theme="ottoman" title="Osmanlı teması">
+                        <i class="bi bi-palette-fill"></i>
+                    </button>
+                </div>
+                <span id="premiumBadge" class="badge bg-warning text-dark mt-2 d-none">
+                    <i class="bi bi-star-fill"></i> Premium
+                </span>
             </div>
-            <span id="premiumBadge" class="badge bg-warning text-dark mt-2 d-none">
-                <i class="bi bi-star-fill"></i> Premium
-            </span>
-          </div>
         </header>
 
         <div id="auth-section" class="mx-auto mb-4" style="padding:1em; border:1px solid #ccc; max-width:400px;">
@@ -72,7 +344,6 @@
             <div id="user-info" style="margin-top:1em; color:green;"></div>
         </div>
 
-        <!-- Premium Modalı -->
         <div class="modal fade" id="premiumModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -84,12 +355,7 @@
                         <div id="premiumLoginForm">
                             <div class="mb-3">
                                 <label for="premiumPassword" class="form-label">Premium Şifre</label>
-                                <div class="input-group">
-                                  <input type="password" class="form-control" id="premiumPassword" placeholder="Premium şifrenizi girin">
-                                  <button class="btn btn-outline-secondary" type="button" id="togglePremiumPassword" tabindex="-1" aria-label="Şifreyi göster/gizle">
-                                    <i class="bi bi-eye"></i>
-                                  </button>
-                                </div>
+                                <input type="password" class="form-control" id="premiumPassword" placeholder="Premium şifrenizi girin">
                                 <div class="form-text">Deneme şifresi: 1234567890</div>
                             </div>
                             <button id="premiumLoginBtn" class="btn btn-warning w-100">Premium Giriş</button>
@@ -116,6 +382,9 @@
             </div>
         </div>
 
+  
+
+  
         <div class="card search-card mb-3">
             <div class="card-body">
                 <div class="input-group">
@@ -153,6 +422,8 @@
                             <i class="bi bi-check-circle"></i>
                         </button>
                     </div>
+
+
                 </div>
             </div>
 
@@ -221,33 +492,31 @@
                     <div id="wordLimitAlert" class="alert alert-warning mt-2 d-none">
                         <i class="bi bi-exclamation-triangle"></i> Ücretsiz sürümde maksimum 100 kelime ekleyebilirsiniz. Premium üye olun!
                     </div>
-                </div>
-            </div>   
+            
         </main>
 
         <div class="social-media-bar text-center py-3">
-          <div class="d-flex justify-content-center gap-3">
-              <a href="https://wa.me/+905309082276" class="social-btn btn btn-success" data-bs-toggle="tooltip" title="WhatsApp">
-                  <i class="bi bi-whatsapp"></i>
-              </a>
-              <a href="https://t.me/osmanlicaogren" class="social-btn btn btn-primary" data-bs-toggle="tooltip" title="Telegram">
-                  <i class="bi bi-telegram"></i>
-              </a>
-              <a href="mailto:ozzasci@gmail.com" class="social-btn btn btn-danger" data-bs-toggle="tooltip" title="E-mail">
-                  <i class="bi bi-envelope-fill"></i>
-              </a>
-              <a href="destek.html" class="social-btn btn support-btn" data-bs-toggle="tooltip" title="Destek Olun">
-                  <i class="bi bi-heart-fill"></i>
-              </a>
-          </div>
-        </div>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="https://wa.me/+905309082276" class="social-btn btn btn-success" data-bs-toggle="tooltip" title="WhatsApp">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="https://t.me/osmanlicaogren" class="social-btn btn btn-primary" data-bs-toggle="tooltip" title="Telegram">
+            <i class="bi bi-telegram"></i>
+        </a>
+        <a href="mailto:ozzasci@gmail.com" class="social-btn btn btn-danger" data-bs-toggle="tooltip" title="E-mail">
+            <i class="bi bi-envelope-fill"></i>
+        </a>
+        <a href="destek.html" class="social-btn btn support-btn" data-bs-toggle="tooltip" title="Destek Olun">
+            <i class="bi bi-heart-fill"></i>
+        </a>
+    </div>
+</div>
 
-        <footer>
-            <div class="text-center py-2 border-top small">
-                &copy; <span id="copyrightYear">2025</span> Osmanlıca Öğren | Tüm Hakları Saklıdır
-            </div>
-        </footer>
-      </div>
+<footer>
+    <div class="text-center py-2 border-top small">
+        &copy; 2025 Osmanlıca Öğren | Tüm Hakları Saklıdır
+    </div>
+</footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -257,47 +526,44 @@
     <script src="firebase-init.js"></script>
     <script src="auth.js"></script>
     <script src="app.js"></script>
-    <script src="menu.js"></script>
     <script>
-      // Premium şifre göster/gizle
-      document.getElementById('togglePremiumPassword')?.addEventListener('click', function () {
-        const input = document.getElementById('premiumPassword');
-        const icon = this.querySelector('i');
-        if (input.type === "password") {
-          input.type = "text";
-          icon.classList.remove('bi-eye');
-          icon.classList.add('bi-eye-slash');
-        } else {
-          input.type = "password";
-          icon.classList.remove('bi-eye-slash');
-          icon.classList.add('bi-eye');
-        }
-      });
-
-      // Günün sözü (örnek)
-      const sozler = [
-        { metin: "Geçmişin izinde, harflerin hikâyesini keşfet.", yazar: "Anonim" },
-        { metin: "Kalemin izinde, tarihin derinliklerine yolculuk.", yazar: "Anonim" },
-        { metin: "Bir harf, bir medeniyetin anahtarıdır.", yazar: "İsmail Kara" },
-        { metin: "Osmanlıca bir lisan değil, bir mirastır.", yazar: "Prof. Dr. Ekmeleddin İhsanoğlu" },
-        { metin: "Köklere dönüş, harflerle başlar.", yazar: "Anonim" },
-        { metin: "Ecdadın sesi, satırlarda yankılanır.", yazar: "Anonim" },
-        { metin: "Osmanlıca: Gönülden kaleme akan hikâye.", yazar: "Mehmet Genç" }
-      ];
-      const tarih = new Date().toDateString();
-      const hash = [...tarih].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const gunlukSoz = sozler[hash % sozler.length];
-      document.getElementById("sloganText").textContent = `"${gunlukSoz.metin}"`;
-      document.getElementById("yazarText").textContent = `– ${gunlukSoz.yazar}`;
-
-      // Copyright yılını otomatik ayarla
-      document.getElementById("copyrightYear").textContent = new Date().getFullYear();
-
-      // Bootstrap tooltipler
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new bootstrap.Tooltip(tooltipTriggerEl)
-      });
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     </script>
+
+<script>
+  const sozler = [
+    { metin: "Geçmişin izinde, harflerin hikâyesini keşfet.", yazar: "Anonim" },
+    { metin: "Kalemin izinde, tarihin derinliklerine yolculuk.", yazar: "Anonim" },
+    { metin: "Bir harf, bir medeniyetin anahtarıdır.", yazar: "İsmail Kara" },
+    { metin: "Osmanlıca bir lisan değil, bir mirastır.", yazar: "Prof. Dr. Ekmeleddin İhsanoğlu" },
+    { metin: "Köklere dönüş, harflerle başlar.", yazar: "Anonim" },
+    { metin: "Ecdadın sesi, satırlarda yankılanır.", yazar: "Anonim" },
+    { metin: "Osmanlıca: Gönülden kaleme akan hikâye.", yazar: "Mehmet Genç" }
+  ];
+
+  const tarih = new Date().toDateString(); // Aynı gün aynı söz için
+  const hash = [...tarih].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const gunlukSoz = sozler[hash % sozler.length];
+
+  document.getElementById("sloganText").textContent = `"${gunlukSoz.metin}"`;
+  document.getElementById("yazarText").textContent = `– ${gunlukSoz.yazar}`;
+</script>
+ <script>
+    const muzik = document.getElementById("arkaPlanMuzik");
+    let muzikCaliyor = true;
+
+    function muzikToggle() {
+      if(muzikCaliyor) {
+        muzik.pause();
+        muzikCaliyor = false;
+      } else {
+        muzik.play();
+        muzikCaliyor = true;
+      }
+    }
+  </script>
 </body>
 </html>
