@@ -1,346 +1,329 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil ve İstatistikler</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profilim | Osmanlıca Öğren</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #f8f9fa;
+      background-color: var(--bs-body-bg);
+      color: var(--bs-body-color);
+      transition: background 0.4s, color 0.4s;
     }
-    .profile-header {
+    .profile-card {
+      max-width: 430px;
+      margin: 0 auto;
+      background: var(--bs-card-bg);
+      border-radius: 1.2rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 2.5rem 2rem 2rem 2rem;
       text-align: center;
-      margin-bottom: 2rem;
+      position: relative;
     }
-    .profile-avatar {
-      width: 120px;
-      height: 120px;
+    .avatar {
+      width: 128px;
+      height: 128px;
       border-radius: 50%;
       object-fit: cover;
-      border: 4px solid #0d6efd;
+      border: 5px solid var(--bs-primary);
+      margin-bottom: 1rem;
+    }
+    .edit-btn {
+      cursor: pointer;
+      color: var(--bs-primary);
+      font-size: 1.1rem;
+      margin-left: 0.5rem;
     }
     .badge-premium {
-      background-color: gold;
-      color: black;
-      font-weight: bold;
+      background: linear-gradient(90deg, #ffe066, #fff3bf);
+      color: #6c4e00;
+      font-weight: 600;
+      border-radius: 1rem;
+      padding: 0.35em 1.1em;
+      margin-left: 0.4em;
+      font-size: 1em;
     }
-    .stats-card {
-      border-left: 4px solid #0d6efd;
-    }
-    .level-badge {
-      font-size: 1rem;
-      font-weight: bold;
-    }
-    .progress {
-      height: 20px;
-    }
-    .table thead {
-      background-color: #e9ecef;
-    }
-    #imageInput {
-      display: none;
-    }
-    .change-photo {
+    .theme-toggle {
+      position: absolute;
+      top: 1.1rem;
+      right: 1.1rem;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--bs-secondary);
       cursor: pointer;
-      color: #0d6efd;
-      text-decoration: underline;
-      font-size: 0.9rem;
+      z-index: 10;
     }
-    [contenteditable] {
-      border-bottom: 1px dashed #ccc;
-      padding: 2px 4px;
-      cursor: text;
+    .stats-row .card {
+      border-radius: 1rem;
+      min-width: 130px;
+      margin-bottom: 1rem;
     }
-  
-<style>
-.social-icon {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 50px;
-  height: 50px;
-  background-color: #0d6efd;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-  z-index: 9999;
-  animation: pulse 2s infinite;
-}
-.social-icon:hover {
-  transform: scale(1.2) rotate(-10deg);
-  background-color: #084298;
-}
-@media (max-width: 768px) {
-  .social-icon {
-    bottom: 60px;
-  }
-}
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
-}
-</style>
-
-</style>
+    .rozetler-area {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    .rozet-badge {
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .rozet-badge:hover {
+      transform: scale(1.08) rotate(-5deg);
+    }
+    .custom-tooltip {
+      --bs-tooltip-bg: #212529;
+      --bs-tooltip-color: #ffc107;
+    }
+    @media (max-width: 575px) {
+      .profile-card {
+        padding: 1.2rem 0.5rem;
+      }
+      .stats-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
 </head>
-<body>
-  <div class="container py-5">
-    <div class="profile-header">
-      <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" alt="Profil Resmi" class="profile-avatar mb-3">
+<body data-bs-theme="light">
+  <main class="container py-4">
+    <section class="profile-card shadow">
+      <button id="themeToggle" class="theme-toggle" aria-label="Tema değiştir">
+        <i id="themeIcon" class="bi bi-moon"></i>
+      </button>
+      <img id="avatar" class="avatar" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" alt="Profil resmi">
       <div>
-        <span class="change-photo" onclick="document.getElementById('imageInput').click()">Profil Fotoğrafını Değiştir</span>
-        <input type="file" id="imageInput" accept="image/*">
+        <label for="avatarInput" class="edit-btn" title="Profil fotoğrafını değiştir">
+          <i class="bi bi-pencil-square"></i>
+        </label>
+        <input type="file" accept="image/*" id="avatarInput" style="display:none">
       </div>
-      <!-- DÜZENLENEBİLİR ALANLAR -->
-      <h3 id="userName" contenteditable="true">Kullanıcı Adı</h3>
-      <p id="userEmail" contenteditable="true" class="text-muted">eposta@example.com</p>
-      <span id="premiumBadge" class="badge badge-premium"><i class="bi bi-star-fill"></i> Premium Üye</span>
+      <h2 id="adSoyad" class="mt-2 mb-0" contenteditable="true" spellcheck="false" aria-label="Adınızı düzenleyin" tabindex="0">Ad Soyad</h2>
+      <p id="eposta" class="text-secondary mb-1" contenteditable="true" spellcheck="false" aria-label="Eposta adresinizi düzenleyin" tabindex="0">mail@example.com</p>
+      <span id="premiumBadge" class="badge-premium d-inline-flex align-items-center" style="display:none;">
+        <i class="bi bi-star-fill me-1"></i> Premium Üye
+      </span>
       <div class="mt-2">
-        <span id="levelBadge" class="level-badge badge bg-primary">Seviye 1</span>
+        <span id="levelBadge" class="badge bg-primary fs-6">Seviye 1</span>
       </div>
-    </div>
+    </section>
 
-    <!-- İSTATİSTİKLER -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-4">
-        <div class="card shadow-sm stats-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Bilinen Kelime</h5>
-            <h2 id="kelimeSayisi" class="text-success">0</h2>
+    <section class="row justify-content-center stats-row my-4 gy-2">
+      <div class="col-12 col-sm-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <div class="fs-2 text-success" id="kelimeSayisi">0</div>
+            <div class="fw-bold">Bilinen Kelime</div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm stats-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Çözülmüş Quiz</h5>
-            <h2 id="quizSayisi" class="text-info">0</h2>
+      <div class="col-12 col-sm-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <div class="fs-2 text-info" id="quizSayisi">0</div>
+            <div class="fw-bold">Çözülmüş Quiz</div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card shadow-sm stats-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Başarı Oranı</h5>
-            <h2 id="basariOrani" class="text-warning">0%</h2>
+      <div class="col-12 col-sm-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <div class="fs-2 text-warning" id="basariOrani">0%</div>
+            <div class="fw-bold">Başarı Oranı</div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- GRAFİK -->
-    <div class="card shadow-sm mb-4">
+    <section class="card shadow-sm my-4">
       <div class="card-body">
-        <h5 class="card-title d-flex justify-content-between align-items-center">
-          Günlük Çözüm Geçmişi
-          <select id="grafikFiltre" class="form-select form-select-sm w-auto">
-            <option value="7">Son 7 Gün</option>
-            <option value="14">Son 14 Gün</option>
-            <option value="30">Son 30 Gün</option>
-          </select>
-        </h5>
-        <canvas id="progressChart" height="100"></canvas>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Son Quizler</h5>
+          <button class="btn btn-sm btn-outline-primary" id="refreshQuiz" title="Quizleri yenile"><i class="bi bi-arrow-repeat"></i></button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Tarih</th>
+                <th scope="col">Quiz</th>
+                <th scope="col">Skor</th>
+              </tr>
+            </thead>
+            <tbody id="quizTable"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- SON QUIZLER -->
-    <div class="card shadow-sm mb-4">
+    <section class="card shadow-sm my-4">
       <div class="card-body">
-        <h5 class="card-title">Son Quizler</h5>
-        <table class="table table-hover">
-          <thead>
-            <tr><th>Tarih</th><th>Quiz Adı</th><th>Skor</th></tr>
-          </thead>
-          <tbody id="quizListesi"></tbody>
-        </table>
+        <h5 class="mb-2">Kazanılan Rozetler</h5>
+        <div id="rozetler" class="rozetler-area"></div>
       </div>
-    </div>
+    </section>
 
-    <!-- ROZETLER -->
-    <div class="card shadow-sm mb-4">
+    <section class="card shadow-sm my-4">
       <div class="card-body">
-        <h5 class="card-title">Kazanılan Rozetler</h5>
-        <div id="rozetAlani" class="d-flex flex-wrap gap-2"></div>
-      </div>
-    </div>
-
-    <!-- GÜNÜN SÖZÜ -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Günün Sözü</h5>
-        <blockquote id="gununSozu" class="blockquote mb-0 text-start">
-          <p>Yükleniyor...</p>
-          <footer class="blockquote-footer">Kaynak Bekleniyor</footer>
+        <h5 class="mb-2">Günün Sözü</h5>
+        <blockquote class="blockquote mb-0">
+          <p id="gununSozu">...</p>
+          <footer class="blockquote-footer" id="gununSozuYazar"></footer>
         </blockquote>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    function grafikVerileri(gun) {
-      const bugun = new Date();
-      const etiketler = [];
-      const veriler = [];
-      for (let i = gun - 1; i >= 0; i--) {
-        const tarih = new Date(bugun);
-        tarih.setDate(bugun.getDate() - i);
-        etiketler.push(`${tarih.getDate()} ${tarih.toLocaleString("tr-TR", { month: "short" })}`);
-        veriler.push(Math.floor(Math.random() * 7));
-      }
-      return { etiketler, veriler };
-    }
-
-    // localStorage kullanıcı bilgisi
-    const kullanici = JSON.parse(localStorage.getItem("kullaniciBilgileri")) || {
-      ad: "Ahmet Yılmaz",
-      email: "ahmet@example.com",
-      kelime: 275,
-      quiz: 42,
-      basariOrani: 89,
-      seviye: 3,
+    // Varsayılan kullanıcı verisi
+    const defaultUser = {
+      ad: "Zeynep Aksoy",
+      eposta: "zeynep@example.com",
+      kelime: 180,
+      quiz: 29,
+      basariOrani: 86,
+      seviye: 2,
       premium: true,
-      profilResmi: "https://via.placeholder.com/120",
-      rozetler: ["ilk50", "10quiz", "aktif"],
+      profilResmi: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
+      rozetler: [
+        { kod: "ilk50", ad: "İlk 50 Kelime", aciklama: "İlk 50 kelimeyi öğrendi", icon: "bi-book", renk: "success" },
+        { kod: "10quiz", ad: "10 Quiz Tamamlandı", aciklama: "10 farklı quiz çözdü", icon: "bi-clipboard-check", renk: "info" },
+        { kod: "aktif", ad: "Aktif Öğrenci", aciklama: "7 gün üst üste giriş yaptı", icon: "bi-lightning-charge", renk: "warning" }
+      ],
       quizler: [
-        { tarih: "10 Temmuz", ad: "1. Kur Testi", skor: "85%" },
-        { tarih: "8 Temmuz", ad: "Rika Hattı", skor: "90%" },
-        { tarih: "5 Temmuz", ad: "Mezar Taşları", skor: "100%" }
+        { tarih: "10 Ağustos", ad: "Kur 2 Testi", skor: "90%" },
+        { tarih: "5 Ağustos", ad: "Sözlük Testi", skor: "80%" },
+        { tarih: "2 Ağustos", ad: "Harf Bilgisi", skor: "100%" }
       ]
     };
 
-    // Sayfaya bilgileri yaz
-    document.getElementById("userName").textContent = kullanici.ad;
-    document.getElementById("userEmail").textContent = kullanici.email;
-    document.getElementById("profileImage").src = kullanici.profilResmi;
-    document.getElementById("levelBadge").textContent = `Seviye ${kullanici.seviye}`;
-    document.getElementById("kelimeSayisi").textContent = kullanici.kelime;
-    document.getElementById("quizSayisi").textContent = kullanici.quiz;
-    document.getElementById("basariOrani").textContent = `${kullanici.basariOrani}%`;
-    if (!kullanici.premium) document.getElementById("premiumBadge").style.display = "none";
+    function loadUser() {
+      return JSON.parse(localStorage.getItem("profilUser")) || defaultUser;
+    }
+    function saveUser(data) {
+      localStorage.setItem("profilUser", JSON.stringify(data));
+    }
 
-    // Quiz tablosu
-    const quizBody = document.getElementById("quizListesi");
-    kullanici.quizler.forEach(q => {
-      quizBody.innerHTML += `<tr><td>${q.tarih}</td><td>${q.ad}</td><td>${q.skor}</td></tr>`;
-    });
+    let user = loadUser();
+
+    // Kişisel bilgiler
+    function renderProfile() {
+      document.getElementById("adSoyad").textContent = user.ad;
+      document.getElementById("eposta").textContent = user.eposta;
+      document.getElementById("avatar").src = user.profilResmi;
+      document.getElementById("levelBadge").textContent = `Seviye ${user.seviye}`;
+      document.getElementById("premiumBadge").style.display = user.premium ? "inline-flex" : "none";
+    }
+
+    // İstatistikler
+    function renderStats() {
+      document.getElementById("kelimeSayisi").textContent = user.kelime;
+      document.getElementById("quizSayisi").textContent = user.quiz;
+      document.getElementById("basariOrani").textContent = user.basariOrani + "%";
+    }
+
+    // Quiz Tablosu
+    function renderQuizTable() {
+      const tbody = document.getElementById("quizTable");
+      tbody.innerHTML = "";
+      user.quizler.forEach(q =>
+        tbody.innerHTML += `<tr>
+          <td>${q.tarih}</td>
+          <td>${q.ad}</td>
+          <td>${q.skor}</td>
+        </tr>`
+      );
+    }
 
     // Rozetler
-    const badgeMap = {
-      "ilk50": `<span class="badge bg-success"><i class="bi bi-book"></i> İlk 50 Kelime</span>`,
-      "10quiz": `<span class="badge bg-info"><i class="bi bi-clipboard-check"></i> 10 Quiz Tamamlandı</span>`,
-      "aktif": `<span class="badge bg-warning text-dark"><i class="bi bi-lightning-charge"></i> Aktif Öğrenci</span>`
-    };
-    const rozetAlani = document.getElementById("rozetAlani");
-    kullanici.rozetler.forEach(r => {
-      if (badgeMap[r]) rozetAlani.innerHTML += badgeMap[r];
-    });
+    function renderRozetler() {
+      const area = document.getElementById("rozetler");
+      area.innerHTML = "";
+      user.rozetler.forEach(r => {
+        area.innerHTML += `
+          <span class="badge bg-${r.renk} rozet-badge" data-bs-toggle="tooltip" data-bs-title="${r.aciklama}">
+            <i class="bi ${r.icon} me-1"></i> ${r.ad}
+          </span>`;
+      });
+      // Bootstrap tooltip initialize
+      const tooltipTriggerList = [].slice.call(area.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(el => new bootstrap.Tooltip(el, {customClass:'custom-tooltip'}));
+    }
 
-    // Grafik
-    let baslangicVeri = grafikVerileri(7);
-    const ctx = document.getElementById('progressChart').getContext('2d');
-    const quizChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: baslangicVeri.etiketler,
-        datasets: [{
-          label: 'Çözülen Quiz Sayısı',
-          data: baslangicVeri.veriler,
-          borderColor: '#0d6efd',
-          backgroundColor: 'rgba(13, 110, 253, 0.2)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
+    // Günün Sözü
+    function renderGununSozu() {
+      const sozler = [
+        { metin: "İlim Çin’de dahi olsa gidip alınız.", yazar: "Hz. Muhammed (s.a.v)" },
+        { metin: "Marifet iltifata tabidir.", yazar: "Şeyh Edebali" },
+        { metin: "Söz gümüşse sükût altındır.", yazar: "Osmanlı Atasözü" },
+        { metin: "Adalet mülkün temelidir.", yazar: "Hz. Ömer (r.a.)" },
+        { metin: "Kalpten çıkan söz kalbe gider.", yazar: "Mevlana" }
+      ];
+      const r = sozler[Math.floor(Math.random() * sozler.length)];
+      document.getElementById("gununSozu").textContent = `"${r.metin}"`;
+      document.getElementById("gununSozuYazar").textContent = r.yazar;
+    }
 
-    document.getElementById("grafikFiltre").addEventListener("change", function () {
-      const gun = parseInt(this.value);
-      const yeniVeri = grafikVerileri(gun);
-      quizChart.data.labels = yeniVeri.etiketler;
-      quizChart.data.datasets[0].data = yeniVeri.veriler;
-      quizChart.update();
-    });
-
-    // PROFİL RESMİ DEĞİŞTİR
-    document.getElementById("imageInput").addEventListener("change", function (event) {
-      const file = event.target.files[0];
+    // Profil resmi yükleme
+    document.getElementById("avatarInput").addEventListener("change", e => {
+      const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function (e) {
-        document.getElementById("profileImage").src = e.target.result;
-        kullanici.profilResmi = e.target.result;
-        localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
+      reader.onload = function(evt) {
+        user.profilResmi = evt.target.result;
+        saveUser(user);
+        renderProfile();
       };
       reader.readAsDataURL(file);
     });
 
-    // AD VE EMAİL DÜZENLEME VE KAYDETME
-    document.getElementById("userName").addEventListener("input", function () {
-      kullanici.ad = this.textContent;
-      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
+    // Ad ve e-posta düzenleme
+    document.getElementById("adSoyad").addEventListener("input", function() {
+      user.ad = this.textContent.trim().slice(0, 40);
+      saveUser(user);
+    });
+    document.getElementById("eposta").addEventListener("input", function() {
+      user.eposta = this.textContent.trim().slice(0, 60);
+      saveUser(user);
     });
 
-    document.getElementById("userEmail").addEventListener("input", function () {
-      kullanici.email = this.textContent;
-      localStorage.setItem("kullaniciBilgileri", JSON.stringify(kullanici));
+    // Tema değiştirici
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    function setTheme(mode) {
+      document.body.setAttribute("data-bs-theme", mode);
+      themeIcon.className = mode === "dark" ? "bi bi-sun" : "bi bi-moon";
+      localStorage.setItem("profilTheme", mode);
+    }
+    themeToggle.addEventListener("click", () => {
+      const current = document.body.getAttribute("data-bs-theme");
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+    // Kullanıcının tercih ettiği tema
+    setTheme(localStorage.getItem("profilTheme") || "light");
+
+    // Quizleri yenile butonu
+    document.getElementById("refreshQuiz").addEventListener("click", function() {
+      // Demo amaçlı quizleri karıştır
+      user.quizler = user.quizler.sort(() => Math.random() - 0.5);
+      saveUser(user);
+      renderQuizTable();
     });
 
-    // GÜNÜN SÖZÜ
-    const osmanlicaSozler = [
-      { metin: "İlim Çin’de dahi olsa gidip alınız.", yazar: "Hz. Muhammed (s.a.v)" },
-      { metin: "Marifet iltifata tabidir.", yazar: "Şeyh Edebali" },
-      { metin: "Söz gümüşse sükût altındır.", yazar: "Osmanlı Atasözü" },
-      { metin: "Kalpten çıkan söz kalbe gider.", yazar: "Mevlana" },
-      { metin: "Adalet mülkün temelidir.", yazar: "Hz. Ömer (r.a.)" }
-    ];
-    const rastgele = osmanlicaSozler[Math.floor(Math.random() * osmanlicaSozler.length)];
-    document.getElementById("gununSozu").innerHTML = `
-      <p>${rastgele.metin}</p>
-      <footer class="blockquote-footer">${rastgele.yazar}</footer>
-    `;
+    // Sayfa yüklenince her şeyi çiz
+    renderProfile();
+    renderStats();
+    renderQuizTable();
+    renderRozetler();
+    renderGununSozu();
   </script>
-
-<a href="index.html" id="geriButon" class="social-icon" data-bs-toggle="tooltip" title="Ana Sayfaya Dön">
-  <i class="bi bi-house-door-fill"></i>
-</a>
-<audio id="clickSound" src="click.mp3" preload="auto"></audio>
-
-
-<script>
-  // DOM yüklendikten sonra çalıştır
-    document.addEventListener('DOMContentLoaded', function() {
-      // Tooltip'leri başlat
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-        new bootstrap.Tooltip(tooltipTriggerEl);
-      });
-
-  const geriButon = document.getElementById("geriButon");
-  const clickSound = document.getElementById("clickSound");
-  geriButon.addEventListener("click", function () {
-    clickSound.play();
-  });
-
-
 </body>
 </html>
