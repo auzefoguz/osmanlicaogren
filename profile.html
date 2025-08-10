@@ -81,6 +81,10 @@
       --bs-tooltip-bg: #212529;
       --bs-tooltip-color: #ffc107;
     }
+    .stat-btn {
+      margin-top: 0.5em;
+      font-size: 0.9em;
+    }
     @media (max-width: 575px) {
       .profile-card {
         padding: 1.2rem 0.5rem;
@@ -121,6 +125,7 @@
           <div class="card-body">
             <div class="fs-2 text-success" id="kelimeSayisi">0</div>
             <div class="fw-bold">Bilinen Kelime</div>
+            <button class="btn btn-outline-success btn-sm stat-btn" id="kelimeEkleBtn"><i class="bi bi-plus-circle"></i> Kelime Ekle</button>
           </div>
         </div>
       </div>
@@ -129,6 +134,7 @@
           <div class="card-body">
             <div class="fs-2 text-info" id="quizSayisi">0</div>
             <div class="fw-bold">Çözülmüş Quiz</div>
+            <button class="btn btn-outline-info btn-sm stat-btn" id="quizEkleBtn"><i class="bi bi-plus-circle"></i> Quiz Çöz</button>
           </div>
         </div>
       </div>
@@ -137,6 +143,7 @@
           <div class="card-body">
             <div class="fs-2 text-warning" id="basariOrani">0%</div>
             <div class="fw-bold">Başarı Oranı</div>
+            <button class="btn btn-outline-warning btn-sm stat-btn" id="basariArtirBtn"><i class="bi bi-plus-circle"></i> +5%</button>
           </div>
         </div>
       </div>
@@ -316,6 +323,23 @@
       user.quizler = user.quizler.sort(() => Math.random() - 0.5);
       saveUser(user);
       renderQuizTable();
+    });
+
+    // === DİNAMİK İSTATİSTİK BUTONLARI ===
+    document.getElementById("kelimeEkleBtn").addEventListener("click", function() {
+      user.kelime++;
+      saveUser(user);
+      renderStats();
+    });
+    document.getElementById("quizEkleBtn").addEventListener("click", function() {
+      user.quiz++;
+      saveUser(user);
+      renderStats();
+    });
+    document.getElementById("basariArtirBtn").addEventListener("click", function() {
+      user.basariOrani = Math.min(user.basariOrani + 5, 100);
+      saveUser(user);
+      renderStats();
     });
 
     // Sayfa yüklenince her şeyi çiz
